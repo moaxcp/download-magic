@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
+import penny.downloadmanager.control.AddDialogControl;
 
 /**
  *
@@ -51,7 +52,6 @@ public class AddDialogModel {
     private String addURL;
     private String listFileName;
     private String listType;
-    private String selectedConnection;
     private EventList<URL> urls;
 
     private boolean visible;
@@ -64,7 +64,6 @@ public class AddDialogModel {
         addURL = "";
         listFileName = "";
         listType = "";
-        selectedConnection = "";
         urls = new BasicEventList<URL>();
         visible = false;
         propertySupport = new SwingPropertyChangeSupport(this, true);
@@ -135,22 +134,6 @@ public class AddDialogModel {
     }
 
     /**
-     * @return the selectedConnection
-     */
-    public String getSelectedConnection() {
-        return selectedConnection;
-    }
-
-    /**
-     * @param selectedConnection the selectedConnection to set
-     */
-    public void setSelectedConnection(String selectedConnection) {
-        String oldValue = this.selectedConnection;
-        this.selectedConnection = selectedConnection;
-        propertySupport.firePropertyChange(PROP_SELECTEDCONNECTION, oldValue, selectedConnection);
-    }
-
-    /**
      * @return the urls
      */
     public URL getUrl(int index) {
@@ -187,6 +170,14 @@ public class AddDialogModel {
         boolean oldValue = this.visible;
         this.visible = visible;
         propertySupport.firePropertyChange(PROP_VISIBLE, oldValue, visible);
+    }
+
+    public void clearDialog() {
+        clearUrls();
+        setListType(AddDialogControl.COM_WHITESPACE);
+        setListFileName("");
+        setSelectedPanel(PanelList.URL);
+        setAddURL("");
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
