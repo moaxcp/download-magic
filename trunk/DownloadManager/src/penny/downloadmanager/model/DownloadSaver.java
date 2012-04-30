@@ -108,6 +108,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     changeList.getReadWriteLock().readLock().unlock();
                     dao.updateDownload(d3, DownloadData.PROP_MD5);
                     dao.updateDownload(d3, DownloadData.PROP_LINKSTATE);
+                    dao.updateDownload(d3, DownloadData.PROP_WORDBUFFER);
                     break;
             }
         }
