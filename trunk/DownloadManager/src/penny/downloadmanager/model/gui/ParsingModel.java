@@ -29,11 +29,11 @@ public class ParsingModel implements Serializable {
 
     public ParsingModel() {
         parseLinks = true;
-        parseUnknownLinks = false;
+        parseUnknownLinks = true;
         parseLinksTypes = new BasicEventList<String>();
         parseLinksTypes.add("text");
         parseWords = true;
-        parseUnknownWords = false;
+        parseUnknownWords = true;
         parseWordsTypes = new BasicEventList<String>();
         parseWordsTypes.add("text");
     }
