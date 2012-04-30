@@ -19,8 +19,13 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JTable;
+import penny.downloadmanager.view.View;
 
 /**
  *
@@ -54,6 +59,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     private TaskManager taskManager;
     private RandomChanges randomChanges;
     private JTable downloadTable;
+    private List<DownloadDataView> downloadViews;
 
     public MainWindowControl(MainWindowModel mainModel, AddDialogModel addModel, AddTaskModel addTaskModel, SettingsDialogModel settingsModel, TaskManager taskManager) {
         this.settingsModel = settingsModel;
@@ -63,6 +69,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
 
         this.taskManager = taskManager;
         randomChanges = new RandomChanges(mainModel.getDownloads());
+        downloadViews = new ArrayList<DownloadDataView>();
     }
 
     public void setDownloadTable(JTable downloadTable) {
@@ -80,6 +87,25 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
         }
     }
 
+    public void openDownloadView(DownloadData download) {
+            DownloadDataView view = null;
+
+            for(DownloadDataView v : downloadViews) {
+                if(v.getDownload().equals(mainModel.getSelectedDownload())) {
+                    view = v;
+                    break;
+                }
+            }
+
+            if(view == null) {
+                view = new DownloadDataView(mainModel.getSelectedDownload());
+                downloadViews.add(view);
+            }
+
+            view.setVisible(true);
+            view.addWindowListener(this);
+    }
+
     public void actionPerformed(ActionEvent e) {
 
         if (e.getActionCommand().equals(COM_RANDOM)) {
@@ -95,7 +121,9 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
         } else if (e.getActionCommand().equals(COM_SETTINGS)) {
             settingsModel.setVisible(true);
         } else if (e.getActionCommand().equals(COM_PROPERTIES) && mainModel.getSelectedDownload() != null) {
-            new DownloadDataView(mainModel.getSelectedDownload()).setVisible(true);
+
+            openDownloadView(mainModel.getSelectedDownload());
+
         } else if (e.getActionCommand().equals(COM_REMOVEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
             mainModel.getDownloads().remove(mainModel.getSelectedDownload());
         } else if (e.getActionCommand().equals(COM_QUEUEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
@@ -172,7 +200,13 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
 
     @Override
     public void windowClosing(WindowEvent e) {
-        exit();
+        if(e.getWindow().equals(View.getMainWindowView())) {
+            exit();
+        } else if(e.getWindow() instanceof DownloadDataView) {
+            ((DownloadDataView) e.getWindow()).removeWindowListener(this);
+            downloadViews.remove((DownloadDataView) e.getWindow());
+
+        }
     }
 
     @Override
@@ -198,7 +232,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource().equals(downloadTable) && e.getClickCount() >= 2) {
-            new DownloadDataView(mainModel.getSelectedDownload()).setVisible(true);
+            openDownloadView(mainModel.getSelectedDownload());
         }
     }
 
