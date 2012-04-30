@@ -1,3 +1,4 @@
+#labels java,md5
 Create a recoverable MD5. This means an MD5 process that can be stopped and restarted without having to reprocess the source. The MD5State is serializable and may be saved at anytime.
 
 This md5 implementation is perfect for ranged protocols such as HTTP and FTP where a stream can be started in the middle of a file. It makes it easier to recover an already calculated md5 of a partial file and start the calculation over with a new ranged connection through HTTP or FTP. Otherwise users will have to recalculate the MD5 of the partial file and start the ranged connection.
