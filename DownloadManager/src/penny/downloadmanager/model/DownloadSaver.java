@@ -32,6 +32,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
         saveProps = new ArrayList<String>();
         saveProps.add(DownloadData.PROP_CONTENTTYPE);
         saveProps.add(DownloadData.PROP_DOWNLOADTIME);
+        saveProps.add(DownloadData.PROP_DOWNLOADED);
         saveProps.add(DownloadData.PROP_FILE);
         saveProps.add(DownloadData.PROP_FILEEXTENTION);
         saveProps.add(DownloadData.PROP_HOST);
