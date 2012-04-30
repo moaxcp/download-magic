@@ -83,11 +83,11 @@ public class JavaDBDataSource {
             + ")";
     private String strCreateMD5StateType =
             "create type MD5STATE\n " +
-            "EXTERNAL NAME 'com.johnmercier.recmd5.MD5State'\n " +
+            "EXTERNAL NAME 'penny.recmd5.MD5State'\n " +
             "LANGUAGE JAVA";
     private String strCreateLinkStateType =
             "create type LinkState\n " +
-            "EXTERNAL NAME 'com.johnmercier.parser.LinkState'\n " +
+            "EXTERNAL NAME 'penny.parser.LinkState'\n " +
             "LANGUAGE JAVA";
     private String strCreateObjectType =
             "create type OBJECT\n " +
@@ -95,7 +95,7 @@ public class JavaDBDataSource {
             "LANGUAGE JAVA";
     private String strCreateDownloadStatusType =
             "create type DownloadStatus\n " +
-            "EXTERNAL NAME 'com.johnmercier.download.DownloadStatus'\n " +
+            "EXTERNAL NAME 'penny.download.DownloadStatus'\n " +
             "LANGUAGE JAVA";
     private String strCreateListType =
             "create type List\n " +
