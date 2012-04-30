@@ -45,6 +45,10 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         jSplitPane1.setDividerLocation(.5);
     }
 
+    public DownloadData getDownload() {
+        return d;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
