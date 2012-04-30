@@ -126,7 +126,6 @@ public class Model {
         applicationSettings = settingsDialogModel.getAppSettings();
         settingsSaver = new ApplicationSettingsSaver("data/settings.dat");
         settingsSaver.setApplicationSettings(applicationSettings);
-        settingsSaver.load();
         settingsDialogModel.getAppSettingsCopy().copy(applicationSettings);
         addDialogModel = new AddDialogModel();
         addTaskModel = new AddTaskModel();
@@ -141,6 +140,7 @@ public class Model {
 
     public static void loadData() {
         try {
+            settingsSaver.load();
             JavaDBDataSource.getInstance().initDB();
             DownloadDAO dao = DAOFactory.getInstance().getDownloadDAO();
             List<DownloadData> downloads1 = dao.getDownloads();
