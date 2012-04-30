@@ -50,6 +50,7 @@ public class AddDialogControl implements ActionListener, WindowListener {
             if (addModel.getSelectedPanel().equals(AddDialogModel.PanelList.URL)) {
                 try {
                     mainControl.add(new URL(addModel.getAddURL()));
+                    addModel.clearDialog();
                     addModel.setVisible(false);
                 } catch (MalformedURLException ex) {
                     JOptionPane.showMessageDialog(null, ex.toString(), "Malformed URL", JOptionPane.ERROR_MESSAGE);
@@ -57,13 +58,16 @@ public class AddDialogControl implements ActionListener, WindowListener {
                 }
             } else if (addModel.getSelectedPanel().equals(AddDialogModel.PanelList.LIST)) {
                 mainControl.add(addModel.getUrls());
+                addModel.clearDialog();
                 addModel.setVisible(false);
             } else if (addModel.getSelectedPanel().equals(AddDialogModel.PanelList.QUERY)) {
+                addModel.clearDialog();
                 addModel.setVisible(false);
             } else {
                 throw new IllegalStateException();
             }
         } else if (e.getActionCommand().equals(COM_CANCEL)) {
+            addModel.clearDialog();
             addModel.setVisible(false);
         } else if (e.getActionCommand().equals(COM_BROWSE)) {
             JFileChooser chooser = new JFileChooser(".");
@@ -90,7 +94,7 @@ public class AddDialogControl implements ActionListener, WindowListener {
                     Logger.getLogger(AddDialogControl.class.getName()).logp(Level.SEVERE, "AddDialogControl", "actionPerformed", ex.toString());
                 }
             } else if(addModel.getListType().equals(COM_SRC)) {
-                
+                //TODO parse using parser
             }
         } else if(e.getActionCommand().equals(COM_WHITESPACE)) {
             addModel.setListType(COM_WHITESPACE);
@@ -99,30 +103,37 @@ public class AddDialogControl implements ActionListener, WindowListener {
         }
     }
 
+    @Override
     public void windowOpened(WindowEvent e) {
 
     }
 
+    @Override
     public void windowClosing(WindowEvent e) {
         addModel.setVisible(false);
     }
 
+    @Override
     public void windowClosed(WindowEvent e) {
 
     }
 
+    @Override
     public void windowIconified(WindowEvent e) {
 
     }
 
+    @Override
     public void windowDeiconified(WindowEvent e) {
 
     }
 
+    @Override
     public void windowActivated(WindowEvent e) {
 
     }
 
+    @Override
     public void windowDeactivated(WindowEvent e) {
 
     }
