@@ -91,6 +91,18 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
         if (name.equals(DownloadData.PROP_RETRYTIME)) {
             return Downloads.formatMilliTimeMilli(download.getRetryTime() / 1000000);
         }
+        if(name.equals(DownloadData.PROP_HREFLINKS)) {
+            return download.getHrefLinks().size();
+        }
+        if(name.equals(DownloadData.PROP_SRCLINKS)) {
+            return download.getSrcLinks().size();
+        }
+        if(name.equals(DownloadData.PROP_WORDS)) {
+            return download.getWords().size();
+        }
+        if(name.equals(DownloadData.PROP_LOCATIONS)) {
+            return download.getLocations().size();
+        }
         return download.getProperty(name);
     }
 
