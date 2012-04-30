@@ -71,6 +71,10 @@ public class ApplicationSettingsSaver {
     }
 
     public void load() {
+        File file = new File(saveFile);
+        if(!file.exists()) {
+            save();
+        }
         FileInputStream fin = null;
         ObjectInputStream ois = null;
         try {
