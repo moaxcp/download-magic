@@ -1,0 +1,1 @@
+The purpose of the Download package is to create an API between the DownloadManager and other APIs that perform the downloading. So far the client APIs supported are Apache HTTP Client 4.1.1 and commons-net 3.0.
