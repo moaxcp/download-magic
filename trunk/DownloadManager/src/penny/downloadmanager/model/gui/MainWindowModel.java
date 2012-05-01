@@ -18,9 +18,11 @@ import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.DownloadDAO;
 import penny.downloadmanager.model.task.TaskData;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
+import penny.downloadmanager.model.Model;
 
 /**
  *
@@ -70,6 +72,9 @@ public class MainWindowModel {
 
     public void clearDownloads() {
         downloadSaver.setSaveDelete(false);
+        for(DownloadData d : downloads) {
+            Model.remove(new File(getSelectedDownload().getTempPath()));
+        }
         downloads.clear();
         DAOFactory.getInstance().getDownloadDAO().clearDownloads();
         downloadSaver.setSaveDelete(true);
@@ -84,6 +89,9 @@ public class MainWindowModel {
             if(j.getStatus() == DownloadStatus.COMPLETE) {
                 remove.add(j);
             }
+        }
+        for(DownloadData d : remove) {
+            Model.remove(new File(getSelectedDownload().getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();
@@ -101,6 +109,9 @@ public class MainWindowModel {
             if(j.getStatus() == DownloadStatus.ERROR) {
                 remove.add(j);
             }
+        }
+        for(DownloadData d : remove) {
+            Model.remove(new File(getSelectedDownload().getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();

@@ -138,6 +138,22 @@ public class Model {
         taskSaver = new TaskSaver(tasks);
     }
 
+    public static void remove(File f) {
+        if (f.isFile()) {
+            f.delete();
+            remove(f.getParentFile());
+        } else if (f.isDirectory()) {
+            if (f.listFiles().length == 0) {
+                File tempFolder = new File(applicationSettings.getSavingModel().getTempFolder());
+                File saveFolder = new File(applicationSettings.getSavingModel().getSaveFolder());
+                if (!f.equals(tempFolder) && !f.equals(saveFolder)) {
+                    f.delete();
+                    remove(f.getParentFile());
+                }
+            }
+        }
+    }
+
     public static void loadData() {
         try {
             settingsSaver.load();

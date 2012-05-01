@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTable;
+import penny.downloadmanager.model.Model;
 import penny.downloadmanager.view.View;
 
 /**
@@ -125,6 +127,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             openDownloadView(mainModel.getSelectedDownload());
 
         } else if (e.getActionCommand().equals(COM_REMOVEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
+            Model.remove(new File(mainModel.getSelectedDownload().getTempPath()));
             mainModel.getDownloads().remove(mainModel.getSelectedDownload());
         } else if (e.getActionCommand().equals(COM_QUEUEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
             mainModel.getSelectedDownload().queue();

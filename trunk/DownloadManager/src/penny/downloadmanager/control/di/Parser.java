@@ -30,7 +30,6 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     private ParsingModel parsingModel;
 
     public Parser() {
-        System.out.println();
         parsingModel = Model.getApplicationSettings().getParsingModel();
         wordExtractor = new WordExtractor(this);
     }
