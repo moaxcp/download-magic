@@ -29,6 +29,7 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JProgressBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import penny.downloadmanager.model.TaskManagerModel;
 
 /**
  *
@@ -39,9 +40,12 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private EventTableModel<DownloadData> downloadTableModel;
     private EventListModel<TaskData> taskListModel;
     private MainWindowModel mainWindowModel;
+    private TaskManagerModel taskModel;
 
-    public MainWindow(MainWindowModel mainWindowModel) {
+    public MainWindow(MainWindowModel mainWindowModel, TaskManagerModel taskModel) {
         this.mainWindowModel = mainWindowModel;
+        this.taskModel = taskModel;
+        taskModel.addPropertyChangeListener(this);
         this.mainWindowModel.addPropertyChnageListener(this);
         downloadTableModel = new EventTableModel<DownloadData>(mainWindowModel.getDownloads(), mainWindowModel.getDownloadFormat());
         mainWindowModel.getDownloads().addListEventListener(this);
@@ -409,7 +413,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             downloadStatus(((DownloadData) evt.getSource()).getStatus());
         } else if (evt.getPropertyName().equals(TaskData.PROP_STATUS)) {
             taskStatus(((TaskData) evt.getSource()).getStatus());
-        } else if(evt.getPropertyName().equals(MainWindowModel.PROP_RUNNING)) {
+        } else if(evt.getPropertyName().equals(TaskManagerModel.PROP_RUNNING)) {
+            System.out.println("is running: " + taskModel.isRunning());
             if(evt.getNewValue().equals(Boolean.TRUE)) {
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);

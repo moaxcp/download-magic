@@ -181,7 +181,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
         }
         mainModel.getTasks().getReadWriteLock().writeLock().unlock();
         taskManager.start();
-        mainModel.setRunning(true);
+        taskManager.getModel().setRunning(true);
     }
 
     private void stopTasks() {
@@ -190,7 +190,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             t.setStatus(Status.STOPPED);
         }
         mainModel.getTasks().getReadWriteLock().writeLock().unlock();
-        mainModel.setRunning(false);
+        taskManager.getModel().setRunning(false);
     }
 
     private void exit() {

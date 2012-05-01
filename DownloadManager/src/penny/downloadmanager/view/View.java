@@ -58,7 +58,7 @@ public class View {
         settingsDialogView = new DownloadSettingsDialog(Model.getSettingsDialogModel());
         Model.getSettingsDialogModel().addPropertyChangeListener(settingsDialogView);
         addDialogView = new AddDialog(Model.getAddDialogModel());
-        mainWindowView = new MainWindow(Model.getMainWindowModel());
+        mainWindowView = new MainWindow(Model.getMainWindowModel(), Model.getTaskManagerModel());
         addTask = new AddTask();
     }
 }
