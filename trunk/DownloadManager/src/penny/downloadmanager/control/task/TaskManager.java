@@ -22,9 +22,11 @@ public class TaskManager {
     private class TaskRunnable implements Runnable {
 
         public void run() {
+            System.out.println("TaskManager finished running is " + model.isRunning());
             model.setRunning(true);
+            System.out.println("TaskManager finished running is " + model.isRunning());
             start:
-            for (int i = 0; i < model.getTasks().size(); i++) {
+            for (int i = 0; i < model.getTasks().size() && model.isRunning(); i++) {
                 TaskData t = model.getTasks().get(i);
                 switch (t.getStatus()) {
                     case QUEUED:
@@ -32,6 +34,7 @@ public class TaskManager {
                             Task.getTask(t).run();
                         } catch (Exception e) {
                             Logger.getLogger(TaskRunnable.class.getName()).log(Level.SEVERE, null, e);
+                            model.setRunning(false);
                         }
                         break;
                     case RUNNING:
@@ -43,11 +46,10 @@ public class TaskManager {
                     case ERROR:
                         break start;
                 }
-                if (!(i < model.getTasks().size())) {
-                    i = 0;
-                }
             }
+            System.out.println("TaskManager finished running is " + model.isRunning());
             model.setRunning(false);
+            System.out.println("TaskManager finished running is " + model.isRunning());
         }
     }
     private Thread thread;
@@ -70,5 +72,9 @@ public class TaskManager {
 
     public void stop() {
         model.setRunning(false);
+    }
+
+    public TaskManagerModel getModel() {
+        return model;
     }
 }

@@ -90,7 +90,6 @@ public class TempFileSaver implements DownloadProcessor {
             } else {
                 switch (savingModel.getTempExistsAction()) {
                     case OVERWRITE:
-                        System.out.println("remove temp");
                         Model.remove(temp);
                         break;
                     case COMPLETE:

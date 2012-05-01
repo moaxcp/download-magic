@@ -55,19 +55,19 @@ public class TaskManagerModel {
         return tasks;
     }
 
-    public void addPropertyChangeSupport(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeSupport(PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(listener);
     }
 
-    public void addPropertyChangeSupport(String prop, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String prop, PropertyChangeListener listener) {
         propertySupport.addPropertyChangeListener(prop, listener);
     }
 
-    public void removePropertyChangeSupport(String prop, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String prop, PropertyChangeListener listener) {
         propertySupport.removePropertyChangeListener(prop, listener);
     }
 }

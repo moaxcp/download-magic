@@ -210,22 +210,6 @@ public class MainWindowModel {
     }
 
     /**
-     * @return the running
-     */
-    public boolean isRunning() {
-        return running;
-    }
-
-    /**
-     * @param running the running to set
-     */
-    public void setRunning(boolean running) {
-        boolean oldValue = this.running;
-        this.running = running;
-        propertySupport.firePropertyChange(PROP_RUNNING, oldValue, running);
-    }
-
-    /**
      * @return the downloadFormat
      */
     public DownloadTableFormat getDownloadFormat() {
