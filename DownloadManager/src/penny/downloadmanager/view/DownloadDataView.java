@@ -473,10 +473,6 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
                     propertyList.add(new PropertyEntry(evt.getPropertyName(), evt.getNewValue().toString()));
                 }
             }
-
         }
     }
-
-    
-
 }

@@ -68,10 +68,6 @@ public class MD5Updater implements DownloadProcessor {
 
     @Override
     public boolean onCheck(Download d) {
-        DownloadData i = (DownloadData) d;
-        if (d.getDownloaded() <= 0 && generate(i)) {
-            i.setMD5(new MD5State());
-        }
         return true;
     }
 
@@ -98,5 +94,9 @@ public class MD5Updater implements DownloadProcessor {
 
     @Override
     public void onInit(Download d) {
+        DownloadData i = (DownloadData) d;
+        if (d.getDownloaded() <= 0 && generate(i)) {
+            i.setMD5(new MD5State());
+        }
     }
 }
