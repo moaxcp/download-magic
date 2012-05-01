@@ -127,7 +127,7 @@ public class Downloader {
 
     private void endInputProcessors(Download d) {
         for (DownloadProcessor i : getProcessors()) {
-                i.onEndInput(d);
+            i.onEndInput(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "stopProcessors", "stop processors for " + d, d);
     }
@@ -172,9 +172,9 @@ public class Downloader {
 
     private ProtocolDownloader getDownloader(String protocol) {
         ProtocolDownloader d = downloaders.get(protocol);
-        if(d == null) {
+        if (d == null) {
             d = ProtocolDownloader.getDownloader(protocol, this);
-            if(d != null) {
+            if (d != null) {
                 downloaders.put(protocol, d);
             } else {
                 throw new IllegalArgumentException(protocol + " does not have a ProtocolDownloader");
@@ -184,7 +184,7 @@ public class Downloader {
     }
 
     public void shutdown() {
-        for(ProtocolDownloader d : downloaders.values()) {
+        for (ProtocolDownloader d : downloaders.values()) {
             d.shutdown();
         }
     }
@@ -198,7 +198,7 @@ public class Downloader {
             } else if (download.getStatus() == DownloadStatus.STOPPED) {
                 break;
             }
-            
+
             download.setStatus(DownloadStatus.STARTED);
 
             download.setAttempts(a);
@@ -207,17 +207,19 @@ public class Downloader {
             initProcessors(download);
             if (!checkProcessors(download)) {
                 resetProcessors(download);
+                download.setDownloaded(0);
             }
-            try {
-                getDownloader(download.getProtocol()).download(download);
-            } catch(IllegalArgumentException e) {
-                download.setStatus(DownloadStatus.ERROR, e.toString());
+            if (download.getStatus() != DownloadStatus.COMPLETE) {
+                try {
+                    getDownloader(download.getProtocol()).download(download);
+                } catch (IllegalArgumentException e) {
+                    download.setStatus(DownloadStatus.ERROR, e.toString());
+                }
             }
-
             if (download.getStatus() == DownloadStatus.COMPLETE) {
                 completeProcessors(download);
             }
-            
+
             if (download.getStatus() == DownloadStatus.ERROR && download.getAttempts() < getdSettings().getMaxDownloadAttempts()) {
                 download.setStatus(DownloadStatus.RETRY);
             }
