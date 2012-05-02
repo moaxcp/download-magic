@@ -414,7 +414,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         } else if (evt.getPropertyName().equals(TaskData.PROP_STATUS)) {
             taskStatus(((TaskData) evt.getSource()).getStatus());
         } else if(evt.getPropertyName().equals(TaskManagerModel.PROP_RUNNING)) {
-            System.out.println("is running: " + taskModel.isRunning());
             if(evt.getNewValue().equals(Boolean.TRUE)) {
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);
