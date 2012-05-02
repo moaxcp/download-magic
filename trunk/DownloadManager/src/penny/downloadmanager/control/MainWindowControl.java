@@ -206,8 +206,10 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
         if(e.getWindow().equals(View.getMainWindowView())) {
             exit();
         } else if(e.getWindow() instanceof DownloadDataView) {
-            ((DownloadDataView) e.getWindow()).removeWindowListener(this);
-            downloadViews.remove((DownloadDataView) e.getWindow());
+            DownloadDataView view = (DownloadDataView) e.getWindow();
+            view.removeWindowListener(this);
+            view.getDownload().removePropertyChangeListener(view);
+            downloadViews.remove(view);
 
         }
     }
