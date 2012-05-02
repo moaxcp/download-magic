@@ -8,7 +8,6 @@
  *
  * Created on Jun 28, 2011, 9:00:04 AM
  */
-
 package penny.downloadmanager.view;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -21,16 +20,16 @@ import penny.downloadmanager.model.DownloadData;
 import penny.downloadmanager.model.gui.PropertyEntry;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import penny.download.Downloads;
 
 /**
  *
  * @author john
  */
 public class DownloadDataView extends javax.swing.JDialog implements PropertyChangeListener {
+
     private DownloadData d;
-
     private EventList<PropertyEntry> propertyList;
-
     private EventTableModel<PropertyEntry> tableModel;
 
     /** Creates new form DownloadDataView */
@@ -38,8 +37,8 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         this.d = d;
         d.addPropertyChangeListener(this);
         this.propertyList = GlazedLists.threadSafeList(new BasicEventList<PropertyEntry>());
-        for(String s : d.getPropertyNames()) {
-            propertyList.add(new PropertyEntry(s, d.getProperty(s).toString()));
+        for (String s : d.getPropertyNames()) {
+            propertyList.add(new PropertyEntry(s, getPropValue(s)));
         }
         tableModel = new EventTableModel<PropertyEntry>(propertyList, new String[]{PropertyEntry.PROP_KEY, PropertyEntry.PROP_VALUE}, new String[]{PropertyEntry.PROP_KEY, PropertyEntry.PROP_VALUE}, new boolean[]{false, false});
         initComponents();
@@ -412,8 +411,6 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private penny.downloadmanager.view.converter.BytesToStringConverter bytesToStringConverter1;
     private penny.downloadmanager.model.DownloadData downloadData;
@@ -464,19 +461,45 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    private String getPropValue(String key) {
+
+        if (key.equals(DownloadData.PROP_HREFLINKS)) {
+            return Integer.toString(d.getHrefLinks().size());
+        } else if (key.equals(DownloadData.PROP_SRCLINKS)) {
+            return Integer.toString(d.getSrcLinks().size());
+        } else if (key.equals(DownloadData.PROP_LOCATIONS)) {
+            return Integer.toString(d.getLocations().size());
+        } else if (key.equals(DownloadData.PROP_WORDS)) {
+            return Integer.toString(d.getWords().size());
+        } else if (key.equals(DownloadData.PROP_DOWNLOADED)) {
+            return Downloads.formatByteSize(d.getDownloaded());
+        } else if (key.equals(DownloadData.PROP_SIZE)) {
+            return Downloads.formatByteSize(d.getSize());
+        } else if(key.equals(DownloadData.PROP_DOWNLOADTIME)) {
+            return Downloads.formatMilliTimeMilli(d.getDownloadTime() / 1000000);
+        } else if(key.equals(DownloadData.PROP_RETRYTIME)) {
+            return Downloads.formatMilliTimeMilli(d.getRetryTime() / 1000000);
+        }
+
+        return d.getProperty(key).toString();
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if(evt.getSource().equals(d)) {
+        if (evt.getSource().equals(d)) {
             boolean add = true;
-            for(PropertyEntry e : propertyList) {
-                if(e.getKey().equals(evt.getPropertyName())) {
-                    e.setValue(evt.getNewValue().toString());
+            PropertyEntry entry = null;
+            for (PropertyEntry e : propertyList) {
+                if (e.getKey().equals(evt.getPropertyName())) {
+                    entry = e;
                     add = false;
                 }
             }
-            if(add) {
-                propertyList.add(new PropertyEntry(evt.getPropertyName(), evt.getNewValue().toString()));
+            if (add) {
+                entry = new PropertyEntry(evt.getPropertyName(), "");
+                propertyList.add(entry);
             }
+            entry.setValue(getPropValue(entry.getKey()));
         }
     }
 }
