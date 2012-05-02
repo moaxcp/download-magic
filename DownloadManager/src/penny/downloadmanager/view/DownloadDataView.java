@@ -13,6 +13,7 @@ package penny.downloadmanager.view;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.GlazedLists;
 import penny.downloadmanager.view.converter.NumberToSizeConverter;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
@@ -36,7 +37,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     public DownloadDataView(DownloadData d) {
         this.d = d;
         d.addPropertyChangeListener(this);
-        this.propertyList = new BasicEventList<PropertyEntry>();
+        this.propertyList = GlazedLists.threadSafeList(new BasicEventList<PropertyEntry>());
         for(String s : d.getPropertyNames()) {
             propertyList.add(new PropertyEntry(s, d.getProperty(s).toString()));
         }
@@ -466,12 +467,15 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if(evt.getSource().equals(d)) {
+            boolean add = true;
             for(PropertyEntry e : propertyList) {
                 if(e.getKey().equals(evt.getPropertyName())) {
                     e.setValue(evt.getNewValue().toString());
-                } else {
-                    propertyList.add(new PropertyEntry(evt.getPropertyName(), evt.getNewValue().toString()));
+                    add = false;
                 }
+            }
+            if(add) {
+                propertyList.add(new PropertyEntry(evt.getPropertyName(), evt.getNewValue().toString()));
             }
         }
     }

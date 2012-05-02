@@ -48,15 +48,29 @@ public class Application {
 
             @Override
             public void run() {
-                Model.getTaskSaver().saveList();
-                System.out.println("saved tasks");
+                try {
+                    Model.getTaskSaver().saveList();
+                    System.out.println("saved tasks");
+                } catch (Exception ex) {
+                    System.out.println("saved tasks");
+                    System.out.println(ex);
+                }
+
                 try {
                     Model.getDownloadSaver().saveAllDownloads();
                     System.out.println("saved downloads");
                 } catch (Exception ex) {
+                    System.out.println("saved downloads");
+                    System.out.println(ex);
                 }
-                JavaDBDataSource.getInstance().shutdownDB();
-                System.out.println("shutdownDB()");
+                
+                try {
+                    JavaDBDataSource.getInstance().shutdownDB();
+                    System.out.println("shutdownDB()");
+                } catch (Exception ex) {
+                    System.out.println("shutdownDB()");
+                    System.out.println(ex);
+                }
             }
         });
 

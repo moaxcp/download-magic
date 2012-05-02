@@ -22,9 +22,7 @@ public class TaskManager {
     private class TaskRunnable implements Runnable {
 
         public void run() {
-            System.out.println("TaskManager finished running is " + model.isRunning());
             model.setRunning(true);
-            System.out.println("TaskManager finished running is " + model.isRunning());
             start:
             for (int i = 0; i < model.getTasks().size() && model.isRunning(); i++) {
                 TaskData t = model.getTasks().get(i);
@@ -47,9 +45,7 @@ public class TaskManager {
                         break start;
                 }
             }
-            System.out.println("TaskManager finished running is " + model.isRunning());
             model.setRunning(false);
-            System.out.println("TaskManager finished running is " + model.isRunning());
         }
     }
     private Thread thread;

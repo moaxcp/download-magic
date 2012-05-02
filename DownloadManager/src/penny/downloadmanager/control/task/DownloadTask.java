@@ -62,6 +62,7 @@ public class DownloadTask extends Task {
             data.addComplete(data.getDownload());
             data.setDownload(data.getNextDownload());
         }
+        downloader.shutdown();
         data.setDownload(null);
         if (data.getStatus() == Status.RUNNING) {
             data.setStatus(Status.FINISHED);
