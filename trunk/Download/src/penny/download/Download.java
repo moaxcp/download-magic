@@ -733,7 +733,6 @@ public class Download implements Comparable<Download> {
      */
     public void initDownloadTime() {
         this.setDownloadStartTime(System.nanoTime());
-        this.setDownloadTime(0);
     }
     
     /**

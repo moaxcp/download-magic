@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
@@ -66,7 +67,8 @@ class FtpDownloader extends ProtocolDownloader {
                 return;
             }
             Logger.getLogger(FtpDownloader.class.getName()).logp(Level.FINE, FtpDownloader.class.getName(), "download()", "Login successful " + client.getReplyString());
-
+            client.setFileType(FTP.BINARY_FILE_TYPE, FTP.BINARY_FILE_TYPE);
+            client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
             //TODO get contentType
             FTPFile file = client.mlistFile(d.getUrl().getPath());
             if(file != null) {

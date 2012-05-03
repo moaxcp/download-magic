@@ -208,6 +208,7 @@ public class Downloader {
             if (!checkProcessors(download)) {
                 resetProcessors(download);
                 download.setDownloaded(0);
+                download.setDownloadTime(0);
             }
             if (download.getStatus() != DownloadStatus.COMPLETE) {
                 try {
