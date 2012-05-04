@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.FileDataSource;
+import penny.download.Downloads;
 
 /**
  *
@@ -28,13 +29,11 @@ public class TempFileSaver implements DownloadProcessor {
 
     private OutputStream out;
     private SavingModel savingModel;
-    private boolean overwriteTemp;
     private File save;
     private File temp;
 
     public TempFileSaver() {
         this.savingModel = Model.getApplicationSettings().getSavingModel();
-        overwriteTemp = false;
     }
 
     private boolean save(Download d) {
@@ -68,35 +67,40 @@ public class TempFileSaver implements DownloadProcessor {
         DownloadData i = (DownloadData) d;
         save = new File(savingModel.getSaveFolder() + "/" + DownloadData.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
         temp = new File(savingModel.getTempFolder() + "/" + DownloadData.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
-        overwriteTemp = false;
 
         if (save.exists()) {
-            Model.remove(temp);
+            i.setDownloaded(save.length());
             switch (Model.getApplicationSettings().getSavingModel().getSaveExistsAction()) {
                 case OVERWRITE:
                     Model.remove(save);
-                    i.setDownloaded(0);
+                    Logger.getLogger(TempFileSaver.class.getName()).fine("Overwriting saveFile " + save);
                     break;
                 case COMPLETE:
-                    i.setDownloaded(save.length());
+                    Model.remove(temp);
                     i.setStatus(DownloadStatus.STOPPED, "");
                     i.setStatus(DownloadStatus.QUEUED, "");
                     i.setStatus(DownloadStatus.COMPLETE, "Save file exists. Download complete.");
+                    Logger.getLogger(TempFileSaver.class.getName()).fine("Save file exists. Download complete.");
                     break;
             }
-        } else {
-            if (!temp.exists()) {
-                i.setTempPath(savingModel.getTempFolder() + "/" + DownloadData.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
-            } else {
-                switch (savingModel.getTempExistsAction()) {
-                    case OVERWRITE:
-                        Model.remove(temp);
-                        break;
-                    case COMPLETE:
-                        break;
-                }
-                i.setDownloaded(temp.length());
+        }
+
+        if (temp.exists()) {
+            Logger.getLogger(TempFileSaver.class.getName()).fine("temp file exists and is " + Downloads.formatByteSize(temp.length()));
+            i.setDownloaded(temp.length());
+            switch (savingModel.getTempExistsAction()) {
+                case OVERWRITE:
+                    Logger.getLogger(TempFileSaver.class.getName()).fine("overwrite tempFile " + temp);
+                    Model.remove(temp);
+                    break;
+                case COMPLETE:
+                    Logger.getLogger(TempFileSaver.class.getName()).fine("continuing with tempFile " + temp);
+                    break;
             }
+        } else if(!save.exists()) {
+            Logger.getLogger(TempFileSaver.class.getName()).fine("temp file does not exist");
+            i.setDownloaded(0);
+            i.setTempPath(savingModel.getTempFolder() + "/" + DownloadData.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
         }
     }
 
@@ -122,7 +126,7 @@ public class TempFileSaver implements DownloadProcessor {
                 }
 
             } else {
-                if(i.getDownloaded() > 0) {
+                if (i.getDownloaded() > 0) {
                     r = false;
                 } else {
                     r = true;
@@ -149,21 +153,10 @@ public class TempFileSaver implements DownloadProcessor {
                 i.setTempPath(savingModel.getTempFolder() + "/" + DownloadData.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
             }
 
-            switch (savingModel.getTempExistsAction()) {
-                case OVERWRITE:
-                    try {
-                        out = new FileOutputStream(i.getTempPath(), !overwriteTemp);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(TempFileSaver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
-                case COMPLETE:
-                    try {
-                        out = new FileOutputStream(i.getTempPath(), true);
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(TempFileSaver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    break;
+            try {
+                out = new FileOutputStream(i.getTempPath(), true);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(TempFileSaver.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -182,7 +175,6 @@ public class TempFileSaver implements DownloadProcessor {
 
     @Override
     public void onReset(Download d) {
-        overwriteTemp = true;
         Model.remove(save);
         Model.remove(temp);
     }

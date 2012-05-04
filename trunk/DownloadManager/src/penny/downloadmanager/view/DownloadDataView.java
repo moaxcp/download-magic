@@ -462,7 +462,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     // End of variables declaration//GEN-END:variables
 
     private String getPropValue(String key) {
-
+        
         if (key.equals(DownloadData.PROP_HREFLINKS)) {
             return Integer.toString(d.getHrefLinks().size());
         } else if (key.equals(DownloadData.PROP_SRCLINKS)) {
