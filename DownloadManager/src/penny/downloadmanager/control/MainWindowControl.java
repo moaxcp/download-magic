@@ -190,7 +190,6 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             t.setStatus(Status.STOPPED);
         }
         mainModel.getTasks().getReadWriteLock().writeLock().unlock();
-        taskManager.getModel().setRunning(false);
     }
 
     private void exit() {

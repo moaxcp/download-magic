@@ -180,7 +180,9 @@ public class SavingModel implements Serializable {
      * @param saveUnknown the saveUnknown to set
      */
     public void setSaveUnknown(boolean saveUnknown) {
+        boolean oldValue = this.saveUnknown;
         this.saveUnknown = saveUnknown;
+        propertySupport.firePropertyChange(PROP_SAVEUNKNOWN, oldValue, saveUnknown);
     }
 
     /**
@@ -194,7 +196,9 @@ public class SavingModel implements Serializable {
      * @param saveTypes the saveTypes to set
      */
     public void setSaveTypes(EventList<String> saveTypes) {
+        EventList<String> oldValue = this.saveTypes;
         this.saveTypes = saveTypes;
+        propertySupport.firePropertyChange(PROP_SAVETYPES, oldValue, saveTypes);
     }
 
     /**
@@ -208,7 +212,10 @@ public class SavingModel implements Serializable {
      * @param tempExistsAction the tempExistsAction to set
      */
     public void setTempExistsAction(FileExistsAction tempExistsAction) {
+        System.out.println("set temp exists " + tempExistsAction);
+        FileExistsAction oldValue = this.tempExistsAction;
         this.tempExistsAction = tempExistsAction;
+        propertySupport.firePropertyChange(PROP_TEMPEXISTSACTION, oldValue, tempExistsAction);
     }
 
     /**
@@ -222,6 +229,8 @@ public class SavingModel implements Serializable {
      * @param saveExistsAction the saveExistsAction to set
      */
     public void setSaveExistsAction(FileExistsAction saveExistsAction) {
+        FileExistsAction oldValue = this.saveExistsAction;
         this.saveExistsAction = saveExistsAction;
+        propertySupport.firePropertyChange(PROP_SAVEEXISTSACTION, oldValue, saveExistsAction);
     }
 }
