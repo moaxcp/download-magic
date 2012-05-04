@@ -49,6 +49,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
         settingsDialogModel1 = settingsModel;
         completeActionConverter = new FileExistsActionConverter(FileExistsAction.COMPLETE);
         overwriteActionConverter = new FileExistsActionConverter(FileExistsAction.OVERWRITE);
+        nanoToSecondConverter1 = new penny.downloadmanager.view.converter.NanoToSecondConverter();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
@@ -312,7 +313,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
                     .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(341, Short.MAX_VALUE))
+                .addContainerGap(363, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Paths", jPanel13);
@@ -476,7 +477,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(116, 116, 116))
+                .addGap(138, 138, 138))
         );
 
         jTabbedPane2.addTab("Saving", jPanel14);
@@ -503,7 +504,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addContainerGap()
                 .addComponent(saveDownloads)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 573, Short.MAX_VALUE)
+                .addComponent(jTabbedPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -559,21 +560,22 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
 
         jSpinner3.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(0), Integer.valueOf(0), null, Integer.valueOf(1)));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${maxDownloadAttempts}"), jSpinner3, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.downloadSettings.maxDownloadAttempts}"), jSpinner3, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
         jLabel8.setText("Download Attempts");
 
         jSpinner4.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(128), Integer.valueOf(128), null, Integer.valueOf(128)));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${bufferSize}"), jSpinner4, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.downloadSettings.bufferSize}"), jSpinner4, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
         jLabel9.setText("Buffer Size");
 
         jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(0L), null, Long.valueOf(1L)));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.maxRetryTime}"), jSpinner2, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.downloadSettings.maxRetryTime}"), jSpinner2, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding.setConverter(nanoToSecondConverter1);
         bindingGroup.addBinding(binding);
 
         jLabel7.setText("Retry Timer");
@@ -640,7 +642,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(162, Short.MAX_VALUE))
+                .addContainerGap(184, Short.MAX_VALUE))
         );
 
         jTabbedPane4.addTab("General", jPanel12);
@@ -681,7 +683,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel34)
                     .addComponent(jTextField30, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(481, Short.MAX_VALUE))
+                .addContainerGap(503, Short.MAX_VALUE))
         );
 
         jTabbedPane4.addTab("User Agents", jPanel22);
@@ -1063,7 +1065,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                .addComponent(jTabbedPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 624, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1148,7 +1150,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addComponent(parseLinks)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel18, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(349, Short.MAX_VALUE))
+                .addContainerGap(371, Short.MAX_VALUE))
         );
 
         jTabbedPane3.addTab("Links", jPanel19);
@@ -1232,7 +1234,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addComponent(parseWords)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel21, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(349, Short.MAX_VALUE))
+                .addContainerGap(371, Short.MAX_VALUE))
         );
 
         jTabbedPane3.addTab("Words", jPanel20);
@@ -1250,7 +1252,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
             jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                .addComponent(jTabbedPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 624, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -1345,7 +1347,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addComponent(jCheckBox9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel29, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(350, Short.MAX_VALUE))
+                .addContainerGap(372, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("MD5", jPanel3);
@@ -1396,7 +1398,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
                     .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(517, Short.MAX_VALUE))
+                .addContainerGap(539, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Image Info", jPanel4);
@@ -1420,7 +1422,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 667, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 689, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
@@ -1596,6 +1598,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField9;
+    private penny.downloadmanager.view.converter.NanoToSecondConverter nanoToSecondConverter1;
     private javax.swing.JButton okButton;
     private penny.downloadmanager.view.converter.FileExistsActionConverter overwriteActionConverter;
     private javax.swing.JCheckBox parseLinks;

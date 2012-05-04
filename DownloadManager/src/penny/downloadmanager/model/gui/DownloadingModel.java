@@ -6,6 +6,7 @@ package penny.downloadmanager.model.gui;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import java.beans.PropertyChangeListener;
 import penny.download.DownloadSettings;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -27,12 +28,15 @@ public class DownloadingModel implements Serializable {
     public static final String PROP_DOWNLOADTYPES = "downloadTypes";
     private EventList<String> downloadTypes;
 
+    private transient PropertyChangeSupport propertySupport;
+
 
     public DownloadingModel() {
         downloadSettings = new DownloadSettings();
         downloadUnknown = true;
         downloadTypes = new BasicEventList<String>();
         downloadTypes.add("*");
+        propertySupport = new SwingPropertyChangeSupport(this, true);
     }
 
     public DownloadingModel(DownloadingModel appSettings) {
@@ -59,14 +63,6 @@ public class DownloadingModel implements Serializable {
     public void setDownloadSettings(DownloadSettings downloadSettings) {
         this.downloadSettings = downloadSettings;
     }
-
-    public long getMaxRetryTime() {
-        return downloadSettings.getMaxRetryTime()/1000000000;
-    }
-
-    public void setMaxRetryTime(long maxRetryTime) {
-        downloadSettings.setMaxRetryTime(maxRetryTime);
-    }
     
     public EventList<String> getDownloadTypes() {
         return downloadTypes;
@@ -83,6 +79,24 @@ public class DownloadingModel implements Serializable {
      * @param downloadUnknown the downloadUnknown to set
      */
     public void setDownloadUnknown(boolean downloadUnknown) {
+        boolean oldValue = this.downloadUnknown;
         this.downloadUnknown = downloadUnknown;
+        propertySupport.firePropertyChange(PROP_DOWNLOADUNKNOWN, oldValue, downloadUnknown);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(property, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(property, listener);
     }
 }
