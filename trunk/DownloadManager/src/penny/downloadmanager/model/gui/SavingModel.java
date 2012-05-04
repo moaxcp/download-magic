@@ -6,6 +6,7 @@ package penny.downloadmanager.model.gui;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.Serializable;
@@ -86,7 +87,9 @@ public class SavingModel implements Serializable {
      * @param save the save to set
      */
     public void setSave(boolean save) {
+        boolean oldValue = this.save;
         this.save = save;
+        propertySupport.firePropertyChange(PROP_SAVE, oldValue, save);
     }
 
     /**
@@ -212,7 +215,6 @@ public class SavingModel implements Serializable {
      * @param tempExistsAction the tempExistsAction to set
      */
     public void setTempExistsAction(FileExistsAction tempExistsAction) {
-        System.out.println("set temp exists " + tempExistsAction);
         FileExistsAction oldValue = this.tempExistsAction;
         this.tempExistsAction = tempExistsAction;
         propertySupport.firePropertyChange(PROP_TEMPEXISTSACTION, oldValue, tempExistsAction);
@@ -232,5 +234,21 @@ public class SavingModel implements Serializable {
         FileExistsAction oldValue = this.saveExistsAction;
         this.saveExistsAction = saveExistsAction;
         propertySupport.firePropertyChange(PROP_SAVEEXISTSACTION, oldValue, saveExistsAction);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(property, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(property, listener);
     }
 }

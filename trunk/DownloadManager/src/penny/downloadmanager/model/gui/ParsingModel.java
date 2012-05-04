@@ -6,7 +6,10 @@ package penny.downloadmanager.model.gui;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  *
@@ -26,6 +29,7 @@ public class ParsingModel implements Serializable {
     private boolean parseUnknownWords;
     public static final String PROP_PARSEWORDSTYPES = "parseWordsTypes";
     private EventList<String> parseWordsTypes;
+    private transient PropertyChangeSupport propertySupport;
 
     public ParsingModel() {
         parseLinks = true;
@@ -36,6 +40,7 @@ public class ParsingModel implements Serializable {
         parseUnknownWords = false;
         parseWordsTypes = new BasicEventList<String>();
         parseWordsTypes.add("text");
+        propertySupport = new SwingPropertyChangeSupport(this, true);
     }
 
     public ParsingModel(ParsingModel parsingModel) {
@@ -43,12 +48,12 @@ public class ParsingModel implements Serializable {
     }
 
     public void copy(ParsingModel parsingModel) {
-        parseLinks = parsingModel.isParseLinks();
-        parseUnknownLinks = parsingModel.isParseUnknownLinks();
+        setParseLinks(parsingModel.isParseLinks());
+        setParseUnknownLinks(parsingModel.isParseUnknownLinks());
         parseLinksTypes.clear();
         parseLinksTypes.addAll(parsingModel.getParseLinksTypes());
-        parseWords = parsingModel.isParseWords();
-        parseUnknownWords = parsingModel.isParseUnknownWords();
+        setParseWords(parsingModel.isParseWords());
+        setParseUnknownWords(parsingModel.isParseUnknownWords());
         parseWordsTypes.clear();
         parseWordsTypes.addAll(parsingModel.getParseWordsTypes());
     }
@@ -64,7 +69,9 @@ public class ParsingModel implements Serializable {
      * @param parseLinks the parseLinks to set
      */
     public void setParseLinks(boolean parseLinks) {
+        boolean oldValue = this.parseLinks;
         this.parseLinks = parseLinks;
+        propertySupport.firePropertyChange(PROP_PARSELINKS, oldValue, parseLinks);
     }
 
     /**
@@ -78,7 +85,9 @@ public class ParsingModel implements Serializable {
      * @param parseUnknownLinks the parseUnknownLinks to set
      */
     public void setParseUnknownLinks(boolean parseUnknownLinks) {
+        boolean oldValue = this.parseUnknownLinks;
         this.parseUnknownLinks = parseUnknownLinks;
+        propertySupport.firePropertyChange(PROP_PARSEUNKNOWNLINKS, oldValue, parseUnknownLinks);
     }
 
     /**
@@ -99,7 +108,9 @@ public class ParsingModel implements Serializable {
      * @param parseWords the parseWords to set
      */
     public void setParseWords(boolean parseWords) {
+        boolean oldValue = this.parseWords;
         this.parseWords = parseWords;
+        propertySupport.firePropertyChange(PROP_PARSEWORDS, oldValue, parseWords);
     }
 
     /**
@@ -113,7 +124,9 @@ public class ParsingModel implements Serializable {
      * @param parseUnknownWords the parseUnknownWords to set
      */
     public void setParseUnknownWords(boolean parseUnknownWords) {
+        boolean oldValue = this.parseUnknownWords;
         this.parseUnknownWords = parseUnknownWords;
+        propertySupport.firePropertyChange(PROP_PARSEUNKNOWNWORDS, oldValue, parseUnknownWords);
     }
 
     /**
@@ -121,5 +134,21 @@ public class ParsingModel implements Serializable {
      */
     public EventList<String> getParseWordsTypes() {
         return parseWordsTypes;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(property, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(property, listener);
     }
 }

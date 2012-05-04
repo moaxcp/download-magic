@@ -6,7 +6,10 @@ package penny.downloadmanager.model.gui;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  *
@@ -24,6 +27,7 @@ public class MD5ingModel implements Serializable {
 
     public static final String PROP_MD5TYPES = "md5Types";
     private EventList<String> md5Types;
+    private transient PropertyChangeSupport propertySupport;
 
     public MD5ingModel() {
         generateMD5 = true;
@@ -31,6 +35,7 @@ public class MD5ingModel implements Serializable {
         md5Unknown = true;
         md5Types = new BasicEventList<String>();
         md5Types.add("*");
+        propertySupport = new SwingPropertyChangeSupport(this, true);
     }
 
     public MD5ingModel(MD5ingModel model) {
@@ -38,9 +43,9 @@ public class MD5ingModel implements Serializable {
     }
 
     public void copy(MD5ingModel model) {
-        this.generateMD5 = model.isGenerateMD5();
-        this.updateMD5 = model.isUpdateMD5();
-        this.md5Unknown = model.isMd5Unknown();
+        setGenerateMD5(model.isGenerateMD5());
+        setUpdateMD5(model.isUpdateMD5());
+        setMd5Unknown(model.isMd5Unknown());
         md5Types.clear();
         md5Types.addAll(model.getMd5Types());
     }
@@ -56,7 +61,9 @@ public class MD5ingModel implements Serializable {
      * @param generateMD5 the generateMD5 to set
      */
     public void setGenerateMD5(boolean generateMD5) {
+        boolean oldValue = this.generateMD5;
         this.generateMD5 = generateMD5;
+        propertySupport.firePropertyChange(PROP_GENERATEMD5, oldValue, generateMD5);
     }
 
     /**
@@ -70,7 +77,9 @@ public class MD5ingModel implements Serializable {
      * @param updateMD5 the updateMD5 to set
      */
     public void setUpdateMD5(boolean updateMD5) {
+        boolean oldValue = this.updateMD5;
         this.updateMD5 = updateMD5;
+        propertySupport.firePropertyChange(PROP_UPDATEMD5, oldValue, updateMD5);
     }
 
     /**
@@ -84,7 +93,9 @@ public class MD5ingModel implements Serializable {
      * @param md5Unknown the md5Unknown to set
      */
     public void setMd5Unknown(boolean md5Unknown) {
+        boolean oldValue = this.md5Unknown;
         this.md5Unknown = md5Unknown;
+        propertySupport.firePropertyChange(PROP_MD5UNKNOWN, oldValue, md5Unknown);
     }
 
     /**
@@ -92,5 +103,21 @@ public class MD5ingModel implements Serializable {
      */
     public EventList<String> getMd5Types() {
         return md5Types;
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(property, listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String property, PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(property, listener);
     }
 }
