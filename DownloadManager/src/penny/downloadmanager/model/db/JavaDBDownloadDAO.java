@@ -417,9 +417,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
     @Override
     public boolean updateDownload(DownloadData download, String property) {
-        if(!downloadExists(download.getUrl().toString())) {
-            throw new IllegalArgumentException(download.getUrl().toString() + " does not exist in db");
-        }
+        
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         try {
