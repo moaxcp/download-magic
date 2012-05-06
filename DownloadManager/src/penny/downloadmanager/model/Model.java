@@ -5,6 +5,7 @@
 package penny.downloadmanager.model;
 
 import ca.odell.glazedlists.ObservableElementList;
+import java.io.FileNotFoundException;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.Application;
 import penny.downloadmanager.model.db.DAOFactory;
@@ -17,12 +18,19 @@ import penny.downloadmanager.model.gui.MainWindowModel;
 import penny.downloadmanager.model.task.DTaskData;
 import penny.downloadmanager.model.task.TaskData;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import penny.download.Download;
+import penny.downloadmanager.model.gui.StartupDialogModel;
+import penny.recmd5.MD5MessageDigest;
+import penny.recmd5.MD5State;
 
 /**
  *
@@ -41,6 +49,7 @@ public class Model {
     private static DownloadSaver downloadSaver;
     private static ApplicationSettingsSaver settingsSaver;
     private static TaskSaver taskSaver;
+    private static StartupDialogModel startupDialogModel;
 
     /**
      * @return the addDialogModel
@@ -102,6 +111,10 @@ public class Model {
         return taskManagerModel;
     }
 
+    public static StartupDialogModel getStartupDialogModel() {
+        return startupDialogModel;
+    }
+
     /**
      * @return the settingsSaver
      */
@@ -134,8 +147,9 @@ public class Model {
         downloads = (ObservableElementList<DownloadData>) mainWindowModel.getDownloads();
         mainWindowModel.setTasks(taskManagerModel.getTasks());
         tasks = (ObservableElementList<TaskData>) taskManagerModel.getTasks();
-        mainWindowModel.setTasks(taskManagerModel.getTasks());
         taskSaver = new TaskSaver(tasks);
+        startupDialogModel = new StartupDialogModel();
+        startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
     }
 
     public static void remove(File f) {
@@ -154,23 +168,153 @@ public class Model {
         }
     }
 
+    public static boolean typeMatches(String contentType, List<String> types) {
+        if (contentType != null && !contentType.equals("")) {
+            for (String s : types) {
+                if (s.equals("*")) {
+                    return true;
+                } else if (s.contains(contentType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean generateMD5(DownloadData d) {
+        boolean r = false;
+        if (applicationSettings.getMd5ingModel().isGenerateMD5()) {
+            if (applicationSettings.getMd5ingModel().isMd5Unknown()) {
+                if (d.getContentType() == null || d.getContentType().equals("")) {
+                    r = true;
+                }
+            }
+            if (Model.typeMatches(d.getContentType(), applicationSettings.getMd5ingModel().getMd5Types())) {
+                r = true;
+            }
+        }
+        return r;
+    }
+
+    public static boolean parseLinks(Download d) {
+        boolean r = false;
+        if (applicationSettings.getParsingModel().isParseLinks()) {
+            if (applicationSettings.getParsingModel().isParseUnknownLinks()) {
+                if (d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
+                    r = true;
+                }
+            }
+            if (Model.typeMatches(d.getContentType(), applicationSettings.getParsingModel().getParseLinksTypes())) {
+                r = true;
+            }
+        }
+        return r;
+    }
+
+    public static boolean parseWords(Download d) {
+        boolean r = false;
+        if (applicationSettings.getParsingModel().isParseWords()) {
+            if (applicationSettings.getParsingModel().isParseUnknownWords()) {
+                if (d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
+                    r = true;
+                }
+            }
+            if (Model.typeMatches(d.getContentType(), applicationSettings.getParsingModel().getParseWordsTypes())) {
+                r = true;
+            }
+        }
+        return r;
+    }
+
+    public static boolean save(Download d) {
+        boolean r = false;
+        if (applicationSettings.getSavingModel().isSave()) {
+            if (applicationSettings.getSavingModel().isSaveUnknown()) {
+                if (d.getContentType() == null || d.getContentType().equals("")) {
+                    r = true;
+                }
+            }
+            if (Model.typeMatches(d.getContentType(), applicationSettings.getSavingModel().getSaveTypes())) {
+                r = true;
+            }
+        }
+        return r;
+    }
+
+    public static MD5State getFileMD5(File file) {
+        MD5MessageDigest md5er = new MD5MessageDigest();
+        try {
+            InputStream in = new FileInputStream(file);
+            byte[] buffer = new byte[applicationSettings.getDownloadingModel().getDownloadSettings().getBufferSize()];
+            int len = in.read(buffer);
+            while (len != -1) {
+                md5er.update(buffer, 0, len);
+                len = in.read(buffer);
+            }
+
+            md5er.digest();
+
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return md5er.getState();
+    }
+
     public static void loadData() {
         try {
-            settingsSaver.load();
+            try {
+                settingsSaver.load();
+            } catch (Exception ex) {
+                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
             JavaDBDataSource.getInstance().initDB();
             DownloadDAO dao = DAOFactory.getInstance().getDownloadDAO();
             List<DownloadData> downloads1 = dao.getDownloads();
-            for (DownloadData d : downloads1) {
-                File tempFile = new File(d.getTempPath());
-                File saveFile = new File(d.getSavePath());
+            downloads.addAll(downloads1);
+            downloadSaver = new DownloadSaver(downloads);
+            mainWindowModel.setDownloadSaver(downloadSaver);
 
+            for (DownloadData d : downloads1) {
                 if (d.getStatus() != DownloadStatus.COMPLETE) {
                     d.queue();
                 }
             }
-            downloads.addAll(downloads1);
-            downloadSaver = new DownloadSaver(downloads);
-            mainWindowModel.setDownloadSaver(downloadSaver);
+
+            if (Model.getApplicationSettings().getStartupModel().isCheckSizes()) {
+                for (DownloadData d : downloads1) {
+                    if (save(d)) {
+                        File file = new File(d.getTempPath());
+                        if (!file.exists()) {
+                            file = new File(d.getSavePath());
+                        }
+                        Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl().toString());
+                        if (file.exists()) {
+                            d.setDownloaded(file.length());
+                        } else {
+                            d.setDownloaded(0);
+                        }
+                    }
+                }
+            }
+
+            if (Model.getApplicationSettings().getStartupModel().isCheckMD5s()) {
+                for (DownloadData d : downloads1) {
+                    if (save(d)) {
+                        File file = new File(d.getTempPath());
+                        if (!file.exists()) {
+                            file = new File(d.getSavePath());
+                        }
+                        Logger.getLogger(Model.class.getName()).fine("Checking MD5 for " + d.getUrl().toString());
+                        if (file.exists()) {
+                            d.getMD5().copy(getFileMD5(file));
+                        }
+                    }
+                }
+            }
+
             mainWindowModel.getTasks().add(new DTaskData(mainWindowModel.getDownloads()));
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.toString(),

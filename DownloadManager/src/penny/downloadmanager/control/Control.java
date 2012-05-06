@@ -25,6 +25,7 @@ public class Control {
     private static ApplicationSettingsControl settingsControl;
     private static MainWindowControl mainWindowControl;
     private static TaskManager taskManager;
+    private static StartupSettingsControl startupControl;
 
     /**
      * @return the addDialogControl
@@ -74,5 +75,7 @@ public class Control {
         View.getMainWindowView().registerController(mainWindowControl);
         addTaskControl = new AddTaskControl(Model.getAddTaskModel(), Model.getMainWindowModel());
         View.getAddTask().registerController(addTaskControl);
+        startupControl = new StartupSettingsControl(Model.getStartupDialogModel());
+        View.getStartupSettings().registerController(startupControl);
     }
 }

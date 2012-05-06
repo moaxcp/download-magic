@@ -54,6 +54,8 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     public static final String COM_CLEARALLDOWNLOADS = "clearAllDownloads";
     public static final String COM_CLEARCOMPLETEDOWNLOADS = "clearCompleteDownloads";
     public static final String COM_CLEARERRORDOWNLOADS = "clearErrorDownloads";
+    public static final String COM_APPLICATIONSTARTUP = "applicationStartup";
+    
     private MainWindowModel mainModel;
     private SettingsDialogModel settingsModel;
     private AddDialogModel addModel;
@@ -149,6 +151,8 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             mainModel.clearCompleteDownloads();
         } else if (e.getActionCommand().equals(COM_CLEARERRORDOWNLOADS)) {
             mainModel.clearErrorDownloads();
+        } else if(e.getActionCommand().equals(COM_APPLICATIONSTARTUP)) {
+            Model.getStartupDialogModel().setVisible(true);
         }
     }
 

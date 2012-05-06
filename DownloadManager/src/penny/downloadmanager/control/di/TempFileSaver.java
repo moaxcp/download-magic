@@ -36,21 +36,6 @@ public class TempFileSaver implements DownloadProcessor {
         this.savingModel = Model.getApplicationSettings().getSavingModel();
     }
 
-    private boolean save(Download d) {
-        boolean r = false;
-        if (savingModel.isSave()) {
-            if (savingModel.isSaveUnknown()) {
-                if (d.getContentType() == null || d.getContentType().equals("")) {
-                    r = true;
-                }
-            }
-            if (ApplicationSettingsModel.typeMatches(d.getContentType(), savingModel.getSaveTypes())) {
-                r = true;
-            }
-        }
-        return r;
-    }
-
     private void closeFile(Download d) {
         try {
             if (out != null) {
@@ -138,7 +123,7 @@ public class TempFileSaver implements DownloadProcessor {
 
     @Override
     public void onStartInput(Download d) {
-        if (save(d)) {
+        if (Model.save(d)) {
             DownloadData i = (DownloadData) d;
             File file = new File(i.getTempPath());
             String realPath = savingModel.getTempFolder() + "/" + DownloadData.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName());
@@ -164,7 +149,7 @@ public class TempFileSaver implements DownloadProcessor {
     @Override
     public void doChunck(Download d, int read, byte[] buffer) {
         try {
-            if (save(d)) {
+            if (Model.save(d)) {
                 out.write(buffer, 0, read);
             }
         } catch (IOException ex) {
@@ -206,7 +191,7 @@ public class TempFileSaver implements DownloadProcessor {
         temp = new File(i.getTempPath());
         save = new File(i.getSavePath());
 
-        if (save(d)) {
+        if (Model.save(d)) {
             closeFile(d);
 
             save.getParentFile().mkdirs();

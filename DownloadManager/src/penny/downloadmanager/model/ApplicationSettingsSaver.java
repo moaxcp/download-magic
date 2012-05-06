@@ -36,9 +36,11 @@ public class ApplicationSettingsSaver {
     }
 
     public void save() {
-        if(appSettings == null) {
+        if (appSettings == null) {
             throw new IllegalStateException("appSettings must be set before being saved");
         }
+        System.out.println("save md5 " + appSettings.getStartupModel().isCheckMD5s());
+        System.out.println("save size " + appSettings.getStartupModel().isCheckSizes());
         FileOutputStream fout = null;
         ObjectOutputStream oos = null;
         try {
@@ -54,14 +56,14 @@ public class ApplicationSettingsSaver {
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                if(oos != null) {
+                if (oos != null) {
                     oos.close();
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                if(fout != null) {
+                if (fout != null) {
                     fout.close();
                 }
             } catch (IOException ex) {
@@ -72,7 +74,7 @@ public class ApplicationSettingsSaver {
 
     public void load() {
         File file = new File(saveFile);
-        if(!file.exists()) {
+        if (!file.exists()) {
             save();
         }
         FileInputStream fin = null;
@@ -81,23 +83,25 @@ public class ApplicationSettingsSaver {
             fin = new FileInputStream(saveFile);
             ois = new ObjectInputStream(fin);
             appSettings.copy((ApplicationSettingsModel) ois.readObject());
+            System.out.println("load md5 " + appSettings.getStartupModel().isCheckMD5s());
+            System.out.println("load size " + appSettings.getStartupModel().isCheckSizes());
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.INFO, "appSettings have been loaded {0}", appSettings);
-        }catch (FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
-        }  catch(ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                if(fin != null) {
+                if (fin != null) {
                     fin.close();
                 }
             } catch (IOException ex) {
                 Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
-                if(ois != null) {
+                if (ois != null) {
                     ois.close();
                 }
             } catch (IOException ex) {

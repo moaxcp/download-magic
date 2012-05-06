@@ -23,6 +23,7 @@ public class ApplicationSettingsModel implements Serializable {
     private ParsingModel parsingModel;
     private MD5ingModel md5ingModel;
     private ImageModel imageModel;
+    private StartupModel startupModel;
 
     public ApplicationSettingsModel() {
         savingModel = new SavingModel();
@@ -30,6 +31,7 @@ public class ApplicationSettingsModel implements Serializable {
         parsingModel = new ParsingModel();
         md5ingModel = new MD5ingModel();
         imageModel = new ImageModel();
+        startupModel = new StartupModel();
     }
 
     public ApplicationSettingsModel(ApplicationSettingsModel appSettings) {
@@ -42,19 +44,7 @@ public class ApplicationSettingsModel implements Serializable {
         this.parsingModel.copy(appSettings.getParsingModel());
         this.md5ingModel.copy(appSettings.getMd5ingModel());
         this.imageModel.copy(appSettings.getImageModel());
-    }
-
-    public static boolean typeMatches(String contentType, List<String> types) {
-        if (contentType != null && !contentType.equals("")) {
-            for (String s : types) {
-                if (s.equals("*")) {
-                    return true;
-                } else if (s.contains(contentType)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        this.startupModel.copy(appSettings.getStartupModel());
     }
 
     /**
@@ -90,5 +80,12 @@ public class ApplicationSettingsModel implements Serializable {
      */
     public ImageModel getImageModel() {
         return imageModel;
+    }
+
+    /**
+     * @return the startupModel
+     */
+    public StartupModel getStartupModel() {
+        return startupModel;
     }
 }
