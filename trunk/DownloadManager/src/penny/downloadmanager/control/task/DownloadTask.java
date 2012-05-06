@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import penny.downloadmanager.control.di.ByteBufferUpdater;
 
 /**
  *
@@ -52,6 +53,8 @@ public class DownloadTask extends Task {
         if(settings.getParsingModel().isParseLinks() || settings.getParsingModel().isParseWords()) {
             processors.add(new Parser());
         }
+
+        processors.add(new ByteBufferUpdater());
         
         data.setStatus(Status.RUNNING);
         Downloader downloader = new Downloader(settings.getDownloadingModel().getDownloadSettings(), processors);

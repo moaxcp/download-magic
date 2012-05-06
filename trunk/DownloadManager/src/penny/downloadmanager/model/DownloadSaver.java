@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.download.DownloadStatus;
 import penny.recmd5.MD5State;
 
 /**
@@ -34,6 +35,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
     private Map<DownloadData, MD5State> md5ValuesMap;
     private Map<DownloadData, String> linkStateValuesMap;
     private Map<DownloadData, String> wordStateValuesMap;
+    private Map<DownloadData, Long> lastSaveTime;
 
     public DownloadSaver(ObservableElementList<DownloadData> downloads) {
         saveProps = new ArrayList<String>();
@@ -69,6 +71,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
         md5ValuesMap = new HashMap<DownloadData, MD5State>();
         linkStateValuesMap = new HashMap<DownloadData, String>();
         wordStateValuesMap = new HashMap<DownloadData, String>();
+        lastSaveTime = new HashMap<DownloadData, Long>();
     }
 
     public boolean isSaveDelete() {
@@ -91,9 +94,10 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                 doUpdate = true;
             }
             if (doUpdate) {
-                if(oldValue != null) {
-                    oldValue.copy(md5);
+                if(oldValue == null) {
+                    oldValue = new MD5State();
                 }
+                oldValue.copy(md5);
                 dao.updateDownload(d, DownloadData.PROP_MD5);
             }
         }
@@ -123,7 +127,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                 doUpdate = true;
             }
             if (doUpdate) {
-                wordStateValuesMap.put(d, state);
+                linkStateValuesMap.put(d, state);
                 dao.updateDownload(d, DownloadData.PROP_LINKSTATE);
             }
         }
@@ -183,7 +187,15 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
 
         boolean update = false;
 
-        if (saveProps.contains(evt.getPropertyName())) {
+        if(d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADED))) {
+            long lastTime = lastSaveTime.get(d) == null ? 0 : lastSaveTime.get(d);
+            if(d.getDownloadTime() - lastTime > 1000000000) {
+                update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADTIME);
+                update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
+                lastSaveTime.put(d, d.getDownloadTime());
+            }
+
+        } else if(saveProps.contains(evt.getPropertyName())) {
             update = dao.updateDownload(d, evt.getPropertyName());
         } else if (evt.getPropertyName().equals(DownloadData.PROP_SRCLINKS)) {
             update = dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.SRC);
@@ -193,7 +205,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
             update = dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
         }
 
-        if (!update && saveProps.contains(evt.getPropertyName())) {
+        if (!update && saveProps.contains(evt.getPropertyName()) && !(evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADED) || evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADTIME))) {
             Logger.getLogger(DownloadSaver.class.getName()).log(Level.SEVERE, "Did not save {0} for {1}", new Object[]{evt.getPropertyName(), d.getUrl()});
         }
     }

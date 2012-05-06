@@ -460,9 +460,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
     @Override
     public boolean saveLink(String url, String link, String type) {
-        if(!downloadExists(url)) {
-            throw new IllegalArgumentException(url + " does not exist in db");
-        }
+        
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int count = 0;
@@ -505,9 +503,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
     @Override
     public boolean saveWord(String url, String word) {
-        if(!downloadExists(url)) {
-            throw new IllegalArgumentException(url + " does not exist in db");
-        }
+
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         long wordIndex = 0;
@@ -537,9 +533,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
     @Override
     public boolean saveProperty(String url, String name, Object property) {
-        if(!downloadExists(url)) {
-            throw new IllegalArgumentException(url + " does not exist in db");
-        }
+
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         try {
