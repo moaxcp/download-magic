@@ -91,6 +91,25 @@ public class MD5State implements Serializable {
 
     }
 
+    public void copy(MD5State md5State) {
+        count = md5State.count;
+        finalCount = md5State.finalCount;
+        hash.delete(0, hash.length());
+        hash.append(md5State.hash);
+        for(int i = 0; i < buffer.length; i++) {
+            buffer[i] = md5State.buffer[i];
+        }
+        for(int i = 0; i < state.length; i++) {
+            state[i] = md5State.state[i];
+        }
+        for(int i = 0; i < finalBuffer.length; i++) {
+            finalBuffer[i] = md5State.finalBuffer[i];
+        }
+        for(int i = 0; i < finalState.length; i++) {
+            finalState[i] = md5State.finalState[i];
+        }
+    }
+
     /**
      * copies the state to the final variables.
      */
