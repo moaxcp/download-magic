@@ -11,6 +11,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.Serializable;
 import javax.swing.event.SwingPropertyChangeSupport;
+import penny.downloadmanager.model.DownloadData;
 
 /**
  *
@@ -48,8 +49,8 @@ public class SavingModel implements Serializable {
         tempFolder = "tempDownloads";
         saveFolder = "saveDownloads";
         defaultFileName = "index.html";
-        tempNameFormat = "${host}" + "${path}" + File.separatorChar + "${file}";
-        saveNameFormat = "${host}" + "${path}" + File.separatorChar + "${file}";
+        tempNameFormat = "${" + DownloadData.PROP_PROTOCOL + "}" + File.separatorChar + "${" + DownloadData.PROP_HOST + "}" + "${" + DownloadData.PROP_PATH + "}" + File.separatorChar + "${" + DownloadData.PROP_FILE + "}";
+        saveNameFormat = "${" + DownloadData.PROP_PROTOCOL + "}" + File.separatorChar + "${" + DownloadData.PROP_HOST + "}" + "${" + DownloadData.PROP_PATH + "}" + File.separatorChar + "${" + DownloadData.PROP_FILE + "}";
         saveUnknown = true;
         tempExistsAction = FileExistsAction.COMPLETE;
         saveExistsAction = FileExistsAction.COMPLETE;
