@@ -34,36 +34,6 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
         wordExtractor = new WordExtractor(this);
     }
 
-    private boolean parseLinks(Download d) {
-        boolean r = false;
-        if (parsingModel.isParseLinks()) {
-            if (parsingModel.isParseUnknownLinks()) {
-                if(d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
-                    r= true;
-                }
-            }
-            if(ApplicationSettingsModel.typeMatches(d.getContentType(), parsingModel.getParseLinksTypes())) {
-                r = true;
-            }
-        }
-        return r;
-    }
-
-    private boolean parseWords(Download d) {
-        boolean r = false;
-        if (parsingModel.isParseWords()) {
-            if (parsingModel.isParseUnknownWords()) {
-                if(d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
-                    r= true;
-                }
-            }
-            if(ApplicationSettingsModel.typeMatches(d.getContentType(), parsingModel.getParseWordsTypes())) {
-                r = true;
-            }
-        }
-        return r;
-    }
-
     @Override
     public void onStartInput(Download d) {
         curDownload = (DownloadData) d;
@@ -91,11 +61,11 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
 
     @Override
     public void doChunck(Download d, int read, byte[] buffer) {
-        if(parseLinks(d)) {
+        if(Model.parseLinks(d)) {
             linkExtractor.put(buffer, 0, read);
             curDownload.setLinkState(linkExtractor.getLinkState());
         }
-        if(parseWords(d)) {
+        if(Model.parseWords(d)) {
             wordExtractor.put(buffer, 0, read);
             curDownload.setWordBuffer(wordExtractor.getWordBuffer());
         }

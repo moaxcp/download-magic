@@ -12,10 +12,14 @@ import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.DownloadDAO;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.recmd5.MD5State;
 
 /**
  *
@@ -27,6 +31,9 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
     private DownloadDAO dao;
     private List<String> saveProps;
     private boolean saveDelete;
+    private Map<DownloadData, MD5State> md5ValuesMap;
+    private Map<DownloadData, String> linkStateValuesMap;
+    private Map<DownloadData, String> wordStateValuesMap;
 
     public DownloadSaver(ObservableElementList<DownloadData> downloads) {
         saveProps = new ArrayList<String>();
@@ -58,6 +65,10 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
         for (DownloadData d : downloads) {
             d.addPropertyChangeListener(this);
         }
+
+        md5ValuesMap = new HashMap<DownloadData, MD5State>();
+        linkStateValuesMap = new HashMap<DownloadData, String>();
+        wordStateValuesMap = new HashMap<DownloadData, String>();
     }
 
     public boolean isSaveDelete() {
@@ -69,7 +80,53 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
     }
 
     public void saveAllDownloads() {
+    }
 
+    public void updateMD5(DownloadData d) {
+        if (Model.generateMD5(d)) {
+            MD5State oldValue = md5ValuesMap.get(d);
+            MD5State md5 = d.getMD5();
+            boolean doUpdate = false;
+            if (oldValue == null || !oldValue.equals(md5)) {
+                doUpdate = true;
+            }
+            if (doUpdate) {
+                if(oldValue != null) {
+                    oldValue.copy(md5);
+                }
+                dao.updateDownload(d, DownloadData.PROP_MD5);
+            }
+        }
+    }
+
+    public void updateWordState(DownloadData d) {
+        if (Model.parseWords(d)) {
+            String oldValue = wordStateValuesMap.get(d);
+            String state = d.getWordBuffer().toString();
+            boolean doUpdate = false;
+            if (oldValue == null || !oldValue.equals(state)) {
+                doUpdate = true;
+            }
+            if (doUpdate) {
+                wordStateValuesMap.put(d, state);
+                dao.updateDownload(d, DownloadData.PROP_WORDBUFFER);
+            }
+        }
+    }
+
+    public void updateLinkState(DownloadData d) {
+        if (Model.parseLinks(d)) {
+            String oldValue = linkStateValuesMap.get(d);
+            String state = d.getLinkState().toString();
+            boolean doUpdate = false;
+            if (oldValue == null || !oldValue.equals(state)) {
+                doUpdate = true;
+            }
+            if (doUpdate) {
+                wordStateValuesMap.put(d, state);
+                dao.updateDownload(d, DownloadData.PROP_LINKSTATE);
+            }
+        }
     }
 
     @Override
@@ -88,6 +145,9 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     changeList.getReadWriteLock().readLock().unlock();
 
                     d1.removePropertyChangeListener(this);
+                    md5ValuesMap.remove(d1);
+                    linkStateValuesMap.remove(d1);
+                    wordStateValuesMap.remove(d1);
 
                     if (saveDelete) {
                         dao.deleteDownload(d1);
@@ -107,9 +167,11 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     changeList.getReadWriteLock().readLock().lock();
                     DownloadData d3 = (DownloadData) changeList.get(sourceIndex);
                     changeList.getReadWriteLock().readLock().unlock();
-                    dao.updateDownload(d3, DownloadData.PROP_MD5);
-                    dao.updateDownload(d3, DownloadData.PROP_LINKSTATE);
-                    dao.updateDownload(d3, DownloadData.PROP_WORDBUFFER);
+
+                    //TODO can check previous values using a map for each download before updating db. should be faster than I/O
+                    updateMD5(d3);
+                    updateLinkState(d3);
+                    updateWordState(d3);
                     break;
             }
         }
@@ -120,10 +182,6 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
         DownloadData d = (DownloadData) evt.getSource();
 
         boolean update = false;
-
-        if (evt.getPropertyName().equals(DownloadData.PROP_STATUS)) {
-            dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
-        }
 
         if (saveProps.contains(evt.getPropertyName())) {
             update = dao.updateDownload(d, evt.getPropertyName());

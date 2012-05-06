@@ -87,7 +87,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         jMenu1 = new javax.swing.JMenu();
         exitMenu = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        applicationStartup = new javax.swing.JMenuItem();
         settingsMenu = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         clearDownloadsMenu = new javax.swing.JMenuItem();
@@ -97,7 +97,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         jMenu6 = new javax.swing.JMenu();
         systemLookMenu = new javax.swing.JMenuItem();
         metalLookMenu = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        downloadProperties = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         testConnectionMenu = new javax.swing.JMenuItem();
         addDownloadMenu = new javax.swing.JMenuItem();
@@ -201,8 +201,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         jMenu2.setText("Edit");
 
-        jMenuItem1.setText("Application Startup");
-        jMenu2.add(jMenuItem1);
+        applicationStartup.setText("Application Startup");
+        jMenu2.add(applicationStartup);
 
         settingsMenu.setText("Download Settings");
         jMenu2.add(settingsMenu);
@@ -233,8 +233,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         jMenu3.add(jMenu6);
 
-        jMenuItem5.setText("Properties");
-        jMenu3.add(jMenuItem5);
+        downloadProperties.setText("Properties");
+        jMenu3.add(downloadProperties);
 
         jMenuBar1.add(jMenu3);
 
@@ -294,9 +294,11 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JButton addDownloadButton;
     private javax.swing.JMenuItem addDownloadMenu;
     private javax.swing.JButton addTaskButton;
+    private javax.swing.JMenuItem applicationStartup;
     private javax.swing.JMenuItem clearCompleteDownloadsMenu;
     private javax.swing.JMenuItem clearDownloadsMenu;
     private javax.swing.JMenuItem clearErrorDownloadsMenu;
+    private javax.swing.JMenuItem downloadProperties;
     private javax.swing.JTable downloadTable;
     private javax.swing.JMenuItem exitMenu;
     private javax.swing.JMenu jMenu1;
@@ -307,9 +309,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPopupMenu jPopupMenu1;
@@ -362,8 +362,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         settingsMenu.addActionListener(mainWindowControl);
         settingsMenu.setActionCommand(MainWindowControl.COM_SETTINGS);
 
-        jMenuItem5.addActionListener(mainWindowControl);
-        jMenuItem5.setActionCommand(MainWindowControl.COM_PROPERTIES);
+        downloadProperties.addActionListener(mainWindowControl);
+        downloadProperties.setActionCommand(MainWindowControl.COM_PROPERTIES);
 
         testConnectionMenu.addActionListener(mainWindowControl);
         testConnectionMenu.setActionCommand(MainWindowControl.COM_ANALYZER);
@@ -390,6 +390,9 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         this.clearErrorDownloadsMenu.addActionListener(mainWindowControl);
         this.clearErrorDownloadsMenu.setActionCommand(MainWindowControl.COM_CLEARERRORDOWNLOADS);
+
+        applicationStartup.addActionListener(mainWindowControl);
+        applicationStartup.setActionCommand(MainWindowControl.COM_APPLICATIONSTARTUP);
     }
 
     public void propertyChange(PropertyChangeEvent evt) {

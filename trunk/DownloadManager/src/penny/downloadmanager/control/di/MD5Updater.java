@@ -32,21 +32,6 @@ public class MD5Updater implements DownloadProcessor {
         md5 = new MD5MessageDigest(i.getMD5());
     }
 
-    private boolean generate(DownloadData d) {
-        boolean r = false;
-        if (md5Model.isGenerateMD5()) {
-            if (md5Model.isMd5Unknown()) {
-                if(d.getContentType() == null || d.getContentType().equals("")) {
-                    r = true;
-                }
-            }
-            if (ApplicationSettingsModel.typeMatches(d.getContentType(), md5Model.getMd5Types())) {
-                r = true;
-            }
-        }
-        return r;
-    }
-
     @Override
     public void onStartInput(Download d) {
         if (md5Model.isGenerateMD5()) {
@@ -61,7 +46,8 @@ public class MD5Updater implements DownloadProcessor {
     @Override
     public void onCompleted(Download d) {
         DownloadData i = (DownloadData) d;
-        if (generate(i)) {
+        if (Model.generateMD5(i)) {
+            md5.digest();
             i.setMD5(i.getMD5());
         }
     }
@@ -74,7 +60,7 @@ public class MD5Updater implements DownloadProcessor {
     @Override
     public void doChunck(Download d, int read, byte[] buffer) {
         DownloadData i = (DownloadData) d;
-        if (generate(i)) {
+        if (Model.generateMD5(i)) {
             md5.update(buffer, 0, read);
             if (md5Model.isUpdateMD5()) {
                 md5.digest();
@@ -86,7 +72,7 @@ public class MD5Updater implements DownloadProcessor {
     @Override
     public void onReset(Download d) {
         DownloadData i = (DownloadData) d;
-        if (generate(i)) {
+        if (Model.generateMD5(i)) {
             i.setMD5(new MD5State());
             init(d);
         }
@@ -95,7 +81,7 @@ public class MD5Updater implements DownloadProcessor {
     @Override
     public void onInit(Download d) {
         DownloadData i = (DownloadData) d;
-        if (d.getDownloaded() <= 0 && generate(i)) {
+        if (d.getDownloaded() <= 0 && Model.generateMD5(i)) {
             i.setMD5(new MD5State());
         }
     }

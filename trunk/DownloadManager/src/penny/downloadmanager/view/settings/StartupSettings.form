@@ -1,9 +1,18 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
-  <Properties>
-    <Property name="defaultCloseOperation" type="int" value="2"/>
-  </Properties>
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <NonVisualComponents>
+    <Component class="penny.downloadmanager.model.gui.StartupDialogModel" name="startupDialogModel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="startupDialogModel"/>
+      </AuxValues>
+    </Component>
+    <Component class="penny.downloadmanager.model.StartupModel" name="startupModel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="startupDialogModel.getStartupModelCopy()"/>
+      </AuxValues>
+    </Component>
+  </NonVisualComponents>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
   </SyntheticProperties>
@@ -28,7 +37,14 @@
                   <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
                   <Component id="jCheckBox2" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="186" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="139" max="32767" attributes="0"/>
+              <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -39,7 +55,12 @@
               <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jCheckBox2" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="242" max="32767" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -49,10 +70,26 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Check file sizes on startup"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="selected" source="startupModel" sourcePath="${checkSizes}" target="jCheckBox1" targetPath="selected" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="jCheckBox2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Check file md5 on startup"/>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="selected" source="startupModel" sourcePath="${checkMD5s}" target="jCheckBox2" targetPath="selected" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Cancel"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="OK"/>
       </Properties>
     </Component>
   </SubComponents>

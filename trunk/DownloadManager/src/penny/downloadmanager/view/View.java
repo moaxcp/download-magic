@@ -10,6 +10,7 @@ import penny.downloadmanager.view.settings.EditFileFormat;
 import penny.downloadmanager.view.add.AddTask;
 import penny.downloadmanager.view.add.AddDialog;
 import penny.downloadmanager.model.Model;
+import penny.downloadmanager.view.settings.StartupSettings;
 
 /**
  *
@@ -21,6 +22,7 @@ public class View {
     private static DownloadSettingsDialog settingsDialogView;
     private static MainWindow mainWindowView;
     private static EditFileFormat editFileFormat;
+    private static StartupSettings startupSettings;
 
     /**
      * @return the addDialogView
@@ -54,11 +56,16 @@ public class View {
         return addTask;
     }
 
+    public static StartupSettings getStartupSettings() {
+        return startupSettings;
+    }
+
     public static void build() {
         settingsDialogView = new DownloadSettingsDialog(Model.getSettingsDialogModel());
         Model.getSettingsDialogModel().addPropertyChangeListener(settingsDialogView);
         addDialogView = new AddDialog(Model.getAddDialogModel());
         mainWindowView = new MainWindow(Model.getMainWindowModel(), Model.getTaskManagerModel());
         addTask = new AddTask();
+        startupSettings = new StartupSettings(Model.getStartupDialogModel());
     }
 }

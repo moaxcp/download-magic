@@ -8,15 +8,11 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
-import penny.downloadmanager.model.db.DAOFactory;
-import penny.downloadmanager.model.db.DownloadDAO;
 import penny.downloadmanager.model.task.TaskData;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -29,18 +25,28 @@ public class TaskSaver implements ListEventListener<TaskData>, PropertyChangeLis
     public TaskSaver(ObservableElementList<TaskData> tasks) {
         this.tasks = tasks;
         this.tasks.addListEventListener(this);
-        for (TaskData t : tasks) {
-            t.addPropertyChangeListener(this);
+        try {
+            tasks.getReadWriteLock().writeLock().lock();
+            for (TaskData t : tasks) {
+                t.addPropertyChangeListener(this);
+            }
+        } finally {
+            tasks.getReadWriteLock().writeLock().unlock();
         }
     }
 
     public void saveList() {
         ArrayList<TaskData> saveList = new ArrayList<TaskData>();
-        for (TaskData t : tasks) {
-            saveList.add(t);
+        try {
+            tasks.getReadWriteLock().readLock().lock();
+            for (TaskData t : tasks) {
+                saveList.add(t);
+            }
+        } finally {
+            tasks.getReadWriteLock().readLock().unlock();
         }
 
-        
+        ObjectOutputStream out;
     }
 
     @Override

@@ -27,7 +27,7 @@
             <Property name="text" type="java.lang.String" value="Edit"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+            <MenuItem class="javax.swing.JMenuItem" name="applicationStartup">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Application Startup"/>
               </Properties>
@@ -81,7 +81,7 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem5">
+            <MenuItem class="javax.swing.JMenuItem" name="downloadProperties">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Properties"/>
               </Properties>
