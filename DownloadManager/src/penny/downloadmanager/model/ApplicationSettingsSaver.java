@@ -39,8 +39,6 @@ public class ApplicationSettingsSaver {
         if (appSettings == null) {
             throw new IllegalStateException("appSettings must be set before being saved");
         }
-        System.out.println("save md5 " + appSettings.getStartupModel().isCheckMD5s());
-        System.out.println("save size " + appSettings.getStartupModel().isCheckSizes());
         FileOutputStream fout = null;
         ObjectOutputStream oos = null;
         try {
@@ -83,8 +81,6 @@ public class ApplicationSettingsSaver {
             fin = new FileInputStream(saveFile);
             ois = new ObjectInputStream(fin);
             appSettings.copy((ApplicationSettingsModel) ois.readObject());
-            System.out.println("load md5 " + appSettings.getStartupModel().isCheckMD5s());
-            System.out.println("load size " + appSettings.getStartupModel().isCheckSizes());
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.INFO, "appSettings have been loaded {0}", appSettings);
         } catch (FileNotFoundException ex) {
             Logger.getLogger(ApplicationSettingsSaver.class.getName()).log(Level.SEVERE, null, ex);

@@ -25,8 +25,6 @@ public class StartupSettings extends javax.swing.JDialog implements PropertyChan
     /** Creates new form StartupSettings */
     public StartupSettings(StartupDialogModel startupDialogModel) {
         this.startupDialogModel = startupDialogModel;
-        System.out.println("view check md5 " + startupDialogModel.getStartupModelCopy().isCheckMD5s());
-        System.out.println("view check size " + startupDialogModel.getStartupModelCopy().isCheckSizes());
         startupDialogModel.addPropertyChangeListener(this);
         startupDialogModel.getStartupModelCopy().addPropertyChangeListener(this);
         initComponents();
@@ -119,12 +117,6 @@ public class StartupSettings extends javax.swing.JDialog implements PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(StartupDialogModel.PROP_VISIBLE)) {
             this.setVisible((Boolean) evt.getNewValue());
-            System.out.println("view check md5 " + startupDialogModel.getStartupModelCopy().isCheckMD5s() + " " + startupDialogModel.getStartupModel().isCheckMD5s());
-            System.out.println("view check size " + startupDialogModel.getStartupModelCopy().isCheckSizes() + " " + startupDialogModel.getStartupModel().isCheckSizes());
-        } else if(evt.getPropertyName().equals(StartupModel.PROP_CHECKMD5S)) {
-            System.out.println("view changed check md5 " + startupDialogModel.getStartupModelCopy().isCheckMD5s() + " " + startupDialogModel.getStartupModel().isCheckMD5s());
-        } else if(evt.getPropertyName().equals(StartupModel.PROP_CHECKSIZES)) {
-            System.out.println("view changed check size " + startupDialogModel.getStartupModelCopy().isCheckSizes() + " " + startupDialogModel.getStartupModel().isCheckSizes());
         }
     }
 }
