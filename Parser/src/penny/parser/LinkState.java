@@ -22,6 +22,13 @@ public class LinkState implements Serializable {
         srcLink = false;
     }
 
+    public void copy(LinkState state) {
+        link.delete(0, link.length());
+        link.append(state.link);
+        extract = state.extract;
+        srcLink = state.srcLink;
+    }
+
     /**
      * @return the link
      */
