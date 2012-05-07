@@ -10,13 +10,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.download.Download;
 
 /**
  *
@@ -31,30 +30,24 @@ public class JavaDBDataSource {
     private String dbName = "downloads";
     private String strCreateDownloadTable =
             "create table DOWNLOAD (\n"
-            + "    " + DownloadData.PROP_URL + "                VARCHAR(32672) NOT NULL PRIMARY KEY, \n"
-            + "    " + DownloadData.PROP_SIZE + "               BIGINT, \n"
-            + "    " + DownloadData.PROP_DOWNLOADED + "         BIGINT, \n"
-            + "    " + DownloadData.PROP_STATUS + "             DownloadStatus, \n"
-            + "    " + DownloadData.PROP_DOWNLOADTIME + "       BIGINT, \n"
-            + "    " + DownloadData.PROP_SAVEPATH + "       VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_TEMPPATH + "        VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_ATTEMPTS + "        SMALLINT, \n"
-            + "    " + DownloadData.PROP_CONTENTTYPE + "        VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_HOST + "               VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_PROTOCOL + "           VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_QUERY + "              VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_PATH + "               VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_FILE + "               VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_PROTOCOLFILENAME + "      VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_FILEEXTENTION + "      VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_MESSAGE + "      VARCHAR(32672), \n"
-            + "    " + DownloadData.PROP_RETRYTIME + "        BIGINT, \n"
-            + "    " + DownloadData.PROP_RESPONSECODE + "        SMALLINT, \n"
-            + "    " + DownloadData.PROP_LOCATIONS + "        List, \n"
-            + "    " + DownloadData.PROP_EXTRAPROPS + "        Map, \n"
-            + "    " + DownloadData.PROP_MD5 + "        MD5State, \n"
-            + "    " + DownloadData.PROP_LINKSTATE + "        LinkState, \n"
-            + "    " + DownloadData.PROP_WORDBUFFER + "        VARCHAR(32672) \n"
+            + "    " + Download.PROP_URL + "                VARCHAR(32672) NOT NULL PRIMARY KEY, \n"
+            + "    " + Download.PROP_SIZE + "               BIGINT, \n"
+            + "    " + Download.PROP_DOWNLOADED + "         BIGINT, \n"
+            + "    " + Download.PROP_STATUS + "             DownloadStatus, \n"
+            + "    " + Download.PROP_DOWNLOADTIME + "       BIGINT, \n"
+            + "    " + Download.PROP_ATTEMPTS + "        SMALLINT, \n"
+            + "    " + Download.PROP_CONTENTTYPE + "        VARCHAR(32672), \n"
+            + "    " + Download.PROP_HOST + "               VARCHAR(32672), \n"
+            + "    " + Download.PROP_PROTOCOL + "           VARCHAR(32672), \n"
+            + "    " + Download.PROP_QUERY + "              VARCHAR(32672), \n"
+            + "    " + Download.PROP_PATH + "               VARCHAR(32672), \n"
+            + "    " + Download.PROP_FILE + "               VARCHAR(32672), \n"
+            + "    " + Download.PROP_PROTOCOLFILENAME + "      VARCHAR(32672), \n"
+            + "    " + Download.PROP_FILEEXTENTION + "      VARCHAR(32672), \n"
+            + "    " + Download.PROP_MESSAGE + "      VARCHAR(32672), \n"
+            + "    " + Download.PROP_RETRYTIME + "        BIGINT, \n"
+            + "    " + Download.PROP_RESPONSECODE + "        SMALLINT, \n"
+            + "    " + Download.PROP_LOCATIONS + "        List \n"
             + ")";
     private String strCreateUrlTable =
             "create table URL (\n"
@@ -81,14 +74,14 @@ public class JavaDBDataSource {
             + "    PRIMARY KEY        (URL, NAME),\n"
             + "    FOREIGN KEY        (URL) REFERENCES DOWNLOAD (" + DownloadData.PROP_URL + ")\n"
             + ")";
-    private String strCreateMD5StateType =
-            "create type MD5STATE\n " +
-            "EXTERNAL NAME 'penny.recmd5.MD5State'\n " +
-            "LANGUAGE JAVA";
-    private String strCreateLinkStateType =
-            "create type LinkState\n " +
-            "EXTERNAL NAME 'penny.parser.LinkState'\n " +
-            "LANGUAGE JAVA";
+//    private String strCreateMD5StateType =
+//            "create type MD5STATE\n " +
+//            "EXTERNAL NAME 'penny.recmd5.MD5State'\n " +
+//            "LANGUAGE JAVA";
+//    private String strCreateLinkStateType =
+//            "create type LinkState\n " +
+//            "EXTERNAL NAME 'penny.parser.LinkState'\n " +
+//            "LANGUAGE JAVA";
     private String strCreateObjectType =
             "create type OBJECT\n " +
             "EXTERNAL NAME 'java.lang.Object'\n " +
@@ -100,10 +93,6 @@ public class JavaDBDataSource {
     private String strCreateListType =
             "create type List\n " +
             "EXTERNAL NAME 'java.util.List'\n " +
-            "LANGUAGE JAVA";
-    private String strCreateMapType =
-            "create type Map\n " +
-            "EXTERNAL NAME 'java.util.Map'\n " +
             "LANGUAGE JAVA";
     private static JavaDBDataSource dataSource;
     private Queue<Connection> conPool;
@@ -232,12 +221,11 @@ public class JavaDBDataSource {
         Statement statement = null;
         try {
             statement = dbConnection.createStatement();
-            statement.execute(strCreateMD5StateType);
-            statement.execute(strCreateLinkStateType);
+            //statement.execute(strCreateMD5StateType);
+            //statement.execute(strCreateLinkStateType);
             statement.execute(strCreateObjectType);
             statement.execute(strCreateDownloadStatusType);
             statement.execute(strCreateListType);
-            statement.execute(strCreateMapType);
             statement.execute(strCreateDownloadTable);
             statement.execute(strCreateUrlTable);
             statement.execute(strCreateWordTable);

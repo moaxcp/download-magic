@@ -26,8 +26,8 @@ public class ImageInfo implements DownloadProcessor {
         try {
             BufferedImage image = ImageIO.read(file);
             if (image != null) {
-                i.setExtraProps(Model.getApplicationSettings().getImageModel().getHeightName(), Integer.toString(image.getHeight()));
-                i.setExtraProps(Model.getApplicationSettings().getImageModel().getWidthName(), Integer.toString(image.getWidth()));
+                i.setExtraProperty(Model.getApplicationSettings().getImageModel().getHeightName(), Integer.toString(image.getHeight()));
+                i.setExtraProperty(Model.getApplicationSettings().getImageModel().getWidthName(), Integer.toString(image.getWidth()));
             }
             image = null;
         } catch (IOException ex) {
