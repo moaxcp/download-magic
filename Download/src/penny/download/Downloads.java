@@ -13,6 +13,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -274,5 +276,35 @@ public class Downloads {
         String smilli = milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli;
         String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
         return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
+    }
+
+    public static String insertProperties(Download d, String statement) {
+        String str = statement;
+        Pattern pat = Pattern.compile("\\$\\{\\w+\\}");
+        Matcher mat = pat.matcher(str);
+        while (mat.find()) {
+            String prop = mat.group();
+            prop = prop.replace("${", "");
+            prop = prop.replace("}", "");
+            str = str.replace("${" + prop + "}", d.getProperty(prop).toString());
+        }
+        return str;
+    }
+
+    public static String getFileName(Download d, String saveNameFormat, String defaultFileName) {
+        String str = saveNameFormat;
+        Pattern pat = Pattern.compile("\\$\\{\\w+\\}");
+        Matcher mat = pat.matcher(str);
+        while (mat.find()) {
+            String prop = mat.group();
+            prop = prop.replace("${", "");
+            prop = prop.replace("}", "");
+            if (prop.equals(Download.PROP_FILE) && d.getProperty(prop).equals("")) {
+                str = str.replace("${" + prop + "}", defaultFileName);
+            } else {
+                str = str.replace("${" + prop + "}", d.getProperty(prop).toString());
+            }
+        }
+        return str;
     }
 }
