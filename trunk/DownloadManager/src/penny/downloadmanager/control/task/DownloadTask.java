@@ -5,18 +5,14 @@
 package penny.downloadmanager.control.task;
 
 import penny.download.DownloadProcessor;
-import penny.download.DownloadSettings;
 import penny.download.Downloader;
 import penny.downloadmanager.control.di.ImageInfo;
 import penny.downloadmanager.control.di.MD5Updater;
 import penny.downloadmanager.control.di.Parser;
 import penny.downloadmanager.control.di.TempFileSaver;
 import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.task.Status;
 import penny.downloadmanager.model.task.DTaskData;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import penny.downloadmanager.control.di.ByteBufferUpdater;
