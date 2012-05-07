@@ -112,97 +112,78 @@ public class Download implements Comparable<Download> {
      * Property string for url.
      */
     public static final String PROP_URL = "url";
-
     /**
      * The URL of this Download.
      */
     protected URL url;
-
     /**
      * The total size of this Download.
      */
     protected long size;
-
     /**
      * How much has been downloaded so far.
      */
     protected long downloaded;
-
     /**
      * The DownloadStatus of this Download.
      */
     protected DownloadStatus status;
-
     /**
      * The total time spent downloading.
      */
     protected long downloadTime;
-
     /**
      * The time the download has been recently started
      */
     protected long downloadStartTime;
-
     /**
      * The time since the retry delay started.
      */
     protected long retryStartTime;
-
     /**
      * The total time spent waiting to retry.
      */
     protected long retryTime;
-
     /**
      * The number of attempts for this Download.
      */
     protected int attempts;
-
     /**
      * The content type of this Download.
      */
     protected String contentType;
-
     /**
      * A general message to be displayed when specific events happen.
      */
     protected String message;
-    
     /**
      * The host of the URL for this Download.
      */
     protected String host;
-
     /**
      * The protocol of the URL for this Download.
      */
     protected String protocol;
-
     /**
      * The query of the URL for this Download.
      */
     protected String query;
-
     /**
      * The path of the URL for this Download.
      */
     protected String path;
-
     /**
      * The file of the URL for this Download.
      */
     protected String file;
-
     /**
      * The file name return by protocol (may not be same as url)
      */
     protected String protocolFileName;
-
     /**
      * The file extention of the URL for this Download.
      */
     protected String fileExtention;
-
     /**
      * The set of URLs the Download has been redirected from. In HTTP when a
      * connection is supposed to be redirected the Download url will change and
@@ -210,7 +191,6 @@ public class Download implements Comparable<Download> {
      */
     protected List<URL> locations;
     public static final String PROP_LOCATIONS = "locations";
-
     /**
      * The HTTP response code recieved when connecting to the url in this
      * Download.
@@ -218,6 +198,40 @@ public class Download implements Comparable<Download> {
     protected int responseCode;
     public static final String PROP_RESPONSECODE = "responseCode";
 
+    
+    protected Map<String, Object> extraProps;
+    private List<String> propertyNames;
+
+    private static final List<String> nativePropertyNames;
+
+    static {
+        List<String> l = new ArrayList<String>();
+
+        l.add(Download.PROP_ATTEMPTS);
+        l.add(Download.PROP_CONTENTTYPE);
+        l.add(Download.PROP_DOWNLOADED);
+        l.add(Download.PROP_DOWNLOADTIME);
+        l.add(Download.PROP_FILE);
+        l.add(Download.PROP_PROTOCOLFILENAME);
+        l.add(Download.PROP_FILEEXTENTION);
+        l.add(Download.PROP_HOST);
+        l.add(Download.PROP_LOCATIONS);
+        l.add(Download.PROP_MESSAGE);
+        l.add(Download.PROP_PATH);
+        l.add(Download.PROP_PROTOCOL);
+        l.add(Download.PROP_QUERY);
+        l.add(Download.PROP_RESPONSECODE);
+        l.add(Download.PROP_RETRYTIME);
+        l.add(Download.PROP_SIZE);
+        l.add(Download.PROP_STATUS);
+        l.add(Download.PROP_URL);
+
+        nativePropertyNames = l;
+    }
+
+    public static List<String> getNativePropertyNames() {
+        return nativePropertyNames;
+    }
 
     /**
      * propertySupport.
@@ -229,38 +243,56 @@ public class Download implements Comparable<Download> {
      */
     public Download() {
         propertySupport = new PropertyChangeSupport(this);
-        this.setFile("");
-        this.setProtocolFileName("");
-        this.setFileExtention("");
-        this.setHost("");
-        this.setPath("");
-        this.setProtocol("");
-        this.setQuery("");
-        this.setSize(-1);
-        this.setDownloaded(0);
-        this.status = DownloadStatus.QUEUED;
-        this.setAttempts(0);
-        this.setContentType("");
-        this.setDownloadStartTime(0);
-        this.setDownloadTime(0);
-        this.setMessage("");
-        this.setRetryStartTime(0);
-        this.setRetryTime(0);
+        file = "";
+        protocol = "";
+        protocolFileName = "";
+        fileExtention = "";
+        host = "";
+        path = "";
+        protocol = "";
+        query = "";
+        size = -1;
+        downloaded = 0;
+        status = DownloadStatus.QUEUED;
+        attempts = 0;
+        contentType = "";
+        downloadStartTime = 0;
+        downloadTime = 0;
+        message = "";
+        retryStartTime = 0;
+        retryTime = 0;
         locations = new ArrayList<URL>();
+        extraProps = new HashMap<String, Object>();
+        propertyNames = new ArrayList<String>();
+
+        propertyNames.add(Download.PROP_ATTEMPTS);
+        propertyNames.add(Download.PROP_CONTENTTYPE);
+        propertyNames.add(Download.PROP_DOWNLOADED);
+        propertyNames.add(Download.PROP_DOWNLOADTIME);
+        propertyNames.add(Download.PROP_FILE);
+        propertyNames.add(Download.PROP_PROTOCOLFILENAME);
+        propertyNames.add(Download.PROP_FILEEXTENTION);
+        propertyNames.add(Download.PROP_HOST);
+        propertyNames.add(Download.PROP_LOCATIONS);
+        propertyNames.add(Download.PROP_MESSAGE);
+        propertyNames.add(Download.PROP_PATH);
+        propertyNames.add(Download.PROP_PROTOCOL);
+        propertyNames.add(Download.PROP_QUERY);
+        propertyNames.add(Download.PROP_RESPONSECODE);
+        propertyNames.add(Download.PROP_RETRYTIME);
+        propertyNames.add(Download.PROP_SIZE);
+        propertyNames.add(Download.PROP_STATUS);
+        propertyNames.add(Download.PROP_URL);
     }
-    
+
     public Download(URL url) {
         this();
         this.setUrl(url);
-        this.setFile(Downloads.getFileName(url.getPath()));
-        this.setPath(Downloads.getPath(url.getPath()));
-        this.setFileExtention(Downloads.getFileExtention(url.getPath()));
-        this.setQuery(url.getQuery());
-        if(this.query == null) {
+        if (this.query == null) {
             this.query = "";
         }
-        this.setProtocol(url.getProtocol());
-        if(this.protocol == null) {
+        
+        if (this.protocol == null) {
             this.protocol = "";
         }
     }
@@ -275,7 +307,7 @@ public class Download implements Comparable<Download> {
         this.url = url;
         propertySupport.firePropertyChange(PROP_URL, oldValue, getUrl());
         setFile(Downloads.getFileName(url.getPath()));
-        if(getFile() != null) {
+        if (getFile() != null) {
             setFileExtention(Downloads.getFileExtention(getFile()));
         }
         setHost(url.getHost());
@@ -381,54 +413,54 @@ public class Download implements Comparable<Download> {
         DownloadStatus oldValue = getStatus();
         switch (status) {
             case QUEUED:
-                if(!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.STOPPED || oldValue == DownloadStatus.QUEUED)) {
+                if (!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.STOPPED || oldValue == DownloadStatus.QUEUED)) {
                     throw new IllegalStateException("Download status must be ERROR or STOPPED before setting to QUEUED. oldValue=" + oldValue);
                 }
                 break;
             case STARTED:
-                if(!(oldValue == DownloadStatus.QUEUED || oldValue == DownloadStatus.RETRYING)) {
+                if (!(oldValue == DownloadStatus.QUEUED || oldValue == DownloadStatus.RETRYING)) {
                     throw new IllegalStateException("Download status must be QUEUED or RETRYING before setting to STARTED. oldValue=" + oldValue);
                 }
                 break;
             case CONNECTING:
-                if(!(oldValue == DownloadStatus.STARTED || oldValue == DownloadStatus.REDIRECTED)) {
+                if (!(oldValue == DownloadStatus.STARTED || oldValue == DownloadStatus.REDIRECTED)) {
                     throw new IllegalStateException("Download status must be STARTING before setting to CONNECTING. oldValue=" + oldValue);
                 }
                 break;
             case CONNECTED:
-                if(!(oldValue == DownloadStatus.CONNECTING)) {
+                if (!(oldValue == DownloadStatus.CONNECTING)) {
                     throw new IllegalStateException("Download status must be CONNECTING before setting to CONNECTED. oldValue=" + oldValue);
                 }
                 break;
             case DOWNLOADING:
-                if(!(oldValue == DownloadStatus.CONNECTED)) {
+                if (!(oldValue == DownloadStatus.CONNECTED)) {
                     throw new IllegalStateException("Download status must be CONNECTED before setting to DOWNLOADING. oldValue=" + oldValue);
                 }
                 break;
             case STOPPED:
                 break;
             case ERROR:
-                if(oldValue == DownloadStatus.COMPLETE) {
+                if (oldValue == DownloadStatus.COMPLETE) {
                     throw new IllegalStateException("Download status cannot be COMPLETE before setting to ERROR. oldValue=" + oldValue);
                 }
                 break;
             case RETRY:
-                if(!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.REDIRECTED)) {
+                if (!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.REDIRECTED)) {
                     throw new IllegalStateException("Download status must be ERROR or REDIRECTED before setting to RETRY. oldValue=" + oldValue);
                 }
                 break;
             case RETRYING:
-                if(!(oldValue == DownloadStatus.RETRY)) {
+                if (!(oldValue == DownloadStatus.RETRY)) {
                     throw new IllegalStateException("Download status must be RETRY before setting to RETRYING. oldValue=" + oldValue);
                 }
                 break;
             case REDIRECTED:
-                if(!(oldValue == DownloadStatus.CONNECTING)) {
+                if (!(oldValue == DownloadStatus.CONNECTING)) {
                     throw new IllegalStateException("Download status must be CONNECTING before setting to REDIRECTED. oldValue=" + oldValue);
                 }
                 break;
             case COMPLETE:
-                if(!(oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.QUEUED)) {
+                if (!(oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.QUEUED)) {
                     throw new IllegalStateException("Download status must be DOWNLOADING before setting to COMPLETE. oldValue=" + oldValue);
                 }
                 break;
@@ -715,7 +747,7 @@ public class Download implements Comparable<Download> {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof Download && ((Download)obj).getUrl().equals(this.getUrl())) {
+        if (obj instanceof Download && ((Download) obj).getUrl().equals(this.getUrl())) {
             return true;
         }
         return false;
@@ -727,14 +759,14 @@ public class Download implements Comparable<Download> {
         hash = 17 * hash + (this.url != null ? this.url.hashCode() : 0);
         return hash;
     }
-    
+
     /**
      * initializes the download time. Use this before a read() operation.
      */
     public void initDownloadTime() {
         this.setDownloadStartTime(System.nanoTime());
     }
-    
+
     /**
      * updates the download time. Use this after a read() operation.
      */
@@ -744,7 +776,7 @@ public class Download implements Comparable<Download> {
         this.setDownloadStartTime(System.nanoTime());
         propertySupport.firePropertyChange(PROP_DOWNLOADTIME, oldValue, getDownloadTime());
     }
-    
+
     /**
      * initializes the retry time. Use this before a sleep() operation.
      */
@@ -752,7 +784,7 @@ public class Download implements Comparable<Download> {
         this.setRetryStartTime(System.nanoTime());
         this.setRetryTime(0);
     }
-    
+
     /**
      * updates the Retry Time. Use this after a sleep() operation.
      */
@@ -761,6 +793,94 @@ public class Download implements Comparable<Download> {
         this.setRetryTime((System.nanoTime() - this.getRetryStartTime()) + this.getRetryTime());
         this.setRetryStartTime(System.nanoTime());
         propertySupport.firePropertyChange(PROP_RETRYTIME, oldValue, getRetryTime());
+    }
+
+    @Override
+    public String toString() {
+        return url.toString();
+    }
+
+    public int compareTo(Download o) {
+        return getUrl().toString().compareTo(o.getUrl().toString());
+    }
+
+    public List<String> getPropertyNames() {
+        for (String k : extraProps.keySet()) {
+            if (!propertyNames.contains(k)) {
+                propertyNames.add(k);
+            }
+        }
+
+        return Collections.unmodifiableList(propertyNames);
+    }
+
+    public Object getProperty(String key) {
+
+        if (key.equals(Download.PROP_ATTEMPTS)) {
+            return Integer.valueOf(this.getAttempts());
+        } else if (key.equals(Download.PROP_CONTENTTYPE)) {
+            return this.getContentType();
+        } else if (key.equals(Download.PROP_DOWNLOADED)) {
+            return Long.valueOf(this.getDownloaded());
+        } else if (key.equals(Download.PROP_DOWNLOADTIME)) {
+            return Long.valueOf(this.getDownloadTime());
+        } else if (key.equals(Download.PROP_FILE)) {
+            return this.getFile();
+        } else if (key.equals(Download.PROP_PROTOCOLFILENAME)) {
+            return this.getProtocolFileName();
+        } else if (key.equals(Download.PROP_FILEEXTENTION)) {
+            return this.getFileExtention();
+        } else if (key.equals(Download.PROP_HOST)) {
+            return this.getHost();
+        } else if (key.equals(Download.PROP_LOCATIONS)) {
+            return this.getLocations();
+        } else if (key.equals(Download.PROP_MESSAGE)) {
+            return this.getMessage();
+        } else if (key.equals(Download.PROP_PATH)) {
+            return this.getPath();
+        } else if (key.equals(Download.PROP_PROTOCOL)) {
+            return this.getProtocol();
+        } else if (key.equals(Download.PROP_QUERY)) {
+            return this.getQuery();
+        } else if (key.equals(Download.PROP_RESPONSECODE)) {
+            return Integer.valueOf(this.getResponseCode());
+        } else if (key.equals(Download.PROP_RETRYTIME)) {
+            return Long.valueOf(this.getRetryTime());
+        } else if (key.equals(Download.PROP_SIZE)) {
+            return Long.valueOf(this.getSize());
+        } else if (key.equals(Download.PROP_STATUS)) {
+            return this.getStatus();
+        } else if (key.equals(Download.PROP_URL)) {
+            return this.getUrl();
+        }
+
+        for (String s : extraProps.keySet()) {
+            if (s.equals(key)) {
+                return extraProps.get(s);
+            }
+        }
+
+        return null;
+    }
+
+    public void setExtraProperty(String key, Object value) {
+        if (nativePropertyNames.contains(key)) {
+            throw new IllegalArgumentException("use setter for native property " + key);
+        } else {
+            Object oldValue = extraProps.get(key);
+            extraProps.put(key, value);
+            propertySupport.firePropertyChange(key, oldValue, value);
+        }
+    }
+
+    public Map<String, Object> getExtraProperties() {
+        return Collections.unmodifiableMap(extraProps);
+    }
+
+    public void setExtraProperty(Map<String, Object> props) {
+        for(String s : props.keySet()) {
+            setExtraProperty(s, props.get(s));
+        }
     }
 
     /**
@@ -779,12 +899,10 @@ public class Download implements Comparable<Download> {
         propertySupport.removePropertyChangeListener(listener);
     }
 
-    @Override
-    public String toString() {
-        return url.toString();
-    }
-
-    public int compareTo(Download o) {
-        return getUrl().toString().compareTo(o.getUrl().toString());
+    public void removePropertyChangeListeners() {
+        PropertyChangeListener[] listeners = propertySupport.getPropertyChangeListeners();
+        for(PropertyChangeListener l : listeners) {
+            removePropertyChangeListener(l);
+        }
     }
 }
