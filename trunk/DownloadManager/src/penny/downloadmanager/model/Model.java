@@ -328,7 +328,12 @@ public class Model {
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        } catch(Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.toString(),
+                    "Exception",
+                    JOptionPane.ERROR_MESSAGE);
+            Application.setShutdown(true);
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //TODO on exception display message and signal shutdown.
     }
 }
