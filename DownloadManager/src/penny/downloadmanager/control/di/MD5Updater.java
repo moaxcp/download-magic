@@ -81,6 +81,7 @@ public class MD5Updater implements DownloadProcessor {
     @Override
     public void onInit(Download d) {
         DownloadData i = (DownloadData) d;
+            init(d);
         if (d.getDownloaded() <= 0 && Model.generateMD5(i)) {
             i.setMD5(new MD5State());
         }
