@@ -73,7 +73,7 @@ public class MainWindowModel {
     public void clearDownloads() {
         downloadSaver.setSaveDelete(false);
         for(DownloadData d : downloads) {
-            Model.remove(new File(getSelectedDownload().getTempPath()));
+            Model.remove(new File(d.getTempPath()));
         }
         downloads.clear();
         DAOFactory.getInstance().getDownloadDAO().clearDownloads();

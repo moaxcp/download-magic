@@ -153,16 +153,18 @@ public class Model {
     }
 
     public static void remove(File f) {
-        if (f.isFile()) {
-            f.delete();
-            remove(f.getParentFile());
-        } else if (f.isDirectory()) {
-            if (f.listFiles().length == 0) {
-                File tempFolder = new File(applicationSettings.getSavingModel().getTempFolder());
-                File saveFolder = new File(applicationSettings.getSavingModel().getSaveFolder());
-                if (!f.equals(tempFolder) && !f.equals(saveFolder)) {
-                    f.delete();
-                    remove(f.getParentFile());
+        if (f != null) {
+            if (f.isFile()) {
+                f.delete();
+                remove(f.getParentFile());
+            } else if (f.isDirectory()) {
+                if (f.listFiles().length == 0) {
+                    File tempFolder = new File(applicationSettings.getSavingModel().getTempFolder());
+                    File saveFolder = new File(applicationSettings.getSavingModel().getSaveFolder());
+                    if (!f.equals(tempFolder) && !f.equals(saveFolder)) {
+                        f.delete();
+                        remove(f.getParentFile());
+                    }
                 }
             }
         }
@@ -328,7 +330,7 @@ public class Model {
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-        } catch(Exception ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(null, ex.toString(),
                     "Exception",
                     JOptionPane.ERROR_MESSAGE);
