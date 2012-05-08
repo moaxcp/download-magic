@@ -7,7 +7,6 @@ package penny.downloadmanager.control.di;
 import penny.download.Download;
 import penny.download.DownloadStatus;
 import penny.download.DownloadProcessor;
-import penny.downloadmanager.model.ApplicationSettingsModel;
 import penny.downloadmanager.model.DownloadData;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.gui.SavingModel;
@@ -196,7 +195,7 @@ public class TempFileSaver implements DownloadProcessor {
 
             save.getParentFile().mkdirs();
             temp.renameTo(save);
-            Model.remove(temp);
+            Model.remove(temp.getParentFile());
         } else {
             Model.remove(temp);
             Model.remove(save);
