@@ -215,7 +215,6 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             int param = 1;
             for (String s : propertyNames) {
                 Object o = download.getProperty(s);
-                System.out.println("property " + s + " value " + o);
                 if (o instanceof Long) {
                     statement.setLong(param, (Long) o);
                 } else if (o instanceof Integer) {
@@ -437,10 +436,10 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 executeUpdate = statement.executeUpdate();
                 Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update download set {1} = {2} where url = ''{3}''", new Object[]{executeUpdate, property, o, download.getUrl().toString()});
                 statement.close();
+                return executeUpdate > 0;
             } else {
-                saveProperty(download.getUrl().toString(), property, download.getProperty(property));
+                return saveProperty(download.getUrl().toString(), property, download.getProperty(property));
             }
-            return executeUpdate > 0;
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "property " + property + " value " + download.getProperty(property), ex);
         } finally {
@@ -526,7 +525,6 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     public boolean saveProperty(String url, String name, Object property) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
-        int executeUpdate = 0;
         try {
             Statement statement = connection.createStatement();
             String query = "select name from property where url = '" + url + "' and name = '" + name + "'";
@@ -538,7 +536,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 insert.setObject(1, property);
                 insert.setString(2, url);
                 insert.setString(3, name);
-                executeUpdate = insert.executeUpdate();
+                int executeUpdate = insert.executeUpdate();
                 Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update property set property = {1} where url = {2} and name = {3}", new Object[]{executeUpdate, property, url, name});
                 return executeUpdate > 0;
             }
@@ -547,7 +545,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             insert.setString(1, url);
             insert.setString(2, name);
             insert.setObject(3, property);
-            executeUpdate = insert.executeUpdate();
+            int executeUpdate = insert.executeUpdate();
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on insert into property (url, name, property) values ({1}, {2}, {3})", new Object[]{executeUpdate, url, name, property});
             insert.close();
             return executeUpdate > 0;

@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.download.Download;
 import penny.download.DownloadStatus;
 import penny.recmd5.MD5State;
 
@@ -173,9 +174,9 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     changeList.getReadWriteLock().readLock().unlock();
 
                     //TODO can check previous values using a map for each download before updating db. should be faster than I/O
-                    updateMD5(d3);
-                    updateLinkState(d3);
-                    updateWordState(d3);
+                    //updateMD5(d3);
+                    //updateLinkState(d3);
+                    //updateWordState(d3);
                     break;
             }
         }
@@ -193,6 +194,8 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                 update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADTIME);
                 update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
                 lastSaveTime.put(d, d.getDownloadTime());
+            } else {
+                update = true;
             }
 
         } else if(saveProps.contains(evt.getPropertyName())) {
@@ -205,7 +208,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
             update = dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
         }
 
-        if (!update && saveProps.contains(evt.getPropertyName()) && !(evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADED) || evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADTIME))) {
+        if (!update && saveProps.contains(evt.getPropertyName())) {
             Logger.getLogger(DownloadSaver.class.getName()).log(Level.SEVERE, "Did not save {0} for {1}", new Object[]{evt.getPropertyName(), d.getUrl()});
         }
     }
