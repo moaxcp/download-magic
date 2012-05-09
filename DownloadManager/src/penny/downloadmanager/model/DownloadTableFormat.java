@@ -21,6 +21,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
     private Map<String, Class> columns;
     public static final String PROP_PROGRESS = "progress";
     public static final String PROP_RATE = "rate";
+    public static final String PROP_TIMELEFT = "timeLeft";
     private Comparator comparator = new Comparator() {
 
         @Override
@@ -33,6 +34,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
         columns = new TreeMap<String, Class>();
         columns.put(PROP_PROGRESS, JProgressBar.class);
         columns.put(PROP_RATE, String.class);
+        columns.put(PROP_TIMELEFT, String.class);
     }
 
     public boolean getColumns(DownloadData d) {
@@ -69,6 +71,11 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
     @Override
     public Object getColumnValue(DownloadData download, int column) {
         String name = getColumnName(column);
+        if(name.equals(PROP_TIMELEFT)) {
+            long rate = (download.getDownloadTime() / 1000000 == 0 ? 0 : download.getDownloaded() / (download.getDownloadTime() / 1000000));
+            long time = rate == 0 ? 0 : (download.getSize() - download.getDownloaded()) / rate;
+            return Downloads.formatMilliTimeMilli(time);
+        }
         if (name.equals(PROP_PROGRESS)) {
             if (download.getSize() >= 0) {
                 return (((float) download.getDownloaded()) / (float) download.getSize()) * 100;
