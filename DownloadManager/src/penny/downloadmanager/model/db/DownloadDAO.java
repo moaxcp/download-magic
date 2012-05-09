@@ -20,23 +20,33 @@ public interface DownloadDAO {
 
     public List<DownloadData> getDownloads();
 
-    public boolean insertDownload(DownloadData download);
+    public void insertDownload(DownloadData download);
 
-    public boolean updateDownload(DownloadData download, String property);
+    public void updateDownload(DownloadData download, String property);
 
-    public boolean updateDownload(DownloadData download);
+    public void updateDownload(DownloadData download);
 
-    public boolean saveLink(String url, String link, String type);
+    public void saveLink(String url, String link, String type);
 
-    public boolean saveWord(String url, String word);
+    public void saveLink(String url, String link, String type, int count);
 
-    public boolean saveProperty(String url, String name, Object property);
+    public void saveWord(String url, String word);
 
-    public boolean deleteDownload(DownloadData download);
+    public void saveProperty(String url, String name, Object property);
 
-    public boolean clearDownloads(DownloadStatus status);
+    public void deleteDownload(String url);
+
+    public void deleteLinks(String url);
+
+    public void deleteWords(String url);
+
+    public void deleteProperties(String url);
+
+    public void deleteProperty(String url, String name);
+
+    public void clearDownloads(List<DownloadData> downloads);
     
-    public long clearDownloads();
+    public void clearDownloads();
 
     public long getDownloadCount();
 

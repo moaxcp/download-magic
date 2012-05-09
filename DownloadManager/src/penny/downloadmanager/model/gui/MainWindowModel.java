@@ -91,12 +91,12 @@ public class MainWindowModel {
             }
         }
         for(DownloadData d : remove) {
-            Model.remove(new File(getSelectedDownload().getTempPath()));
+            Model.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();
         
-        DAOFactory.getInstance().getDownloadDAO().clearDownloads(DownloadStatus.COMPLETE);
+        DAOFactory.getInstance().getDownloadDAO().clearDownloads(remove);
         downloadSaver.setSaveDelete(true);
     }
 
@@ -111,11 +111,11 @@ public class MainWindowModel {
             }
         }
         for(DownloadData d : remove) {
-            Model.remove(new File(getSelectedDownload().getTempPath()));
+            Model.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();
-        DAOFactory.getInstance().getDownloadDAO().clearDownloads(DownloadStatus.ERROR);
+        DAOFactory.getInstance().getDownloadDAO().clearDownloads(remove);
         downloadSaver.setSaveDelete(true);
     }
 
