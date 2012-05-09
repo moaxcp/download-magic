@@ -84,6 +84,11 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
     }
 
     public void saveAllDownloads() {
+        downloads.getReadWriteLock().readLock().lock();
+        for(DownloadData d : downloads) {
+            dao.updateDownload(d);
+        }
+        downloads.getReadWriteLock().readLock().unlock();
     }
 
     public void updateMD5(DownloadData d) {
@@ -155,7 +160,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     wordStateValuesMap.remove(d1);
 
                     if (saveDelete) {
-                        dao.deleteDownload(d1);
+                        dao.deleteDownload(d1.getUrl().toString());
                     }
                     break;
                 case ListEvent.INSERT:
@@ -186,30 +191,22 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
     public void propertyChange(PropertyChangeEvent evt) {
         DownloadData d = (DownloadData) evt.getSource();
 
-        boolean update = false;
-
         if(d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADED))) {
             long lastTime = lastSaveTime.get(d) == null ? 0 : lastSaveTime.get(d);
             if(d.getDownloadTime() - lastTime > 1000000000) {
-                update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADTIME);
-                update = dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
+                dao.updateDownload(d, DownloadData.PROP_DOWNLOADTIME);
+                dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
                 lastSaveTime.put(d, d.getDownloadTime());
-            } else {
-                update = true;
             }
 
         } else if(saveProps.contains(evt.getPropertyName())) {
-            update = dao.updateDownload(d, evt.getPropertyName());
+            dao.updateDownload(d, evt.getPropertyName());
         } else if (evt.getPropertyName().equals(DownloadData.PROP_SRCLINKS)) {
-            update = dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.SRC);
+            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.SRC);
         } else if (evt.getPropertyName().equals(DownloadData.PROP_HREFLINKS)) {
-            update = dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.HREF);
+            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.HREF);
         } else if (evt.getPropertyName().equals(DownloadData.PROP_WORDS)) {
-            update = dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
-        }
-
-        if (!update && saveProps.contains(evt.getPropertyName())) {
-            Logger.getLogger(DownloadSaver.class.getName()).log(Level.SEVERE, "Did not save {0} for {1}", new Object[]{evt.getPropertyName(), d.getUrl()});
+            dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
         }
     }
 }
