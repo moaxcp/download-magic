@@ -13,7 +13,7 @@ package penny.downloadmanager.view.test;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventTableModel;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import java.awt.LayoutManager;
 
 /**

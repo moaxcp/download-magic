@@ -9,7 +9,6 @@
 
 package penny.downloadmanager.model.db;
 import penny.download.DownloadStatus;
-import penny.downloadmanager.model.DownloadData;
 import java.util.List;
 
 /**
@@ -19,7 +18,7 @@ import java.util.List;
 public interface DownloadDAO {
 
     public List<DownloadData> getDownloads();
-
+    
     public void insertDownload(DownloadData download);
 
     public void updateDownload(DownloadData download, String property);

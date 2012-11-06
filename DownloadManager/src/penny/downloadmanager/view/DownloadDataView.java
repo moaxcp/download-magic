@@ -16,7 +16,7 @@ import ca.odell.glazedlists.GlazedLists;
 import penny.downloadmanager.view.converter.NumberToSizeConverter;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.gui.PropertyEntry;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -413,7 +413,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private penny.downloadmanager.view.converter.BytesToStringConverter bytesToStringConverter1;
-    private penny.downloadmanager.model.DownloadData downloadData;
+    private penny.downloadmanager.model.db.DownloadData downloadData;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

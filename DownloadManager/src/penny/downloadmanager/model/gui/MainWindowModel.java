@@ -11,7 +11,7 @@ import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.UniqueList;
 import penny.download.DownloadStatus;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.DownloadSaver;
 import penny.downloadmanager.model.DownloadTableFormat;
 import penny.downloadmanager.model.db.DAOFactory;

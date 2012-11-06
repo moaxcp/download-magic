@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.model;
 
+import penny.downloadmanager.model.db.DownloadData;
 import ca.odell.glazedlists.ObservableElementList;
 import java.io.FileNotFoundException;
 import penny.download.DownloadStatus;

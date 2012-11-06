@@ -5,7 +5,7 @@
 
 package penny.downloadmanager.model.task;
 
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;

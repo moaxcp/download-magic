@@ -15,7 +15,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.util.RandomChanges;
 import java.net.MalformedURLException;
 import java.net.URL;

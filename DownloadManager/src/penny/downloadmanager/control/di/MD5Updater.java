@@ -9,7 +9,7 @@ import penny.recmd5.MD5State;
 import penny.download.Download;
 import penny.download.DownloadProcessor;
 import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.gui.MD5ingModel;
 import penny.downloadmanager.model.Model;
 import java.security.MessageDigest;

@@ -7,7 +7,7 @@ package penny.downloadmanager.control.di;
 import penny.download.Download;
 import penny.download.DownloadProcessor;
 import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.gui.ParsingModel;
 import java.net.URISyntaxException;

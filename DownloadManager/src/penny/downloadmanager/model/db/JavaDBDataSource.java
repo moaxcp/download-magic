@@ -4,7 +4,6 @@
  */
 package penny.downloadmanager.model.db;
 
-import penny.downloadmanager.model.DownloadData;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -30,7 +29,8 @@ public class JavaDBDataSource {
     private String dbName = "downloads";
     private String strCreateDownloadTable =
             "create table DOWNLOAD (\n"
-            + "    " + Download.PROP_URL + "                VARCHAR(32672) NOT NULL PRIMARY KEY, \n"
+            + "    " + DownloadData.PROP_ID + "             BIGINT NOT NULL PRIMARY KEY, \n"
+            + "    " + Download.PROP_URL + "                VARCHAR(32672) NOT NULL, \n"
             + "    " + Download.PROP_SIZE + "               BIGINT, \n"
             + "    " + Download.PROP_DOWNLOADED + "         BIGINT, \n"
             + "    " + Download.PROP_STATUS + "             DownloadStatus, \n"

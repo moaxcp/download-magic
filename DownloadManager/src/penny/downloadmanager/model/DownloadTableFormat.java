@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.model;
 
+import penny.downloadmanager.model.db.DownloadData;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import penny.download.DownloadStatus;
 import penny.download.Downloads;

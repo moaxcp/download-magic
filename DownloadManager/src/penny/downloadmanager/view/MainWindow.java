@@ -20,7 +20,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.MainWindowControl;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.gui.MainWindowModel;
 import penny.downloadmanager.model.task.Status;
 import penny.downloadmanager.model.task.TaskData;

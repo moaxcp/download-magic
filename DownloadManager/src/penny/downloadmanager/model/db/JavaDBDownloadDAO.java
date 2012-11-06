@@ -8,17 +8,9 @@
  */
 package penny.downloadmanager.model.db;
 
-import penny.download.DownloadStatus;
-import penny.recmd5.MD5State;
-import penny.downloadmanager.model.DownloadData;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +18,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import penny.download.Download;
+import penny.download.DownloadStatus;
 import penny.parser.LinkState;
+import penny.recmd5.MD5State;
 
 /**
  *
@@ -79,7 +73,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select url from download";
+            String query = "select " + DownloadData.PROP_ID + " from download";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
 
@@ -101,7 +95,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         return downloads;
     }
 
-    public DownloadData getDownload(String url) {
+    public DownloadData getDownload(UUID uuid) {
         DownloadData d = null;
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
@@ -223,7 +217,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             throw new IllegalArgumentException(download.getUrl().toString() + "  exists in db");
         }
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = DownloadData.getNativePropertyNames();
+        List<String> propertyNames = new ArrayList<String>(DownloadData.getNativePropertyNames());
         query.append("insert into DOWNLOAD\n(");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {
@@ -315,7 +309,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     @Override
     public void updateDownload(DownloadData download) {
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = DownloadData.getNativePropertyNames();
+        List<String> propertyNames = new ArrayList<String>(DownloadData.getNativePropertyNames());
         query.append("update DOWNLOAD\n set ");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {
