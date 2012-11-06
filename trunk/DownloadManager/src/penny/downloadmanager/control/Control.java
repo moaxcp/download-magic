@@ -7,7 +7,7 @@ package penny.downloadmanager.control;
 
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.task.TaskManager;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.DownloadDAO;

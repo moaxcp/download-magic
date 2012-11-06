@@ -10,7 +10,7 @@
  */
 package penny.downloadmanager.view.renderer;
 
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import java.awt.Color;
 
 /**

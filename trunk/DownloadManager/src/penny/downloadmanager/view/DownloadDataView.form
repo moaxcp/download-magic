@@ -2,7 +2,7 @@
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
-    <Component class="penny.downloadmanager.model.DownloadData" name="downloadData">
+    <Component class="penny.downloadmanager.model.db.DownloadData" name="downloadData">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="d"/>
       </AuxValues>

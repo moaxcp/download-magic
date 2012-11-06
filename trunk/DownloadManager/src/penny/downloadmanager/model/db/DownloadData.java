@@ -3,13 +3,15 @@
  * and open the template in the editor.
  */
 
-package penny.downloadmanager.model;
+package penny.downloadmanager.model.db;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import java.util.Objects;
 import penny.recmd5.MD5State;
 import penny.download.Download;
 import java.net.URL;
+import java.util.UUID;
 import penny.parser.LinkState;
 
 /**
@@ -17,12 +19,14 @@ import penny.parser.LinkState;
  * @author john
  */
 public class DownloadData extends Download {
+    
+    public static final String PROP_ID = "ID";
+    
+    private UUID id;
 
     public static final String PROP_MD5 = "MD5";
-    private MD5State newMD5;
 
     public static final String PROP_LINKSTATE = "linkState";
-    private LinkState newLinkState;
 
     public static final String PROP_WORDBUFFER = "wordBuffer";
 
@@ -42,9 +46,8 @@ public class DownloadData extends Download {
     public static final String HREF = "href";
     public static final String SRC = "src";
     
-    private void init() {
-        newMD5 = new MD5State();
-        newLinkState = new LinkState();
+    public void init(URL url) {
+        super.init(url);
         hrefLinks = new BasicEventList<String>();
         srcLinks = new BasicEventList<String>();
         words = new BasicEventList<String>();
@@ -57,21 +60,14 @@ public class DownloadData extends Download {
         setExtraProperty(PROP_TEMPPATH, "");
     }
 
-    public DownloadData() {
-        super();
-        init();
-    }
-
-    public DownloadData(URL url) {
+    DownloadData(URL url, UUID id) {
         super(url);
-        init();
+        init(url);
+        this.id = id;
     }
-
-    public DownloadData(URL url, String tempPath, String savePath) {
-        super(url);
-        init();
-        setExtraProperty(PROP_SAVEPATH, savePath);
-        setExtraProperty(PROP_TEMPPATH, tempPath);
+    
+    public UUID getId() {
+        return id;
     }
 
     /**
@@ -85,13 +81,7 @@ public class DownloadData extends Download {
      * @param MD5 the MD5 to set
      */
     public void setMD5(MD5State MD5) {
-        if(MD5 == null) {
-            throw new IllegalArgumentException("MD5 cannot be null");
-        }
-        MD5State oldValue = getMD5();
-        newMD5.copy(MD5);
-        setExtraProperty(PROP_MD5, newMD5);
-        newMD5 = oldValue;
+        setExtraProperty(PROP_MD5, MD5);
     }
 
     /**
@@ -105,13 +95,7 @@ public class DownloadData extends Download {
      * @param MD5 the MD5 to set
      */
     public void setLinkState(LinkState linkState) {
-        if(linkState == null) {
-            throw new IllegalArgumentException("linkState cannot be null");
-        }
-        LinkState oldValue = getLinkState();
-        newLinkState.copy(linkState);
-        setExtraProperty(PROP_LINKSTATE, newLinkState);
-        newLinkState = oldValue;
+        setExtraProperty(PROP_LINKSTATE, linkState);
     }
 
     /**

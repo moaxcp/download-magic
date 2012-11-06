@@ -5,7 +5,7 @@
 package penny.downloadmanager.util;
 
 import ca.odell.glazedlists.EventList;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;

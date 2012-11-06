@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.control.task;
 
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.task.LinkToDownloadTaskData;
 import penny.downloadmanager.model.task.Status;
 

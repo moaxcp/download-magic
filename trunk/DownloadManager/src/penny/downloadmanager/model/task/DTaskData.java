@@ -7,7 +7,7 @@ package penny.downloadmanager.model.task;
 
 import ca.odell.glazedlists.EventList;
 import penny.download.DownloadStatus;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;

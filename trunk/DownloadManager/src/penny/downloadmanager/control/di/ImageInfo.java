@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 import penny.downloadmanager.model.Model;
 import java.awt.image.BufferedImage;
 import java.io.File;

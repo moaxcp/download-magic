@@ -11,7 +11,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.Serializable;
 import javax.swing.event.SwingPropertyChangeSupport;
-import penny.downloadmanager.model.DownloadData;
+import penny.downloadmanager.model.db.DownloadData;
 
 /**
  *
