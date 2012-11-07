@@ -111,7 +111,7 @@ public class DownloadSettings implements Serializable {
         maxHops = 3;
         this.maxRetryTime = 5000000000l;
         this.maxDownloadAttempts = 3;
-        this.bufferSize = 2048;
+        this.bufferSize = 10240;
         downloadProxyServer = null;
         downloadProxyPort = -1;
         downloadConnectTimeout = 10000;
@@ -149,7 +149,7 @@ public class DownloadSettings implements Serializable {
         setPropertySupport(new PropertyChangeSupport(this));
     }
 
-    public void copy(DownloadSettings dSettings) {
+    public synchronized void copy(DownloadSettings dSettings) {
         this.setAutoFollowRedirects(dSettings.isAutoFollowRedirects());
         this.setBufferSize(dSettings.getBufferSize());
         this.setDownloadConnectTimeout(dSettings.getDownloadConnectTimeout());

@@ -1,29 +1,30 @@
 /*
- * Download.java
+ * AbstractDownload.java
  *
  * Created on February 23, 2007, 8:11 AM
  * Updated on February 8, 2009, 7:46 PM
  */
 package penny.download;
 
-import java.beans.*;
-import java.net.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.net.URL;
 import java.util.*;
 
 /**
- * This class represents a Download. It is the base class for all other downloads.
+ * This class represents a AbstractDownload. It is the base class for all other downloads.
  * This class and all classes that extend it should be used to track information
  * on a download only. All other logic such as getting connections and save files
  * should be implementend elseware. ex. DownloadConnectionFactory.
  *
- * Download can be used to update a table model with property change listeners.
+ * AbstractDownload can be used to update a table model with property change listeners.
  *
  * It can also be used as a model object to update the download.db which uses
  * DAO objects for different databases.
  *
- * It is important to understand how to update the two times stored in Download:
+ * It is important to understand how to update the two times stored in AbstractDownload:
  * retryTime and downloadTime. Before each operation, for instance read() for
- * Download, initDownloadTime() must be called, then the operation, then
+ * AbstractDownload, initDownloadTime() must be called, then the operation, then
  * updateDownloadTime(). This should be done in a loop so the time is constantly
  * updated.
  *
@@ -32,9 +33,8 @@ import java.util.*;
  * for it.
  * @author John J Mercier
  */
-public class Download implements Comparable<Download> {
-
-    private static final long serialVersionUID = -7323355147711248756L;
+public abstract class AbstractDownload {
+    
     public static final String FILE = "file";
     /**
      * FTP protocol
@@ -113,11 +113,11 @@ public class Download implements Comparable<Download> {
      */
     public static final String PROP_URL = "url";
     /**
-     * The URL of this Download.
+     * The URL of this AbstractDownload.
      */
     protected URL url;
     /**
-     * The total size of this Download.
+     * The total size of this AbstractDownload.
      */
     protected long size;
     /**
@@ -125,7 +125,7 @@ public class Download implements Comparable<Download> {
      */
     protected long downloaded;
     /**
-     * The DownloadStatus of this Download.
+     * The DownloadStatus of this AbstractDownload.
      */
     protected DownloadStatus status;
     /**
@@ -145,11 +145,11 @@ public class Download implements Comparable<Download> {
      */
     protected long retryTime;
     /**
-     * The number of attempts for this Download.
+     * The number of attempts for this AbstractDownload.
      */
     protected int attempts;
     /**
-     * The content type of this Download.
+     * The content type of this AbstractDownload.
      */
     protected String contentType;
     /**
@@ -157,23 +157,23 @@ public class Download implements Comparable<Download> {
      */
     protected String message;
     /**
-     * The host of the URL for this Download.
+     * The host of the URL for this AbstractDownload.
      */
     protected String host;
     /**
-     * The protocol of the URL for this Download.
+     * The protocol of the URL for this AbstractDownload.
      */
     protected String protocol;
     /**
-     * The query of the URL for this Download.
+     * The query of the URL for this AbstractDownload.
      */
     protected String query;
     /**
-     * The path of the URL for this Download.
+     * The path of the URL for this AbstractDownload.
      */
     protected String path;
     /**
-     * The file of the URL for this Download.
+     * The file of the URL for this AbstractDownload.
      */
     protected String file;
     /**
@@ -181,57 +181,22 @@ public class Download implements Comparable<Download> {
      */
     protected String protocolFileName;
     /**
-     * The file extention of the URL for this Download.
+     * The file extention of the URL for this AbstractDownload.
      */
     protected String fileExtention;
     /**
-     * The set of URLs the Download has been redirected from. In HTTP when a
-     * connection is supposed to be redirected the Download url will change and
+     * The set of URLs the AbstractDownload has been redirected from. In HTTP when a
+     * connection is supposed to be redirected the AbstractDownload url will change and
      * locations will store the previous urls.
      */
     protected List<URL> locations;
     public static final String PROP_LOCATIONS = "locations";
     /**
      * The HTTP response code recieved when connecting to the url in this
-     * Download.
+     * AbstractDownload.
      */
     protected int responseCode;
     public static final String PROP_RESPONSECODE = "responseCode";
-
-    
-    protected Map<String, Object> extraProps;
-    private List<String> propertyNames;
-
-    private static final List<String> nativePropertyNames;
-
-    static {
-        List<String> l = new ArrayList<String>();
-
-        l.add(Download.PROP_ATTEMPTS);
-        l.add(Download.PROP_CONTENTTYPE);
-        l.add(Download.PROP_DOWNLOADED);
-        l.add(Download.PROP_DOWNLOADTIME);
-        l.add(Download.PROP_FILE);
-        l.add(Download.PROP_PROTOCOLFILENAME);
-        l.add(Download.PROP_FILEEXTENTION);
-        l.add(Download.PROP_HOST);
-        l.add(Download.PROP_LOCATIONS);
-        l.add(Download.PROP_MESSAGE);
-        l.add(Download.PROP_PATH);
-        l.add(Download.PROP_PROTOCOL);
-        l.add(Download.PROP_QUERY);
-        l.add(Download.PROP_RESPONSECODE);
-        l.add(Download.PROP_RETRYTIME);
-        l.add(Download.PROP_SIZE);
-        l.add(Download.PROP_STATUS);
-        l.add(Download.PROP_URL);
-
-        nativePropertyNames = l;
-    }
-
-    public static List<String> getNativePropertyNames() {
-        return nativePropertyNames;
-    }
 
     /**
      * propertySupport.
@@ -239,9 +204,9 @@ public class Download implements Comparable<Download> {
     protected PropertyChangeSupport propertySupport;
 
     /**
-     * Creates an empty Download object. The initial status is QUEUED.
+     * Creates an empty AbstractDownload object. The initial status is QUEUED.
      */
-    public Download() {
+    public AbstractDownload() {
         propertySupport = new PropertyChangeSupport(this);
         file = "";
         protocol = "";
@@ -262,30 +227,9 @@ public class Download implements Comparable<Download> {
         retryStartTime = 0;
         retryTime = 0;
         locations = new ArrayList<URL>();
-        extraProps = new HashMap<String, Object>();
-        propertyNames = new ArrayList<String>();
-
-        propertyNames.add(Download.PROP_ATTEMPTS);
-        propertyNames.add(Download.PROP_CONTENTTYPE);
-        propertyNames.add(Download.PROP_DOWNLOADED);
-        propertyNames.add(Download.PROP_DOWNLOADTIME);
-        propertyNames.add(Download.PROP_FILE);
-        propertyNames.add(Download.PROP_PROTOCOLFILENAME);
-        propertyNames.add(Download.PROP_FILEEXTENTION);
-        propertyNames.add(Download.PROP_HOST);
-        propertyNames.add(Download.PROP_LOCATIONS);
-        propertyNames.add(Download.PROP_MESSAGE);
-        propertyNames.add(Download.PROP_PATH);
-        propertyNames.add(Download.PROP_PROTOCOL);
-        propertyNames.add(Download.PROP_QUERY);
-        propertyNames.add(Download.PROP_RESPONSECODE);
-        propertyNames.add(Download.PROP_RETRYTIME);
-        propertyNames.add(Download.PROP_SIZE);
-        propertyNames.add(Download.PROP_STATUS);
-        propertyNames.add(Download.PROP_URL);
     }
 
-    public Download(URL url) {
+    public AbstractDownload(URL url) {
         this();
         this.setUrl(url);
         if (this.query == null) {
@@ -298,7 +242,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the url of this Download. Setting the url will also set the file,
+     * Sets the url of this AbstractDownload. Setting the url will also set the file,
      * file extention, host, path, protocol, and query.
      * @param url
      */
@@ -317,7 +261,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * returns the url of this Download.
+     * returns the url of this AbstractDownload.
      * @return The url
      */
     public URL getUrl() {
@@ -325,7 +269,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the number of attempts for this Download.
+     * Sets the number of attempts for this AbstractDownload.
      * @param attempts
      */
     public void setAttempts(int attempts) {
@@ -335,7 +279,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * returns the number of attempts for this Download.
+     * returns the number of attempts for this AbstractDownload.
      * @return
      */
     public int getAttempts() {
@@ -343,7 +287,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the total size of the Download.
+     * Sets the total size of the AbstractDownload.
      * @param size
      */
     public void setSize(long size) {
@@ -353,7 +297,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the total size of the Download.
+     * Returns the total size of the AbstractDownload.
      * @return the size in bytes
      */
     public long getSize() {
@@ -361,7 +305,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the bytes downloaded for this Download.
+     * Sets the bytes downloaded for this AbstractDownload.
      * @param downloaded
      */
     public void setDownloaded(long downloaded) {
@@ -371,7 +315,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * returns the number of bytes downloaded for this Download.
+     * returns the number of bytes downloaded for this AbstractDownload.
      * @return bytes downloaded
      */
     public long getDownloaded() {
@@ -405,8 +349,8 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the status of this Download. If an attempt is made to set the
-     * Download to the wrong status an IllegalStateException is thrown.
+     * Sets the status of this AbstractDownload. If an attempt is made to set the
+     * AbstractDownload to the wrong status an IllegalStateException is thrown.
      * @param status
      */
     void setStatus(DownloadStatus status) {
@@ -471,7 +415,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the status of this Download.
+     * Returns the status of this AbstractDownload.
      * @return
      */
     public DownloadStatus getStatus() {
@@ -495,7 +439,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the total time spent downloading this Download.
+     * Sets the total time spent downloading this AbstractDownload.
      * @param downloadTime
      */
     public void setDownloadTime(long downloadTime) {
@@ -505,7 +449,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the total time spent downloading this Download.
+     * Returns the total time spent downloading this AbstractDownload.
      * @return
      */
     public long getDownloadTime() {
@@ -513,7 +457,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the current retry start time for this Download.
+     * Sets the current retry start time for this AbstractDownload.
      * @param retryStartTime
      */
     protected void setRetryStartTime(long retryStartTime) {
@@ -521,7 +465,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * returns the current retry start time for this Download.
+     * returns the current retry start time for this AbstractDownload.
      * @return
      */
     protected long getRetryStartTime() {
@@ -547,7 +491,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the content type for this Download.
+     * Returns the content type for this AbstractDownload.
      * @return
      */
     public String getContentType() {
@@ -555,7 +499,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the content type for this Download.
+     * Sets the content type for this AbstractDownload.
      * @param contentType
      */
     public void setContentType(String contentType) {
@@ -565,7 +509,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the message for this Download.
+     * Returns the message for this AbstractDownload.
      * @return message
      */
     public String getMessage() {
@@ -573,7 +517,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the message for this Download.
+     * Sets the message for this AbstractDownload.
      * @param message
      */
     public void setMessage(String message) {
@@ -583,7 +527,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Gets the host for this Download.
+     * Gets the host for this AbstractDownload.
      * @return String host
      */
     public String getHost() {
@@ -591,7 +535,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the host for this Download.
+     * Sets the host for this AbstractDownload.
      * @param host
      */
     protected void setHost(String host) {
@@ -601,7 +545,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the protocol for this Download.
+     * Returns the protocol for this AbstractDownload.
      * @return
      */
     public String getProtocol() {
@@ -609,7 +553,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the Protocol for this Download.
+     * Sets the Protocol for this AbstractDownload.
      * @param protocol
      */
     protected void setProtocol(String protocol) {
@@ -619,7 +563,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the Query for this Download.
+     * Returns the Query for this AbstractDownload.
      * @return
      */
     public String getQuery() {
@@ -627,7 +571,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the query for this Download.
+     * Sets the query for this AbstractDownload.
      * @param query
      */
     protected void setQuery(String query) {
@@ -637,7 +581,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the path for this Download. This does not include the file name.
+     * Returns the path for this AbstractDownload. This does not include the file name.
      * @return
      */
     public String getPath() {
@@ -645,7 +589,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the path for this Download.
+     * Sets the path for this AbstractDownload.
      * @param path
      */
     protected void setPath(String path) {
@@ -655,7 +599,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Gets the file name for this Download. This does not include the path.
+     * Gets the file name for this AbstractDownload. This does not include the path.
      * @return
      */
     public String getFile() {
@@ -663,7 +607,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the file name for this Download. This does not include the path.
+     * Sets the file name for this AbstractDownload. This does not include the path.
      * @param file
      */
     protected void setFile(String file) {
@@ -673,7 +617,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Gets the protocol file name for this Download. This does not include the path.
+     * Gets the protocol file name for this AbstractDownload. This does not include the path.
      * @return
      */
     public String getProtocolFileName() {
@@ -681,7 +625,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the protocol file name for this Download. This does not include the path.
+     * Sets the protocol file name for this AbstractDownload. This does not include the path.
      * @param file
      */
     protected void setProtocolFileName(String file) {
@@ -691,7 +635,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the file extention for this Download.
+     * Returns the file extention for this AbstractDownload.
      * @return
      */
     public String getFileExtention() {
@@ -699,7 +643,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the file Extention for this Download.
+     * Sets the file Extention for this AbstractDownload.
      * @param fileExtention
      */
     protected void setFileExtention(String fileExtention) {
@@ -709,7 +653,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the locations where this Download has been redirected from.
+     * Returns the locations where this AbstractDownload has been redirected from.
      * @return
      */
     public List<URL> getLocations() {
@@ -728,7 +672,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Returns the response code recieved when connecting to this Download.
+     * Returns the response code recieved when connecting to this AbstractDownload.
      * @return
      */
     public int getResponseCode() {
@@ -736,7 +680,7 @@ public class Download implements Comparable<Download> {
     }
 
     /**
-     * Sets the response code recieved when connecting to this Download.
+     * Sets the response code recieved when connecting to this AbstractDownload.
      * @param responseCode
      */
     public void setResponseCode(int responseCode) {
@@ -747,7 +691,7 @@ public class Download implements Comparable<Download> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Download && ((Download) obj).getUrl().equals(this.getUrl())) {
+        if (obj instanceof AbstractDownload && ((AbstractDownload) obj).getUrl().equals(this.getUrl())) {
             return true;
         }
         return false;
@@ -798,89 +742,6 @@ public class Download implements Comparable<Download> {
     @Override
     public String toString() {
         return url.toString();
-    }
-
-    public int compareTo(Download o) {
-        return getUrl().toString().compareTo(o.getUrl().toString());
-    }
-
-    public List<String> getPropertyNames() {
-        for (String k : extraProps.keySet()) {
-            if (!propertyNames.contains(k)) {
-                propertyNames.add(k);
-            }
-        }
-
-        return Collections.unmodifiableList(propertyNames);
-    }
-
-    public Object getProperty(String key) {
-
-        if (key.equals(Download.PROP_ATTEMPTS)) {
-            return Integer.valueOf(this.getAttempts());
-        } else if (key.equals(Download.PROP_CONTENTTYPE)) {
-            return this.getContentType();
-        } else if (key.equals(Download.PROP_DOWNLOADED)) {
-            return Long.valueOf(this.getDownloaded());
-        } else if (key.equals(Download.PROP_DOWNLOADTIME)) {
-            return Long.valueOf(this.getDownloadTime());
-        } else if (key.equals(Download.PROP_FILE)) {
-            return this.getFile();
-        } else if (key.equals(Download.PROP_PROTOCOLFILENAME)) {
-            return this.getProtocolFileName();
-        } else if (key.equals(Download.PROP_FILEEXTENTION)) {
-            return this.getFileExtention();
-        } else if (key.equals(Download.PROP_HOST)) {
-            return this.getHost();
-        } else if (key.equals(Download.PROP_LOCATIONS)) {
-            return this.getLocations();
-        } else if (key.equals(Download.PROP_MESSAGE)) {
-            return this.getMessage();
-        } else if (key.equals(Download.PROP_PATH)) {
-            return this.getPath();
-        } else if (key.equals(Download.PROP_PROTOCOL)) {
-            return this.getProtocol();
-        } else if (key.equals(Download.PROP_QUERY)) {
-            return this.getQuery();
-        } else if (key.equals(Download.PROP_RESPONSECODE)) {
-            return Integer.valueOf(this.getResponseCode());
-        } else if (key.equals(Download.PROP_RETRYTIME)) {
-            return Long.valueOf(this.getRetryTime());
-        } else if (key.equals(Download.PROP_SIZE)) {
-            return Long.valueOf(this.getSize());
-        } else if (key.equals(Download.PROP_STATUS)) {
-            return this.getStatus();
-        } else if (key.equals(Download.PROP_URL)) {
-            return this.getUrl();
-        }
-
-        for (String s : extraProps.keySet()) {
-            if (s.equals(key)) {
-                return extraProps.get(s);
-            }
-        }
-
-        return null;
-    }
-
-    public void setExtraProperty(String key, Object value) {
-        if (nativePropertyNames.contains(key)) {
-            throw new IllegalArgumentException("use setter for native property " + key);
-        } else {
-            Object oldValue = extraProps.get(key);
-            extraProps.put(key, value);
-            propertySupport.firePropertyChange(key, oldValue, value);
-        }
-    }
-
-    public Map<String, Object> getExtraProperties() {
-        return Collections.unmodifiableMap(extraProps);
-    }
-
-    public void setExtraProperty(Map<String, Object> props) {
-        for(String s : props.keySet()) {
-            setExtraProperty(s, props.get(s));
-        }
     }
 
     /**

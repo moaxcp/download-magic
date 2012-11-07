@@ -19,22 +19,13 @@ import java.util.logging.Logger;
  */
 public class Downloader {
 
-    private Download download;
+    private AbstractDownload download;
     private List<DownloadProcessor> processors;
     private DownloadSettings dSettings;
     private Map<String, ProtocolDownloader> downloaders;
 
-    public Downloader() {
-        processors = new ArrayList<DownloadProcessor>();
-        download = new Download();
-        dSettings = new DownloadSettings();
-        downloaders = new HashMap<String, ProtocolDownloader>();
-    }
-
-    public Downloader(DownloadSettings ds, List<DownloadProcessor> processors) {
-        this();
+    public Downloader(DownloadSettings ds) {
         this.dSettings = ds;
-        this.processors = processors;
     }
 
     public void addProcessor(DownloadProcessor di) {
@@ -48,14 +39,14 @@ public class Downloader {
     /**
      * @return the download
      */
-    public Download getDownload() {
+    public AbstractDownload getDownload() {
         return download;
     }
 
     /**
      * @param download the download to set
      */
-    public void setDownload(Download download) {
+    public void setDownload(AbstractDownload download) {
         this.download = download;
     }
 
@@ -87,7 +78,7 @@ public class Downloader {
         this.dSettings = dSettings;
     }
 
-    void resetProcessors(Download d) {
+    void resetProcessors(AbstractDownload d) {
         d.setDownloaded(0);
         for (DownloadProcessor i : getProcessors()) {
             i.onReset(d);
@@ -95,7 +86,7 @@ public class Downloader {
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetInterfaces", "reset interfaces for " + d, d);
     }
 
-    void runInput(InputStream in, Download d) throws IOException {
+    void runInput(InputStream in, AbstractDownload d) throws IOException {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
         startInputProcessors(d);
         int read = -1;
@@ -111,42 +102,42 @@ public class Downloader {
         Logger.getLogger(Downloader.class.getName()).exiting(Downloader.class.getName(), "runInput");
     }
 
-    private void initProcessors(Download d) {
+    private void initProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
             i.onInit(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetProcessors", "reset processors for " + d, d);
     }
 
-    private void startInputProcessors(Download d) {
+    private void startInputProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
             i.onStartInput(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "startProcessors", "start processors for " + d, d);
     }
 
-    private void endInputProcessors(Download d) {
+    private void endInputProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
             i.onEndInput(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "stopProcessors", "stop processors for " + d, d);
     }
 
-    private void completeProcessors(Download d) {
+    private void completeProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
             i.onCompleted(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "completeProcessors", "complete processors for " + d, d);
     }
 
-    private void chunckProcessors(Download d, int read, byte[] buffer) {
+    private void chunckProcessors(AbstractDownload d, int read, byte[] buffer) {
         for (DownloadProcessor i : getProcessors()) {
             i.doChunck(d, read, buffer);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINER, Downloader.class.getName(), "chunkProcessors", "chunck processors for " + d, d);
     }
 
-    private boolean checkProcessors(Download d) {
+    private boolean checkProcessors(AbstractDownload d) {
         boolean r = true;
         for (DownloadProcessor i : getProcessors()) {
             r = i.onCheck(d);
@@ -158,7 +149,7 @@ public class Downloader {
         return r;
     }
 
-    private void startRetryTimer(Download d) {
+    private void startRetryTimer(AbstractDownload d) {
         d.setRetryTime(0);
         while (d.getRetryTime() < getdSettings().getMaxRetryTime() && d.getStatus() == DownloadStatus.RETRYING) {
             try {

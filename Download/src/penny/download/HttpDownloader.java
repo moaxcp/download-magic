@@ -35,9 +35,9 @@ class HttpDownloader extends ProtocolDownloader {
 
     class DownloaderInterceptor implements HttpRequestInterceptor {
 
-        private Download download;
+        private AbstractDownload download;
 
-        public void setDownload(Download d) {
+        public void setDownload(AbstractDownload d) {
             download = d;
         }
 
@@ -86,7 +86,7 @@ class HttpDownloader extends ProtocolDownloader {
         httpClient.getConnectionManager().shutdown();
     }
 
-    void download(Download d) {
+    void download(AbstractDownload d) {
         InputStream instream = null;
         HttpGet httpget = null;
         interceptor.setDownload(d);
