@@ -16,7 +16,7 @@ public class FileDownloader extends ProtocolDownloader {
     }
 
     @Override
-    void download(Download d) {
+    void download(AbstractDownload d) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

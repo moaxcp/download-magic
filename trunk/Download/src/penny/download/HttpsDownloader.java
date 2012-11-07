@@ -11,7 +11,7 @@ package penny.download;
 class HttpsDownloader extends ProtocolDownloader {
 
     @Override
-    void download(Download d) {
+    void download(AbstractDownload d) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

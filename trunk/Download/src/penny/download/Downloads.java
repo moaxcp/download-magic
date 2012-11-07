@@ -6,11 +6,7 @@ package penny.download;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -40,11 +36,11 @@ public class Downloads {
     protected static final long day = 24 * hour;
 
     /**
-     * Gets the percentage of download completed for a Download.
+     * Gets the percentage of download completed for a AbstractDownload.
      * @param d
      * @return percentage complete
      */
-    public static float getProgress(Download d) {
+    public static float getProgress(AbstractDownload d) {
         if(d.getSize() > 0) {
             return ((float) d.getDownloaded() / d.getSize()) * 100;
         } else {
@@ -53,11 +49,11 @@ public class Downloads {
     }
 
     /**
-     * Returns the time left for a Download.
+     * Returns the time left for a AbstractDownload.
      * @param d
      * @return the time left
      */
-    public static long getTimeLeft(Download d) {
+    public static long getTimeLeft(AbstractDownload d) {
         if (d.getDownloadTime() == 0) {
             return 0;
         }
@@ -65,11 +61,11 @@ public class Downloads {
     }
 
     /**
-     * Returns the rate for a Download.
+     * Returns the rate for a AbstractDownload.
      * @param d The download to calculate the rate for.
      * @return the rate in seconds
      */
-    public static String getRate(Download d) {
+    public static String getRate(AbstractDownload d) {
         return formatByteSize((d.getDownloadTime() / 1000000000 == 0 ? 0 : d.getDownloaded() / (d.getDownloadTime() / 1000000000))) + "/s";
     }
 
@@ -276,35 +272,5 @@ public class Downloads {
         String smilli = milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli;
         String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
         return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
-    }
-
-    public static String insertProperties(Download d, String statement) {
-        String str = statement;
-        Pattern pat = Pattern.compile("\\$\\{\\w+\\}");
-        Matcher mat = pat.matcher(str);
-        while (mat.find()) {
-            String prop = mat.group();
-            prop = prop.replace("${", "");
-            prop = prop.replace("}", "");
-            str = str.replace("${" + prop + "}", d.getProperty(prop).toString());
-        }
-        return str;
-    }
-
-    public static String getFileName(Download d, String saveNameFormat, String defaultFileName) {
-        String str = saveNameFormat;
-        Pattern pat = Pattern.compile("\\$\\{\\w+\\}");
-        Matcher mat = pat.matcher(str);
-        while (mat.find()) {
-            String prop = mat.group();
-            prop = prop.replace("${", "");
-            prop = prop.replace("}", "");
-            if (prop.equals(Download.PROP_FILE) && d.getProperty(prop).equals("")) {
-                str = str.replace("${" + prop + "}", defaultFileName);
-            } else {
-                str = str.replace("${" + prop + "}", d.getProperty(prop).toString());
-            }
-        }
-        return str;
     }
 }

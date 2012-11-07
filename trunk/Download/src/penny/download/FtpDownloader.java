@@ -37,7 +37,7 @@ class FtpDownloader extends ProtocolDownloader {
         }
     }
 
-    void download(Download d) {
+    void download(AbstractDownload d) {
         InputStream instream = null;
 
         try {

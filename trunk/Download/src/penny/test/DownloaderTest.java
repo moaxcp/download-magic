@@ -7,14 +7,14 @@ package penny.test;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
+import penny.download.DownloadSettings;
 import penny.download.Downloader;
 
 /**
@@ -61,10 +61,16 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     }
 
     public void go() throws MalformedURLException {
-        Downloader downloader = new Downloader();
+        DownloadSettings ds = new DownloadSettings();
+        Downloader downloader = new Downloader(ds);
         downloader.addProcessor(this);
         for(String url : http) {
-            Download d = new Download(new URL(url));
+            class Download extends AbstractDownload {
+                Download(URL url) {
+                    setUrl(url);
+                }
+            }
+            AbstractDownload d = new Download(new URL(url));
             d.addPropertyChangeListener(this);
             downloader.setDownload(d);
             downloader.download();
@@ -77,41 +83,41 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
         test.go();
     }
 
-    public void onInit(Download d) {
+    public void onInit(AbstractDownload d) {
         System.out.println("init " + d);
     }
 
-    public boolean onCheck(Download d) {
+    public boolean onCheck(AbstractDownload d) {
         System.out.println("onCheck " + d);
         return true;
     }
 
-    public void onReset(Download d) {
+    public void onReset(AbstractDownload d) {
         System.out.println("onReset " + d);
     }
 
-    public void onStartInput(Download d) {
+    public void onStartInput(AbstractDownload d) {
         System.out.println("onStarted " + d);
     }
 
-    public void doChunck(Download d, int read, byte[] buffer) {
+    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
         //System.out.println("doChunck " + d);
     }
 
-    public void onEndInput(Download d) {
+    public void onEndInput(AbstractDownload d) {
         System.out.println("onStopped " + d);
     }
 
-    public void onCompleted(Download d) {
+    public void onCompleted(AbstractDownload d) {
         System.out.println("onCompleted " + d);
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if(evt.getPropertyName().equals(Download.PROP_STATUS)) {
-            Download d = (Download) evt.getSource();
+        if(evt.getPropertyName().equals(AbstractDownload.PROP_STATUS)) {
+            AbstractDownload d = (AbstractDownload) evt.getSource();
             System.out.println(d.getStatus() + " " + d.getUrl());
-        } else if(evt.getPropertyName().equals(Download.PROP_MESSAGE)) {
-            Download d = (Download) evt.getSource();
+        } else if(evt.getPropertyName().equals(AbstractDownload.PROP_MESSAGE)) {
+            AbstractDownload d = (AbstractDownload) evt.getSource();
             System.out.println("Message: " + d.getMessage());
         }
     }

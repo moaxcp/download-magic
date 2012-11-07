@@ -10,18 +10,18 @@ package penny.download;
  * @author john
  */
 abstract class ProtocolDownloader {
-    abstract void download(Download d);
+    abstract void download(AbstractDownload d);
     abstract void shutdown();
 
     static ProtocolDownloader getDownloader(String protocol, Downloader d) {
         ProtocolDownloader downloader = null;
-        if(protocol.toLowerCase().equals(Download.HTTP)) {
+        if(protocol.toLowerCase().equals(AbstractDownload.HTTP)) {
             downloader = new HttpDownloader(d);
-        } else if(protocol.toLowerCase().equals(Download.HTTPS)) {
+        } else if(protocol.toLowerCase().equals(AbstractDownload.HTTPS)) {
             downloader = new HttpDownloader(d);
-        } else if(protocol.toLowerCase().equals(Download.FTP)) {
+        } else if(protocol.toLowerCase().equals(AbstractDownload.FTP)) {
             downloader = new FtpDownloader(d);
-        } else if(protocol.toLowerCase().equals(Download.FILE)) {
+        } else if(protocol.toLowerCase().equals(AbstractDownload.FILE)) {
             downloader = new FileDownloader(d);
         }
         return downloader;
