@@ -20,7 +20,7 @@ import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.MainWindowControl;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.MainWindowModel;
 import penny.downloadmanager.model.task.Status;
 import penny.downloadmanager.model.task.TaskData;
@@ -37,7 +37,7 @@ import penny.downloadmanager.model.TaskManagerModel;
  */
 public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener, ListEventListener, ListSelectionListener {
 
-    private EventTableModel<DownloadData> downloadTableModel;
+    private EventTableModel<Download> downloadTableModel;
     private EventListModel<TaskData> taskListModel;
     private MainWindowModel mainWindowModel;
     private TaskManagerModel taskModel;
@@ -47,7 +47,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         this.taskModel = taskModel;
         taskModel.addPropertyChangeListener(this);
         this.mainWindowModel.addPropertyChnageListener(this);
-        downloadTableModel = new EventTableModel<DownloadData>(mainWindowModel.getDownloads(), mainWindowModel.getDownloadFormat());
+        downloadTableModel = new EventTableModel<Download>(mainWindowModel.getDownloads(), mainWindowModel.getDownloadFormat());
         mainWindowModel.getDownloads().addListEventListener(this);
         taskListModel = new EventListModel<TaskData>(mainWindowModel.getTasks());
         mainWindowModel.getTasks().addListEventListener(this);
@@ -400,10 +400,10 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             this.setVisible((Boolean) evt.getNewValue());
         } else if (evt.getPropertyName().equals(MainWindowModel.PROP_SELDOWNLOAD)) {
             if (evt.getOldValue() != null) {
-                ((DownloadData) evt.getOldValue()).removePropertyChangeListener(this);
+                ((Download) evt.getOldValue()).removePropertyChangeListener(this);
             }
             if (evt.getNewValue() != null) {
-                ((DownloadData) evt.getNewValue()).addPropertyChangeListener(this);
+                ((Download) evt.getNewValue()).addPropertyChangeListener(this);
             }
         } else if (evt.getPropertyName().equals(MainWindowModel.PROP_SELTASK)) {
             if (evt.getOldValue() != null) {
@@ -412,8 +412,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             if (evt.getNewValue() != null) {
                 ((TaskData) evt.getNewValue()).addPropertyChangeListener(this);
             }
-        } else if (evt.getPropertyName().equals(DownloadData.PROP_STATUS)) {
-            downloadStatus(((DownloadData) evt.getSource()).getStatus());
+        } else if (evt.getPropertyName().equals(Download.PROP_STATUS)) {
+            downloadStatus(((Download) evt.getSource()).getStatus());
         } else if (evt.getPropertyName().equals(TaskData.PROP_STATUS)) {
             taskStatus(((TaskData) evt.getSource()).getStatus());
         } else if(evt.getPropertyName().equals(TaskManagerModel.PROP_RUNNING)) {
@@ -442,7 +442,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     changeList.getReadWriteLock().readLock().lock();
                     Object obj = changeList.get(sourceIndex);
                     changeList.getReadWriteLock().readLock().unlock();
-                    if (obj instanceof DownloadData && mainWindowModel.getDownloadFormat().getColumns((DownloadData) obj)) {
+                    if (obj instanceof Download && mainWindowModel.getDownloadFormat().getColumns((Download) obj)) {
                         downloadTableModel.setTableFormat(mainWindowModel.getDownloadFormat());
                     }
                     break;
@@ -450,7 +450,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     changeList.getReadWriteLock().readLock().lock();
                     Object obj2 = changeList.get(sourceIndex);
                     changeList.getReadWriteLock().readLock().unlock();
-                    if (obj2 instanceof DownloadData && mainWindowModel.getDownloadFormat().getColumns((DownloadData) obj2)) {
+                    if (obj2 instanceof Download && mainWindowModel.getDownloadFormat().getColumns((Download) obj2)) {
                         downloadTableModel.setTableFormat(mainWindowModel.getDownloadFormat());
                     }
                     break;

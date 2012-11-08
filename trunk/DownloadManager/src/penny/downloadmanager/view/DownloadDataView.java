@@ -16,7 +16,7 @@ import ca.odell.glazedlists.GlazedLists;
 import penny.downloadmanager.view.converter.NumberToSizeConverter;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.PropertyEntry;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -28,12 +28,12 @@ import penny.download.Downloads;
  */
 public class DownloadDataView extends javax.swing.JDialog implements PropertyChangeListener {
 
-    private DownloadData d;
+    private Download d;
     private EventList<PropertyEntry> propertyList;
     private EventTableModel<PropertyEntry> tableModel;
 
     /** Creates new form DownloadDataView */
-    public DownloadDataView(DownloadData d) {
+    public DownloadDataView(Download d) {
         this.d = d;
         d.addPropertyChangeListener(this);
         this.propertyList = GlazedLists.threadSafeList(new BasicEventList<PropertyEntry>());
@@ -45,7 +45,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         jSplitPane1.setDividerLocation(.5);
     }
 
-    public DownloadData getDownload() {
+    public Download getDownload() {
         return d;
     }
 
@@ -413,7 +413,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private penny.downloadmanager.view.converter.BytesToStringConverter bytesToStringConverter1;
-    private penny.downloadmanager.model.db.DownloadData downloadData;
+    private penny.downloadmanager.model.db.Download downloadData;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -463,21 +463,21 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
 
     private String getPropValue(String key) {
         
-        if (key.equals(DownloadData.PROP_HREFLINKS)) {
+        if (key.equals(Download.PROP_HREFLINKS)) {
             return Integer.toString(d.getHrefLinks().size());
-        } else if (key.equals(DownloadData.PROP_SRCLINKS)) {
+        } else if (key.equals(Download.PROP_SRCLINKS)) {
             return Integer.toString(d.getSrcLinks().size());
-        } else if (key.equals(DownloadData.PROP_LOCATIONS)) {
+        } else if (key.equals(Download.PROP_LOCATIONS)) {
             return Integer.toString(d.getLocations().size());
-        } else if (key.equals(DownloadData.PROP_WORDS)) {
+        } else if (key.equals(Download.PROP_WORDS)) {
             return Integer.toString(d.getWords().size());
-        } else if (key.equals(DownloadData.PROP_DOWNLOADED)) {
+        } else if (key.equals(Download.PROP_DOWNLOADED)) {
             return Downloads.formatByteSize(d.getDownloaded());
-        } else if (key.equals(DownloadData.PROP_SIZE)) {
+        } else if (key.equals(Download.PROP_SIZE)) {
             return Downloads.formatByteSize(d.getSize());
-        } else if(key.equals(DownloadData.PROP_DOWNLOADTIME)) {
+        } else if(key.equals(Download.PROP_DOWNLOADTIME)) {
             return Downloads.formatMilliTimeMilli(d.getDownloadTime() / 1000000);
-        } else if(key.equals(DownloadData.PROP_RETRYTIME)) {
+        } else if(key.equals(Download.PROP_RETRYTIME)) {
             return Downloads.formatMilliTimeMilli(d.getRetryTime() / 1000000);
         }
 

@@ -17,7 +17,7 @@ import java.util.Map;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.DownloadDAO;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.parser.LinkState;
 import penny.recmd5.MD5State;
 
@@ -25,52 +25,52 @@ import penny.recmd5.MD5State;
  *
  * @author john
  */
-public class DownloadSaver implements ListEventListener<DownloadData>, PropertyChangeListener {
+public class DownloadSaver implements ListEventListener<Download>, PropertyChangeListener {
 
-    private ObservableElementList<DownloadData> downloads;
+    private ObservableElementList<Download> downloads;
     private DownloadDAO dao;
     private List<String> saveProps;
     private boolean saveDelete;
-    private Map<DownloadData, MD5State> md5ValuesMap;
-    private Map<DownloadData, LinkState> linkStateValuesMap;
-    private Map<DownloadData, String> wordStateValuesMap;
-    private Map<DownloadData, Long> lastSaveTime;
+    private Map<Download, MD5State> md5ValuesMap;
+    private Map<Download, LinkState> linkStateValuesMap;
+    private Map<Download, String> wordStateValuesMap;
+    private Map<Download, Long> lastSaveTime;
 
-    public DownloadSaver(ObservableElementList<DownloadData> downloads) {
+    public DownloadSaver(ObservableElementList<Download> downloads) {
         saveProps = new ArrayList<String>();
-        saveProps.add(DownloadData.PROP_CONTENTTYPE);
-        saveProps.add(DownloadData.PROP_DOWNLOADTIME);
-        saveProps.add(DownloadData.PROP_DOWNLOADED);
-        saveProps.add(DownloadData.PROP_FILE);
-        saveProps.add(DownloadData.PROP_FILEEXTENTION);
-        saveProps.add(DownloadData.PROP_HOST);
-        saveProps.add(DownloadData.PROP_LOCATIONS);
-        //saveProps.add(DownloadData.PROP_MD5);
-        //saveProps.add(DownloadData.PROP_LINKSTATE);
-        saveProps.add(DownloadData.PROP_WORDBUFFER);
-        saveProps.add(DownloadData.PROP_MESSAGE);
-        saveProps.add(DownloadData.PROP_PATH);
-        saveProps.add(DownloadData.PROP_PROTOCOL);
-        saveProps.add(DownloadData.PROP_PROTOCOLFILENAME);
-        saveProps.add(DownloadData.PROP_QUERY);
-        saveProps.add(DownloadData.PROP_RESPONSECODE);
-        saveProps.add(DownloadData.PROP_SAVEPATH);
-        saveProps.add(DownloadData.PROP_SIZE);
-        saveProps.add(DownloadData.PROP_STATUS);
-        saveProps.add(DownloadData.PROP_TEMPPATH);
-        saveProps.add(DownloadData.PROP_URL);
+        saveProps.add(Download.PROP_CONTENTTYPE);
+        saveProps.add(Download.PROP_DOWNLOADTIME);
+        saveProps.add(Download.PROP_DOWNLOADED);
+        saveProps.add(Download.PROP_FILE);
+        saveProps.add(Download.PROP_FILEEXTENTION);
+        saveProps.add(Download.PROP_HOST);
+        saveProps.add(Download.PROP_LOCATIONS);
+        //saveProps.add(Download.PROP_MD5);
+        //saveProps.add(Download.PROP_LINKSTATE);
+        saveProps.add(Download.PROP_WORDBUFFER);
+        saveProps.add(Download.PROP_MESSAGE);
+        saveProps.add(Download.PROP_PATH);
+        saveProps.add(Download.PROP_PROTOCOL);
+        saveProps.add(Download.PROP_PROTOCOLFILENAME);
+        saveProps.add(Download.PROP_QUERY);
+        saveProps.add(Download.PROP_RESPONSECODE);
+        saveProps.add(Download.PROP_SAVEPATH);
+        saveProps.add(Download.PROP_SIZE);
+        saveProps.add(Download.PROP_STATUS);
+        saveProps.add(Download.PROP_TEMPPATH);
+        saveProps.add(Download.PROP_URL);
         this.downloads = downloads;
         dao = DAOFactory.getInstance().getDownloadDAO();
         saveDelete = true;
         this.downloads.addListEventListener(this);
-        for (DownloadData d : downloads) {
+        for (Download d : downloads) {
             d.addPropertyChangeListener(this);
         }
 
-        md5ValuesMap = new HashMap<DownloadData, MD5State>();
-        linkStateValuesMap = new HashMap<DownloadData, LinkState>();
-        wordStateValuesMap = new HashMap<DownloadData, String>();
-        lastSaveTime = new HashMap<DownloadData, Long>();
+        md5ValuesMap = new HashMap<Download, MD5State>();
+        linkStateValuesMap = new HashMap<Download, LinkState>();
+        wordStateValuesMap = new HashMap<Download, String>();
+        lastSaveTime = new HashMap<Download, Long>();
     }
 
     public boolean isSaveDelete() {
@@ -83,13 +83,13 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
 
     public void saveAllDownloads() {
         downloads.getReadWriteLock().readLock().lock();
-        for(DownloadData d : downloads) {
+        for(Download d : downloads) {
             dao.updateDownload(d);
         }
         downloads.getReadWriteLock().readLock().unlock();
     }
 
-    public void updateMD5(DownloadData d) {
+    public void updateMD5(Download d) {
         if (Model.generateMD5(d)) {
             MD5State oldValue = md5ValuesMap.get(d);
             MD5State md5 = d.getMD5();
@@ -102,12 +102,12 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     oldValue = new MD5State();
                 }
                 oldValue.copy(md5);
-                dao.updateDownload(d, DownloadData.PROP_MD5);
+                dao.updateDownload(d, Download.PROP_MD5);
             }
         }
     }
 
-    public void updateLinkState(DownloadData d) {
+    public void updateLinkState(Download d) {
         if (Model.parseLinks(d)) {
             LinkState oldValue = linkStateValuesMap.get(d);
             LinkState state = d.getLinkState();
@@ -120,7 +120,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     oldValue = new LinkState();
                 }
                 oldValue.copy(state);
-                dao.updateDownload(d, DownloadData.PROP_LINKSTATE);
+                dao.updateDownload(d, Download.PROP_LINKSTATE);
             }
         }
     }
@@ -137,7 +137,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
             switch (changeType) {
                 case ListEvent.DELETE:
                     changeList.getReadWriteLock().readLock().lock();
-                    DownloadData d1 = (DownloadData) listChanges.getOldValue();
+                    Download d1 = (Download) listChanges.getOldValue();
                     changeList.getReadWriteLock().readLock().unlock();
 
                     d1.removePropertyChangeListener(this);
@@ -151,7 +151,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                     break;
                 case ListEvent.INSERT:
                     changeList.getReadWriteLock().readLock().lock();
-                    DownloadData d2 = (DownloadData) changeList.get(sourceIndex);
+                    Download d2 = (Download) changeList.get(sourceIndex);
                     changeList.getReadWriteLock().readLock().unlock();
 
                     d2.addPropertyChangeListener(this);
@@ -160,7 +160,7 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
                 case ListEvent.UPDATE:
 
                     changeList.getReadWriteLock().readLock().lock();
-                    DownloadData d3 = (DownloadData) changeList.get(sourceIndex);
+                    Download d3 = (Download) changeList.get(sourceIndex);
                     changeList.getReadWriteLock().readLock().unlock();
 
                     updateMD5(d3);
@@ -172,23 +172,23 @@ public class DownloadSaver implements ListEventListener<DownloadData>, PropertyC
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        DownloadData d = (DownloadData) evt.getSource();
+        Download d = (Download) evt.getSource();
 
-        if(d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(DownloadData.PROP_DOWNLOADED))) {
+        if(d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(Download.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(Download.PROP_DOWNLOADED))) {
             long lastTime = lastSaveTime.get(d) == null ? 0 : lastSaveTime.get(d);
             if(d.getDownloadTime() - lastTime > 1000000000) {
-                dao.updateDownload(d, DownloadData.PROP_DOWNLOADTIME);
-                dao.updateDownload(d, DownloadData.PROP_DOWNLOADED);
+                dao.updateDownload(d, Download.PROP_DOWNLOADTIME);
+                dao.updateDownload(d, Download.PROP_DOWNLOADED);
                 lastSaveTime.put(d, d.getDownloadTime());
             }
 
         } else if(saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
-        } else if (evt.getPropertyName().equals(DownloadData.PROP_SRCLINKS)) {
-            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.SRC);
-        } else if (evt.getPropertyName().equals(DownloadData.PROP_HREFLINKS)) {
-            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), DownloadData.HREF);
-        } else if (evt.getPropertyName().equals(DownloadData.PROP_WORDS)) {
+        } else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
+            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), Download.SRC);
+        } else if (evt.getPropertyName().equals(Download.PROP_HREFLINKS)) {
+            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), Download.HREF);
+        } else if (evt.getPropertyName().equals(Download.PROP_WORDS)) {
             dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
         }
     }

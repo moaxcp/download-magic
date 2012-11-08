@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.model;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import ca.odell.glazedlists.ObservableElementList;
 import java.io.FileNotFoundException;
 import penny.download.DownloadStatus;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.downloadmanager.model.gui.StartupDialogModel;
 import penny.recmd5.MD5MessageDigest;
 import penny.recmd5.MD5State;
@@ -45,7 +45,7 @@ public class Model {
     private static MainWindowModel mainWindowModel;
     private static TaskManagerModel taskManagerModel;
     private static ApplicationSettingsModel applicationSettings;
-    private static ObservableElementList<DownloadData> downloads;
+    private static ObservableElementList<Download> downloads;
     private static ObservableElementList<TaskData> tasks;
     private static DownloadSaver downloadSaver;
     private static ApplicationSettingsSaver settingsSaver;
@@ -87,7 +87,7 @@ public class Model {
     /**
      * @return the downloads
      */
-    public static ObservableElementList<DownloadData> getDownloads() {
+    public static ObservableElementList<Download> getDownloads() {
         return downloads;
     }
 
@@ -145,7 +145,7 @@ public class Model {
         addTaskModel = new AddTaskModel();
         taskManagerModel = new TaskManagerModel();
         mainWindowModel = new MainWindowModel();
-        downloads = (ObservableElementList<DownloadData>) mainWindowModel.getDownloads();
+        downloads = (ObservableElementList<Download>) mainWindowModel.getDownloads();
         mainWindowModel.setTasks(taskManagerModel.getTasks());
         tasks = (ObservableElementList<TaskData>) taskManagerModel.getTasks();
         taskSaver = new TaskSaver(tasks);
@@ -184,7 +184,7 @@ public class Model {
         return false;
     }
 
-    public static boolean generateMD5(DownloadData d) {
+    public static boolean generateMD5(Download d) {
         boolean r = false;
         if (applicationSettings.getMd5ingModel().isGenerateMD5()) {
             if (applicationSettings.getMd5ingModel().isMd5Unknown()) {
@@ -199,7 +199,7 @@ public class Model {
         return r;
     }
 
-    public static boolean parseLinks(Download d) {
+    public static boolean parseLinks(AbstractDownload d) {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseLinks()) {
             if (applicationSettings.getParsingModel().isParseUnknownLinks()) {
@@ -214,7 +214,7 @@ public class Model {
         return r;
     }
 
-    public static boolean parseWords(Download d) {
+    public static boolean parseWords(AbstractDownload d) {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseWords()) {
             if (applicationSettings.getParsingModel().isParseUnknownWords()) {
@@ -229,7 +229,7 @@ public class Model {
         return r;
     }
 
-    public static boolean save(Download d) {
+    public static boolean save(AbstractDownload d) {
         boolean r = false;
         if (applicationSettings.getSavingModel().isSave()) {
             if (applicationSettings.getSavingModel().isSaveUnknown()) {
@@ -275,19 +275,19 @@ public class Model {
             startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
             JavaDBDataSource.getInstance().initDB();
             DownloadDAO dao = DAOFactory.getInstance().getDownloadDAO();
-            List<DownloadData> downloads1 = dao.getDownloads();
+            List<Download> downloads1 = dao.getDownloads();
             downloads.addAll(downloads1);
             downloadSaver = new DownloadSaver(downloads);
             mainWindowModel.setDownloadSaver(downloadSaver);
 
-            for (DownloadData d : downloads1) {
+            for (Download d : downloads1) {
                 if (d.getStatus() != DownloadStatus.COMPLETE) {
                     d.queue();
                 }
             }
 
             if (Model.getApplicationSettings().getStartupModel().isCheckSizes()) {
-                for (DownloadData d : downloads1) {
+                for (Download d : downloads1) {
                     if (save(d)) {
                         File file = new File(d.getTempPath());
                         if (!file.exists()) {
@@ -304,7 +304,7 @@ public class Model {
             }
 
             if (Model.getApplicationSettings().getStartupModel().isCheckMD5s()) {
-                for (DownloadData d : downloads1) {
+                for (Download d : downloads1) {
                     if (save(d)) {
                         File file = new File(d.getTempPath());
                         if (!file.exists()) {

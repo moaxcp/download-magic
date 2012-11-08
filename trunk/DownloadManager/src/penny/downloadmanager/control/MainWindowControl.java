@@ -3,7 +3,7 @@ package penny.downloadmanager.control;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.task.TaskManager;
 import penny.downloadmanager.model.gui.SettingsDialogModel;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.AddDialogModel;
 import penny.downloadmanager.model.gui.AddTaskModel;
 import penny.downloadmanager.model.gui.MainWindowModel;
@@ -81,7 +81,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     }
 
     public void add(URL url) {
-        DownloadData d = new DownloadData(url);
+        Download d = new Download(url);
         mainModel.getDownloads().add(d);
     }
 
@@ -91,7 +91,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
         }
     }
 
-    public void openDownloadView(DownloadData download) {
+    public void openDownloadView(Download download) {
             DownloadDataView view = null;
 
             for(DownloadDataView v : downloadViews) {
@@ -173,7 +173,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
 
     private void startTasks() {
         mainModel.getDownloads().getReadWriteLock().writeLock().lock();
-        for (DownloadData i : mainModel.getDownloads()) {
+        for (Download i : mainModel.getDownloads()) {
             if (!i.getStatus().equals(DownloadStatus.COMPLETE)) {
                 i.queue();
             }

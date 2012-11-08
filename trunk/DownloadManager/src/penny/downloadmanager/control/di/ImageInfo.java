@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.Model;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,7 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.FileDataSource;
 import javax.imageio.ImageIO;
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
 
 /**
@@ -22,7 +22,7 @@ import penny.download.DownloadProcessor;
  */
 public class ImageInfo implements DownloadProcessor {
 
-    private void getImageInfo(DownloadData i, File file) {
+    private void getImageInfo(Download i, File file) {
         try {
             BufferedImage image = ImageIO.read(file);
             if (image != null) {
@@ -36,17 +36,17 @@ public class ImageInfo implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(Download d) {
+    public void onStartInput(AbstractDownload d) {
     }
 
     @Override
-    public void onEndInput(Download d) {
+    public void onEndInput(AbstractDownload d) {
     }
 
     @Override
-    public void onCompleted(Download d) {
+    public void onCompleted(AbstractDownload d) {
         if (Model.getApplicationSettings().getImageModel().isWidthAndHeight()) {
-            DownloadData i = (DownloadData) d;
+            Download i = (Download) d;
             File file = new File(i.getTempPath());
             if (file.exists()) {
                 FileDataSource dataSource = new FileDataSource(file);
@@ -66,19 +66,19 @@ public class ImageInfo implements DownloadProcessor {
     }
 
     @Override
-    public boolean onCheck(Download d) {
+    public boolean onCheck(AbstractDownload d) {
         return true;
     }
 
     @Override
-    public void doChunck(Download d, int read, byte[] buffer) {
+    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
     }
 
     @Override
-    public void onReset(Download d) {
+    public void onReset(AbstractDownload d) {
     }
 
     @Override
-    public void onInit(Download d) {
+    public void onInit(AbstractDownload d) {
     }
 }

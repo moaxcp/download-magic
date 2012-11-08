@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.Model;
 import penny.recmd5.MD5MessageDigest;
 
@@ -22,11 +22,11 @@ import penny.recmd5.MD5MessageDigest;
  */
 public class StartupFileChecker {
 
-    private List<DownloadData> downloads;
+    private List<Download> downloads;
     private long current;
     private long total;
 
-    public StartupFileChecker(List<DownloadData> downloads) {
+    public StartupFileChecker(List<Download> downloads) {
         this.downloads = downloads;
     }
 
@@ -61,7 +61,7 @@ public class StartupFileChecker {
     public void checkFileSizes() {
         setTotal(downloads.size());
         setCurrent(0);
-        for (DownloadData download : downloads) {
+        for (Download download : downloads) {
             if (Model.save(download)) {
                 File file = new File(download.getTempPath());
                 if (file.length() != download.getDownloaded()) {
@@ -73,7 +73,7 @@ public class StartupFileChecker {
     }
 
     public void checkMD5s() {
-        for (DownloadData download : downloads) {
+        for (Download download : downloads) {
             File file = new File(download.getTempPath());
             if (file.exists() && Model.generateMD5(download)) {
                 MD5MessageDigest md5 = new MD5MessageDigest();

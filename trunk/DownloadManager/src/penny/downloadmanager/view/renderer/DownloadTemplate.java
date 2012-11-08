@@ -10,7 +10,7 @@
  */
 package penny.downloadmanager.view.renderer;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.awt.Color;
 
 /**
@@ -69,7 +69,7 @@ public class DownloadTemplate extends javax.swing.JPanel {
     private javax.swing.JLabel url;
     // End of variables declaration//GEN-END:variables
 
-    void setDownloadData(DownloadData data, Color background, Color forground) {
+    void setDownloadData(Download data, Color background, Color forground) {
         if (data != null) {
             fileName.setText(data.getFile());
             this.progress.setMaximum(10000);

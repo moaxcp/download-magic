@@ -5,7 +5,7 @@ package penny.downloadmanager.view.test;
  *
  * Created on May 8, 2008, 7:51 PM
  */
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadStatus;
 import penny.download.Downloader;
 import java.beans.PropertyChangeEvent;
@@ -26,7 +26,7 @@ import javax.swing.event.ListDataListener;
 public class ConnectionTest extends javax.swing.JFrame implements PropertyChangeListener, ListDataListener {
 
     DefaultListModel eventList = new DefaultListModel();
-    Download download = null;
+    AbstractDownload download = null;
     TextUpdater tu;
 
     /** Creates new form ConnectionTest */
@@ -132,7 +132,7 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 goButton.setText("Stop");
                 download = null;
                 try {
-                    download = new Download(new URL(addressBox.getText()));
+                    download = new AbstractDownload(new URL(addressBox.getText()));
                     download.addPropertyChangeListener(ConnectionTest.this);
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(ConnectionTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -189,11 +189,11 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
 
             public void run() {
                 if (evt instanceof IndexedPropertyChangeEvent) {
-                } else if (evt.getPropertyName().equals(Download.PROP_STATUS)) {
-                    if (((Download) evt.getSource()).getStatus() == DownloadStatus.STOPPED) {
+                } else if (evt.getPropertyName().equals(AbstractDownload.PROP_STATUS)) {
+                    if (((AbstractDownload) evt.getSource()).getStatus() == DownloadStatus.STOPPED) {
                         goButton.setEnabled(true);
                     }
-                    eventList.addElement(evt.getPropertyName() + " = " + evt.getNewValue().toString() + "; " + ((Download) evt.getSource()).getMessage());
+                    eventList.addElement(evt.getPropertyName() + " = " + evt.getNewValue().toString() + "; " + ((AbstractDownload) evt.getSource()).getMessage());
                 } else {
                     eventList.addElement(evt.getPropertyName() + " = " + evt.getNewValue());
                 }

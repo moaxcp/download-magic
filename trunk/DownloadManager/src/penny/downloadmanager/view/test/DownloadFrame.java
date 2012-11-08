@@ -15,7 +15,7 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.util.RandomChanges;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,12 +32,12 @@ public class DownloadFrame extends javax.swing.JFrame {
 
     private static RandomChanges randomChanges;
 
-    private ObservableElementList<DownloadData> downloadList;
+    private ObservableElementList<Download> downloadList;
     private DownloadTableFormatCM downloadTableFormat;
 
     /** Creates new form DownloadBrowserView */
-    public DownloadFrame(EventList<DownloadData> downloads) {
-        downloadList = new ObservableElementList(downloads, GlazedLists.beanConnector(DownloadData.class));
+    public DownloadFrame(EventList<Download> downloads) {
+        downloadList = new ObservableElementList(downloads, GlazedLists.beanConnector(Download.class));
         downloadTableFormat = new DownloadTableFormatCM();
         downloadList.addListEventListener(downloadTableFormat);
         load(downloadList);
@@ -113,7 +113,7 @@ public class DownloadFrame extends javax.swing.JFrame {
 
     private void urlTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_urlTextActionPerformed
         try {
-            downloadList.add(new DownloadData(new URL(urlText.getText())));
+            downloadList.add(new Download(new URL(urlText.getText())));
             urlText.setText("");
         } catch (MalformedURLException ex) {
             Logger.getLogger(DownloadFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,7 +151,7 @@ public class DownloadFrame extends javax.swing.JFrame {
 
         for (String s : urls) {
             try {
-                DownloadData d = new DownloadData(new URL(s));
+                Download d = new Download(new URL(s));
                 downloads.add(d);
             } catch (MalformedURLException ex) {
                 Logger.getLogger(DownloadFrame.class.getName()).log(Level.SEVERE, null, ex);

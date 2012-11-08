@@ -7,7 +7,7 @@ package penny.downloadmanager.model.task;
 
 import ca.odell.glazedlists.EventList;
 import penny.download.DownloadStatus;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -20,20 +20,20 @@ import java.util.List;
 public class DTaskData extends TaskData {
 
     public static final String PROP_DOWNLOAD = "download";
-    private DownloadData download;
+    private Download download;
 
 
-    private EventList<DownloadData> downloads;
+    private EventList<Download> downloads;
     
     public static final String PROP_COMPLETE = "complete";
-    private List<DownloadData> complete;
+    private List<Download> complete;
 
-    public DTaskData(EventList<DownloadData> downloads) {
+    public DTaskData(EventList<Download> downloads) {
         this.downloads = downloads;
         this.name = "Download Task";
         this.status = Status.QUEUED;
-        complete = new ArrayList<DownloadData>();
-        for(DownloadData d : downloads) {
+        complete = new ArrayList<Download>();
+        for(Download d : downloads) {
             if(d.getStatus() != DownloadStatus.QUEUED) {
                 addComplete(d);
             }
@@ -54,9 +54,9 @@ public class DTaskData extends TaskData {
         propertySupport.firePropertyChange(PROP_STATUS, oldValue, status);
     }
 
-    public DownloadData getNextDownload() {
+    public Download getNextDownload() {
         downloads.getReadWriteLock().writeLock().lock();
-        for (DownloadData i : downloads) {
+        for (Download i : downloads) {
             if (i.getStatus().equals(DownloadStatus.QUEUED)) {
                 downloads.getReadWriteLock().writeLock().unlock();
                 return i;
@@ -69,31 +69,31 @@ public class DTaskData extends TaskData {
     /**
      * @return the download
      */
-    public DownloadData getDownload() {
+    public Download getDownload() {
         return download;
     }
 
     /**
      * @param download the download to set
      */
-    public void setDownload(DownloadData download) {
-        DownloadData oldValue = this.download;
+    public void setDownload(Download download) {
+        Download oldValue = this.download;
         this.download = download;
         propertySupport.firePropertyChange(PROP_DOWNLOAD, oldValue, download);
     }
     
-    public int getProgress(DownloadData download) {
+    public int getProgress(Download download) {
         return download.getSize() > 0 ? ((int) (download.getDownloaded() / (float) download.getSize() * 10000)) : 0;
     }
 
     /**
      * @return the downloads
      */
-    public EventList<DownloadData> getDownloads() {
+    public EventList<Download> getDownloads() {
         return downloads;
     }
 
-    public void addComplete(DownloadData data) {
+    public void addComplete(Download data) {
         int oldValue = complete.size();
         complete.add(data);
         propertySupport.firePropertyChange(PROP_COMPLETE, oldValue, complete.size());
