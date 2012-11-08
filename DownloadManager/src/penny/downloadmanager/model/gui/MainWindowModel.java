@@ -11,7 +11,7 @@ import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.UniqueList;
 import penny.download.DownloadStatus;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.DownloadSaver;
 import penny.downloadmanager.model.DownloadTableFormat;
 import penny.downloadmanager.model.db.DAOFactory;
@@ -37,7 +37,7 @@ public class MainWindowModel {
     private boolean randomChange;
 
     public static final String PROP_SELDOWNLOAD = "selectedDownload";
-    private DownloadData selectedDownload;
+    private Download selectedDownload;
 
     public static final String PROP_SELTASK = "selectedTask";
     private TaskData selectedTask;
@@ -45,7 +45,7 @@ public class MainWindowModel {
     public static final String PROP_RUNNING = "running";
     private boolean running;
 
-    private EventList<DownloadData> downloads;
+    private EventList<Download> downloads;
     private DownloadTableFormat downloadFormat;
     private EventList<TaskData> tasks;
     private DownloadSaver downloadSaver;
@@ -53,9 +53,9 @@ public class MainWindowModel {
     private SwingPropertyChangeSupport propertySupport;
 
     public MainWindowModel() {
-        downloads = new ObservableElementList<DownloadData>(
-                GlazedLists.threadSafeList(new UniqueList<DownloadData>(new BasicEventList<DownloadData>())),
-                GlazedLists.beanConnector(DownloadData.class));
+        downloads = new ObservableElementList<Download>(
+                GlazedLists.threadSafeList(new UniqueList<Download>(new BasicEventList<Download>())),
+                GlazedLists.beanConnector(Download.class));
         DAOFactory.setDB(DAOFactory.JAVADB);
 
         this.tasks = new ObservableElementList<TaskData>(
@@ -72,7 +72,7 @@ public class MainWindowModel {
 
     public void clearDownloads() {
         downloadSaver.setSaveDelete(false);
-        for(DownloadData d : downloads) {
+        for(Download d : downloads) {
             Model.remove(new File(d.getTempPath()));
         }
         downloads.clear();
@@ -83,14 +83,14 @@ public class MainWindowModel {
     public void clearCompleteDownloads() {
         downloadSaver.setSaveDelete(false);
         downloads.getReadWriteLock().writeLock().lock();
-        List<DownloadData> remove = new ArrayList<DownloadData>();
+        List<Download> remove = new ArrayList<Download>();
         for(int i = 0; i < downloads.size(); i++) {
-            DownloadData j = downloads.get(i);
+            Download j = downloads.get(i);
             if(j.getStatus() == DownloadStatus.COMPLETE) {
                 remove.add(j);
             }
         }
-        for(DownloadData d : remove) {
+        for(Download d : remove) {
             Model.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
@@ -103,14 +103,14 @@ public class MainWindowModel {
     public void clearErrorDownloads() {
         downloadSaver.setSaveDelete(false);
         downloads.getReadWriteLock().writeLock().lock();
-        List<DownloadData> remove = new ArrayList<DownloadData>();
+        List<Download> remove = new ArrayList<Download>();
         for(int i = 0; i < downloads.size(); i++) {
-            DownloadData j = downloads.get(i);
+            Download j = downloads.get(i);
             if(j.getStatus() == DownloadStatus.ERROR) {
                 remove.add(j);
             }
         }
-        for(DownloadData d : remove) {
+        for(Download d : remove) {
             Model.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
@@ -126,11 +126,11 @@ public class MainWindowModel {
     /**
      * @return the downloads
      */
-    public EventList<DownloadData> getDownloads() {
+    public EventList<Download> getDownloads() {
         return downloads;
     }
 
-    public void setDownloads(EventList<DownloadData> downloads) {
+    public void setDownloads(EventList<Download> downloads) {
         this.downloads = downloads;
     }
 
@@ -180,15 +180,15 @@ public class MainWindowModel {
     /**
      * @return the selectedDownload
      */
-    public DownloadData getSelectedDownload() {
+    public Download getSelectedDownload() {
         return selectedDownload;
     }
 
     /**
      * @param selectedDownload the selectedDownload to set
      */
-    public void setSelectedDownload(DownloadData selectedDownload) {
-        DownloadData oldValue = this.selectedDownload;
+    public void setSelectedDownload(Download selectedDownload) {
+        Download oldValue = this.selectedDownload;
         this.selectedDownload = selectedDownload;
         propertySupport.firePropertyChange(PROP_SELDOWNLOAD, oldValue, selectedDownload);
     }

@@ -12,9 +12,10 @@ import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import penny.download.Download;
+import penny.download.AbstractDownload;
 
 /**
  *
@@ -29,59 +30,64 @@ public class JavaDBDataSource {
     private String dbName = "downloads";
     private String strCreateDownloadTable =
             "create table DOWNLOAD (\n"
-            + "    " + DownloadData.PROP_ID + "             BIGINT NOT NULL PRIMARY KEY, \n"
-            + "    " + Download.PROP_URL + "                VARCHAR(32672) NOT NULL, \n"
-            + "    " + Download.PROP_SIZE + "               BIGINT, \n"
-            + "    " + Download.PROP_DOWNLOADED + "         BIGINT, \n"
-            + "    " + Download.PROP_STATUS + "             DownloadStatus, \n"
-            + "    " + Download.PROP_DOWNLOADTIME + "       BIGINT, \n"
-            + "    " + Download.PROP_ATTEMPTS + "        SMALLINT, \n"
-            + "    " + Download.PROP_CONTENTTYPE + "        VARCHAR(32672), \n"
-            + "    " + Download.PROP_HOST + "               VARCHAR(32672), \n"
-            + "    " + Download.PROP_PROTOCOL + "           VARCHAR(32672), \n"
-            + "    " + Download.PROP_QUERY + "              VARCHAR(32672), \n"
-            + "    " + Download.PROP_PATH + "               VARCHAR(32672), \n"
-            + "    " + Download.PROP_FILE + "               VARCHAR(32672), \n"
-            + "    " + Download.PROP_PROTOCOLFILENAME + "      VARCHAR(32672), \n"
-            + "    " + Download.PROP_FILEEXTENTION + "      VARCHAR(32672), \n"
-            + "    " + Download.PROP_MESSAGE + "      VARCHAR(32672), \n"
-            + "    " + Download.PROP_RETRYTIME + "        BIGINT, \n"
-            + "    " + Download.PROP_RESPONSECODE + "        SMALLINT, \n"
-            + "    " + Download.PROP_LOCATIONS + "        List \n"
+            + "    " + Download.PROP_ID + "             CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL PRIMARY KEY, \n"
+            + "    " + Download.PROP_URL +              " VARCHAR(32672) NOT NULL, \n"
+            + "    " + Download.PROP_SIZE +             " BIGINT, \n"
+            + "    " + Download.PROP_DOWNLOADED +       " BIGINT, \n"
+            + "    " + Download.PROP_STATUS +           " DownloadStatus, \n"
+            + "    " + Download.PROP_DOWNLOADTIME +     " BIGINT, \n"
+            + "    " + Download.PROP_ATTEMPTS +         " SMALLINT, \n"
+            + "    " + Download.PROP_CONTENTTYPE +      " VARCHAR(32672), \n"
+            + "    " + Download.PROP_HOST +             " VARCHAR(32672), \n"
+            + "    " + Download.PROP_PROTOCOL +         " VARCHAR(32672), \n"
+            + "    " + Download.PROP_QUERY +            " VARCHAR(32672), \n"
+            + "    " + Download.PROP_PATH +             " VARCHAR(32672), \n"
+            + "    " + Download.PROP_FILE +             " VARCHAR(32672), \n"
+            + "    " + Download.PROP_PROTOCOLFILENAME + " VARCHAR(32672), \n"
+            + "    " + Download.PROP_FILEEXTENTION +    " VARCHAR(32672), \n"
+            + "    " + Download.PROP_MESSAGE +          " VARCHAR(32672), \n"
+            + "    " + Download.PROP_RETRYTIME +        " BIGINT, \n"
+            + "    " + Download.PROP_RESPONSECODE +     " SMALLINT, \n"
+            + "    " + Download.PROP_LOCATIONS +        " List, \n"
+            + "    " + Download.PROP_MD5 +              " MD5State, \n"
+            + "    " + Download.PROP_LINKSTATE +        " LinkState, \n"
+            + "    " + Download.PROP_WORDBUFFER +       " VARCHAR(32672), \n"
+            + "    " + Download.PROP_SAVEPATH +         " VARCHAR(32672), \n"
+            + "    " + Download.PROP_TEMPPATH +         " VARCHAR(32672) \n"
             + ")";
     private String strCreateUrlTable =
             "create table URL (\n"
-            + "    URL                VARCHAR(32672) NOT NULL,\n"
-            + "    LINK                VARCHAR(32672) NOT NULL,\n"
-            + "    TYPE                VARCHAR(4),\n"
-            + "    COUNT                INTEGER,\n"
-            + "    PRIMARY KEY        (URL, LINK, TYPE),\n"
-            + "    FOREIGN KEY        (URL) REFERENCES DOWNLOAD (" + DownloadData.PROP_URL + ")\n"
+            + "    " + Download.PROP_ID + " CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL,\n"
+            + "    " + "LINK" +           " VARCHAR(32672) NOT NULL,\n"
+            + "    " + "TYPE" +           " VARCHAR(4),\n"
+            + "    " + "COUNT" +          " INTEGER,\n"
+            + "    PRIMARY KEY (" + Download.PROP_ID + ", LINK, TYPE),\n"
+            + "    FOREIGN KEY (" + Download.PROP_ID + ") REFERENCES DOWNLOAD (" + Download.PROP_ID + ")\n"
             + ")";
     private String strCreateWordTable =
             "create table WORD (\n"
-            + "    URL                VARCHAR(32672) NOT NULL,\n"
+            + "    " + Download.PROP_ID + " CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL,\n"
             + "    WORD                VARCHAR(32672) NOT NULL,\n"
-            + "    WORDINDEX                BIGINT,\n"
-            + "    PRIMARY KEY        (URL, WORD, WORDINDEX),\n"
-            + "    FOREIGN KEY        (URL) REFERENCES DOWNLOAD (" + DownloadData.PROP_URL + ")\n"
+            + "    WORDINDEX           BIGINT,\n"
+            + "    PRIMARY KEY        (" + Download.PROP_ID + ", WORD, WORDINDEX),\n"
+            + "    FOREIGN KEY        (" + Download.PROP_ID + ") REFERENCES DOWNLOAD (" + Download.PROP_ID + ")\n"
             + ")";
     private String strCreatePropertyTable =
             "create table PROPERTY (\n"
-            + "    URL                VARCHAR(32672) NOT NULL,\n"
+            + "    " + Download.PROP_ID + " CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL,\n"
             + "    NAME               VARCHAR(32672) NOT NULL,\n"
             + "    PROPERTY           Object,\n"
-            + "    PRIMARY KEY        (URL, NAME),\n"
-            + "    FOREIGN KEY        (URL) REFERENCES DOWNLOAD (" + DownloadData.PROP_URL + ")\n"
+            + "    PRIMARY KEY        (" + Download.PROP_ID + ", NAME),\n"
+            + "    FOREIGN KEY        (" + Download.PROP_ID + ") REFERENCES DOWNLOAD (" + Download.PROP_ID + ")\n"
             + ")";
-//    private String strCreateMD5StateType =
-//            "create type MD5STATE\n " +
-//            "EXTERNAL NAME 'penny.recmd5.MD5State'\n " +
-//            "LANGUAGE JAVA";
-//    private String strCreateLinkStateType =
-//            "create type LinkState\n " +
-//            "EXTERNAL NAME 'penny.parser.LinkState'\n " +
-//            "LANGUAGE JAVA";
+    private String strCreateMD5StateType =
+            "create type MD5STATE\n " +
+            "EXTERNAL NAME 'penny.recmd5.MD5State'\n " +
+            "LANGUAGE JAVA";
+    private String strCreateLinkStateType =
+            "create type LinkState\n " +
+            "EXTERNAL NAME 'penny.parser.LinkState'\n " +
+            "LANGUAGE JAVA";
     private String strCreateObjectType =
             "create type OBJECT\n " +
             "EXTERNAL NAME 'java.lang.Object'\n " +
@@ -221,8 +227,8 @@ public class JavaDBDataSource {
         Statement statement = null;
         try {
             statement = dbConnection.createStatement();
-            //statement.execute(strCreateMD5StateType);
-            //statement.execute(strCreateLinkStateType);
+            statement.execute(strCreateMD5StateType);
+            statement.execute(strCreateLinkStateType);
             statement.execute(strCreateObjectType);
             statement.execute(strCreateDownloadStatusType);
             statement.execute(strCreateListType);

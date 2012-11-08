@@ -5,7 +5,7 @@
 
 package penny.downloadmanager.view.converter;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.SavingModel.FileExistsAction;
 import penny.recmd5.MD5State;
 import org.jdesktop.beansbinding.Converter;
@@ -16,13 +16,13 @@ import org.jdesktop.beansbinding.Converter;
  */
 public class NumberToSizeConverter extends Converter<Long, Integer> {
 
-    private DownloadData d;
+    private Download d;
 
     public NumberToSizeConverter() {
         
     }
 
-    public NumberToSizeConverter(DownloadData d) {
+    public NumberToSizeConverter(Download d) {
         this.d = d;
     }
 

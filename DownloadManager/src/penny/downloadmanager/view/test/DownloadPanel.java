@@ -13,7 +13,7 @@ package penny.downloadmanager.view.test;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.swing.EventTableModel;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.awt.LayoutManager;
 
 /**
@@ -21,9 +21,9 @@ import java.awt.LayoutManager;
  * @author john
  */
 public class DownloadPanel extends javax.swing.JPanel {
-    private EventList<DownloadData> list;
+    private EventList<Download> list;
     private DownloadTableFormatCM format;
-    private EventTableModel<DownloadData> downloadModel;
+    private EventTableModel<Download> downloadModel;
 
 
     public DownloadPanel() {
@@ -32,10 +32,10 @@ public class DownloadPanel extends javax.swing.JPanel {
 
 
     /** Creates new form DownloadPanel */
-    public DownloadPanel(EventList<DownloadData> list, DownloadTableFormatCM format) {
+    public DownloadPanel(EventList<Download> list, DownloadTableFormatCM format) {
         this.list = list;
         this.format = format;
-        downloadModel = new EventTableModel<DownloadData>(list, format);
+        downloadModel = new EventTableModel<Download>(list, format);
         initComponents();
     }
 
@@ -92,7 +92,7 @@ public class DownloadPanel extends javax.swing.JPanel {
     /**
      * @param list the list to set
      */
-    public void setList(EventList<DownloadData> list) {
+    public void setList(EventList<Download> list) {
         this.list = list;
     }
 

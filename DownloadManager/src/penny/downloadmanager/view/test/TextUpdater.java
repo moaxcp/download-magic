@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.view.test;
 
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
 import javax.swing.JList;
 import javax.swing.JTextArea;
@@ -22,13 +22,13 @@ public class TextUpdater implements DownloadProcessor {
         this.text = text;
     }
 
-    public void onStartInput(Download d) {
+    public void onStartInput(AbstractDownload d) {
     }
 
-    public void onEndInput(Download d) {
+    public void onEndInput(AbstractDownload d) {
     }
 
-    public void doChunck(Download d, int read, byte[] buffer) {
+    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
         for (int i = 0; i < read; i++) {
             urlContent.append((char)buffer[i]);
         }
@@ -40,24 +40,24 @@ public class TextUpdater implements DownloadProcessor {
         });
     }
 
-    public void onReset(Download d) {
+    public void onReset(AbstractDownload d) {
 
     }
 
-    public void onCompleted(Download d) {
+    public void onCompleted(AbstractDownload d) {
         
     }
 
-    public void setDownloaded(Download d) {
+    public void setDownloaded(AbstractDownload d) {
         
     }
 
-    public boolean onCheck(Download d) {
+    public boolean onCheck(AbstractDownload d) {
         return true;
     }
 
     @Override
-    public void onInit(Download d) {
+    public void onInit(AbstractDownload d) {
         
     }
 }

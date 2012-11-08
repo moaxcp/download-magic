@@ -11,7 +11,7 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import ca.odell.glazedlists.swing.EventTableColumnModel;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -23,7 +23,7 @@ import javax.swing.table.TableColumn;
  *
  * @author john
  */
-public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>, ListEventListener<DownloadData> {
+public class DownloadTableFormatCM implements AdvancedTableFormat<Download>, ListEventListener<Download> {
 
     private EventList<TableColumn> columns;
     private EventTableColumnModel<TableColumn> columnModel;
@@ -43,7 +43,7 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>,
         classes.add(JProgressBar.class);
     }
 
-    public void getColumns(DownloadData d) {
+    public void getColumns(Download d) {
         for (String s : d.getPropertyNames()) {
             boolean add = true;
             //required lock for read/write transaction
@@ -79,7 +79,7 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>,
         throw new IllegalArgumentException();
     }
 
-    public Object getColumnValue(DownloadData download, int column) {
+    public Object getColumnValue(Download download, int column) {
         String name = getColumnName(column);
         if (name.equals(PROP_PROGRESS)) {
             if (download.getSize() != 0) {
@@ -95,7 +95,7 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>,
     }
 
     public Comparator getColumnComparator(final int column) {
-        if (getColumnName(column).equals(DownloadData.PROP_URL)) {
+        if (getColumnName(column).equals(Download.PROP_URL)) {
 
             return new Comparator() {
 
@@ -113,8 +113,8 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>,
         return columnModel;
     }
 
-    public void listChanged(ListEvent<DownloadData> listChanges) {
-        EventList<DownloadData> changeList = listChanges.getSourceList();
+    public void listChanged(ListEvent<Download> listChanges) {
+        EventList<Download> changeList = listChanges.getSourceList();
 
         while (listChanges.next()) {
             int sourceIndex = listChanges.getIndex();
@@ -126,7 +126,7 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<DownloadData>,
                     break;
                 case ListEvent.INSERT:
                     changeList.getReadWriteLock().readLock().lock();
-                    DownloadData obj = changeList.get(sourceIndex);
+                    Download obj = changeList.get(sourceIndex);
                     getColumns(obj);
                     changeList.getReadWriteLock().readLock().unlock();
 

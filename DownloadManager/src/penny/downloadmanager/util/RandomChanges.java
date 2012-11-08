@@ -5,7 +5,7 @@
 package penny.downloadmanager.util;
 
 import ca.odell.glazedlists.EventList;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 public class RandomChanges implements Runnable {
 
     private boolean run;
-    private EventList<DownloadData> downloads;
+    private EventList<Download> downloads;
     private Random random = new Random();
 
-    public RandomChanges(EventList<DownloadData> downloads) {
+    public RandomChanges(EventList<Download> downloads) {
         this.downloads = downloads;
         run = true;
     }
@@ -38,7 +38,7 @@ public class RandomChanges implements Runnable {
         int changed = downloads.size();
         while (run && changed > 0) {
             changed = downloads.size();
-            for (DownloadData d : downloads) {
+            for (Download d : downloads) {
                 if (d.getSize() < 0) {
                     d.setSize(random.nextInt(100000) + 50000);
                 }

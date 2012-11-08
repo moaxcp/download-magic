@@ -4,10 +4,10 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
 import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.gui.ParsingModel;
 import java.net.URISyntaxException;
@@ -26,7 +26,7 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
 
     private LinkExtractor linkExtractor;
     private WordExtractor wordExtractor;
-    private DownloadData curDownload;
+    private Download curDownload;
     private ParsingModel parsingModel;
 
     public Parser() {
@@ -35,8 +35,8 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onStartInput(Download d) {
-        curDownload = (DownloadData) d;
+    public void onStartInput(AbstractDownload d) {
+        curDownload = (Download) d;
         try {
             linkExtractor = new LinkExtractor(curDownload.getUrl().toURI(), this);
             linkExtractor.setLinkState(curDownload.getLinkState());
@@ -47,20 +47,20 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onEndInput(Download d) {
+    public void onEndInput(AbstractDownload d) {
     }
 
     @Override
-    public void onCompleted(Download d) {
+    public void onCompleted(AbstractDownload d) {
     }
 
     @Override
-    public boolean onCheck(Download d) {
+    public boolean onCheck(AbstractDownload d) {
         return true;
     }
 
     @Override
-    public void doChunck(Download d, int read, byte[] buffer) {
+    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
         if(Model.parseLinks(d)) {
             linkExtractor.put(buffer, 0, read);
             curDownload.setLinkState(linkExtractor.getLinkState());
@@ -72,7 +72,7 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onReset(Download d) {
+    public void onReset(AbstractDownload d) {
     }
 
     @Override
@@ -85,7 +85,7 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onInit(Download d) {
+    public void onInit(AbstractDownload d) {
     }
 
     @Override

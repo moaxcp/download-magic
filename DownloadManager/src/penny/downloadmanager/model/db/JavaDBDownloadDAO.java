@@ -11,13 +11,9 @@ package penny.downloadmanager.model.db;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import penny.download.Download;
 import penny.download.DownloadStatus;
 import penny.parser.LinkState;
 import penny.recmd5.MD5State;
@@ -64,44 +60,52 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             statement.setObject(param, (MD5State) o);
         } else if (o instanceof LinkState) {
             statement.setObject(param, (LinkState) o);
+        } else if (o instanceof UUID) {
+            statement.setString(param, ((UUID)o).toString());
         }
     }
 
     @Override
-    public List<DownloadData> getDownloads() {
-        List<DownloadData> downloads = new ArrayList<DownloadData>();
+    public List<Download> getDownloads() {
+        List<Download> downloads = new ArrayList<Download>();
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select " + DownloadData.PROP_ID + " from download";
+            String query = "select " + Download.PROP_ID + " from download";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
-                DownloadData d = getDownload(rs.getString("url"));
-                if (d != null) {
-                    downloads.add(d);
-                } else {
-                    Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Could not create a DownloadData with {0} but it is in the db. It may not be a url.", rs.getString("url"));
+                try {
+                    Download d = getDownload(UUID.fromString(rs.getString("ID")));
+                    if (d != null) {
+                        downloads.add(d);
+                    } else {
+                        Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Could not create a Download with {0} but it is in the db.", rs.getString(Download.PROP_ID));
+                    }
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "UUID from db \"{0}\" is not valid.", rs.getString(Download.PROP_ID));
+                    throw new IllegalStateException("There was an Illegal Argument Exception", ex);
                 }
             }
             statement.close();
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
+            throw new IllegalStateException("There was a SQL Exception", ex);
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
         }
         return downloads;
     }
 
-    public DownloadData getDownload(UUID uuid) {
-        DownloadData d = null;
+    @Override
+    public Download getDownload(UUID uuid) {
+        Download d = null;
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
-            d = new DownloadData(new URL(url));
+            d = new Download(uuid);
             Statement statement = connection.createStatement();
-            String query = "select * from download where url = '" + url + "'";
+            String query = "select * from download where " + Download.PROP_ID + " = '" + uuid + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
@@ -120,16 +124,19 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 } else if (s == DownloadStatus.ERROR) {
                     d.error();
                 }
-                d.setExtraProperty((Map<String, Object>) getProperties(url));
-                d.getSrcLinks().addAll(getLinks(url, DownloadData.SRC));
-                d.getHrefLinks().addAll(getLinks(url, DownloadData.HREF));
-                d.getWords().addAll(getWords(url));
+                d.setMD5((MD5State) rs.getObject(Download.PROP_MD5));
+                d.setLinkState((LinkState) rs.getObject(Download.PROP_LINKSTATE));
+                d.setWordBuffer(rs.getString(Download.PROP_WORDBUFFER));
+                d.setSavePath(rs.getString(Download.PROP_SAVEPATH));
+                d.setTempPath(rs.getString(Download.PROP_TEMPPATH));
+                d.addExtraProperties((Map<String, Object>) getProperties(uuid));
+                d.getSrcLinks().addAll(getLinks(uuid, Download.SRC));
+                d.getHrefLinks().addAll(getLinks(uuid, Download.HREF));
+                d.getWords().addAll(getWords(uuid));
             } else {
                 d = null;
             }
             statement.close();
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
             throw new IllegalStateException("There was an SQL Exception", ex);
@@ -139,12 +146,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         return d;
     }
 
-    private HashMap<String, Object> getProperties(String url) {
+    private HashMap<String, Object> getProperties(UUID uuid) {
         HashMap<String, Object> props = new HashMap<String, Object>();
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select * from property where url = '" + url + "'";
+            String query = "select * from property where " + Download.PROP_ID + " = '" + uuid + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
@@ -162,20 +169,20 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         return props;
     }
 
-    private List<String> getLinks(String url, String type) {
+    private List<String> getLinks(UUID uuid, String type) {
         List<String> urls = new ArrayList<String>();
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select * from url where url = '" + url + "' and TYPE = '" + type + "'";
+            String query = "select * from url where " + Download.PROP_ID + " = '" + uuid + "' and TYPE = '" + type + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 int count = rs.getInt("count");
                 for (int i = 0; i < count; i++) {
-                    if (type.equals(DownloadData.HREF)) {
+                    if (type.equals(Download.HREF)) {
                         urls.add(rs.getString("link"));
-                    } else if (type.equals(DownloadData.SRC)) {
+                    } else if (type.equals(Download.SRC)) {
                         urls.add(rs.getString("link"));
                     }
                 }
@@ -190,12 +197,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         return urls;
     }
 
-    private List<String> getWords(String url) {
+    private List<String> getWords(UUID uuid) {
         List<String> words = new ArrayList<String>();
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select * from word where url = '" + url + "' order by wordindex";
+            String query = "select * from word where " + Download.PROP_ID + " = '" + uuid + "' order by wordindex";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
@@ -212,12 +219,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void insertDownload(DownloadData download) {
-        if (downloadExists(download.getUrl().toString())) {
-            throw new IllegalArgumentException(download.getUrl().toString() + "  exists in db");
+    public void insertDownload(Download download) {
+        if (downloadExists(download.getId())) {
+            throw new IllegalArgumentException(download + "  exists in db");
         }
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = new ArrayList<String>(DownloadData.getNativePropertyNames());
+        List<String> propertyNames = Download.propertyNames;
         query.append("insert into DOWNLOAD\n(");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {
@@ -240,6 +247,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 param++;
             }
 
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query.toString());
             int executeUpdate = statement.executeUpdate();
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query.toString()});
             statement.close();
@@ -250,22 +258,22 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
             Map<String, Integer> href = countUrls(download.getHrefLinks());
             for (String s : href.keySet()) {
-                saveLink(download.getUrl().toString(), s, DownloadData.HREF, href.get(s));
+                saveLink(download.getId(), s, Download.HREF, href.get(s));
             }
 
             href = null;
 
             Map<String, Integer> src = countUrls(download.getSrcLinks());
             for (String s : src.keySet()) {
-                saveLink(download.getUrl().toString(), s, DownloadData.SRC, src.get(s));
+                saveLink(download.getId(), s, Download.SRC, src.get(s));
             }
 
             for (String s : download.getWords()) {
-                saveWord(download.getUrl().toString(), s);
+                saveWord(download.getId(), s);
             }
 
             for (String s : download.getExtraProperties().keySet()) {
-                saveProperty(download.getUrl().toString(), s, download.getProperty(s));
+                saveProperty(download.getId(), s, download.getExtraProperties().get(s));
             }
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -276,13 +284,13 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void updateDownload(DownloadData download, String property) {
+    public void updateDownload(Download download, String property) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         try {
             if (!download.getExtraProperties().keySet().contains(property)) {
-                PreparedStatement statement = connection.prepareStatement("update download set " + property + " = ? where url = '" + download.getUrl().toString() + "'");
+                PreparedStatement statement = connection.prepareStatement("update download set " + property + " = ? where " + Download.PROP_ID + " = '" + download.getId() + "'");
                 Object o = download.getProperty(property);
                 setObjectParam(statement, 1, o);
                 executeUpdate = statement.executeUpdate();
@@ -294,7 +302,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 }
 
             } else {
-                saveProperty(download.getUrl().toString(), property, download.getProperty(property));
+                saveProperty(download.getId(), property, download.getExtraProperties().get(property));
             }
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "property " + property + " value " + download.getProperty(property), ex);
@@ -305,11 +313,10 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     //TODO add change url for download
-    
     @Override
-    public void updateDownload(DownloadData download) {
+    public void updateDownload(Download download) {
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = new ArrayList<String>(DownloadData.getNativePropertyNames());
+        List<String> propertyNames = Download.propertyNames;
         query.append("update DOWNLOAD\n set ");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {
@@ -336,23 +343,23 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
             Map<String, Integer> href = countUrls(download.getHrefLinks());
             for (String s : href.keySet()) {
-                saveLink(download.getUrl().toString(), s, DownloadData.HREF, href.get(s));
+                saveLink(download.getId(), s, Download.HREF, href.get(s));
             }
 
             href = null;
 
             Map<String, Integer> src = countUrls(download.getSrcLinks());
             for (String s : src.keySet()) {
-                saveLink(download.getUrl().toString(), s, DownloadData.SRC, src.get(s));
+                saveLink(download.getId(), s, Download.SRC, src.get(s));
             }
 
-            deleteWords(download.getUrl().toString());
+            deleteWords(download.getId());
             for (String s : download.getWords()) {
-                saveWord(download.getUrl().toString(), s);
+                saveWord(download.getId(), s);
             }
 
             for (String s : download.getExtraProperties().keySet()) {
-                saveProperty(download.getUrl().toString(), s, download.getProperty(s));
+                saveProperty(download.getId(), s, download.getExtraProperties().get(s));
             }
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -364,13 +371,13 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void saveLink(String url, String link, String type) {
+    public void saveLink(UUID uuid, String link, String type) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int count = 0;
             Statement s = connection.createStatement();
-            String query = "select count from url where url = '" + url + "' and link = '" + link + "' and type = '" + type + "'";
+            String query = "select count from url where " + Download.PROP_ID + " = '" + uuid + "' and link = '" + link + "' and type = '" + type + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query);
             ResultSet rs = s.executeQuery(query);
             if (rs.next()) {
@@ -379,22 +386,22 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             s.close();
             int executeUpdate = 0;
             if (count > 0) {
-                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where url = ? and link = ? and type = ?");
+                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where " + Download.PROP_ID + " = ? and link = ? and type = ?");
                 statement.setInt(1, count + 1);
-                statement.setString(2, url);
+                statement.setString(2, uuid.toString());
                 statement.setString(3, link);
                 statement.setString(4, type);
                 executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where url = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, count, url, link, type});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where " + Download.PROP_ID + " = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, count, uuid, link, type});
                 statement.close();
             } else {
-                PreparedStatement statement = connection.prepareStatement("insert into url\n(url, link, type, count)\nvalues\n(?, ?, ?, ?)");
-                statement.setString(1, url);
+                PreparedStatement statement = connection.prepareStatement("insert into url\n(" + Download.PROP_ID + ", link, type, count)\nvalues\n(?, ?, ?, ?)");
+                statement.setString(1, uuid.toString());
                 statement.setString(2, link);
                 statement.setString(3, type);
                 statement.setInt(4, count + 1);
                 executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (url, link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, url, link, type, count});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (" + Download.PROP_ID + ", link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, uuid, link, type, count});
                 statement.close();
             }
 
@@ -402,7 +409,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update/insert");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + url + " " + link + " " + type, ex);
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + uuid + " " + link + " " + type, ex);
             throw new IllegalStateException("There was an SQL Exception", ex);
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
@@ -410,13 +417,13 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void saveLink(String url, String link, String type, int count) {
+    public void saveLink(UUID uuid, String link, String type, int count) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int dbCount = 0;
             Statement s = connection.createStatement();
-            String query = "select count from url where url = '" + url + "' and link = '" + link + "' and type = '" + type + "'";
+            String query = "select count from url where " + Download.PROP_ID + " = '" + uuid + "' and link = '" + link + "' and type = '" + type + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query);
             ResultSet rs = s.executeQuery(query);
             if (rs.next()) {
@@ -425,22 +432,22 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             s.close();
             int executeUpdate = 0;
             if (dbCount > 0) {
-                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where url = ? and link = ? and type = ?");
+                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where " + Download.PROP_ID + " = ? and link = ? and type = ?");
                 statement.setInt(1, count);
-                statement.setString(2, url);
+                statement.setString(2, uuid.toString());
                 statement.setString(3, link);
                 statement.setString(4, type);
                 executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where url = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, dbCount, url, link, type});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where " + Download.PROP_ID + " = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, dbCount, uuid, link, type});
                 statement.close();
             } else {
-                PreparedStatement statement = connection.prepareStatement("insert into url\n(url, link, type, count)\nvalues\n(?, ?, ?, ?)");
-                statement.setString(1, url);
+                PreparedStatement statement = connection.prepareStatement("insert into url\n(" + Download.PROP_ID + ", link, type, count)\nvalues\n(?, ?, ?, ?)");
+                statement.setString(1, uuid.toString());
                 statement.setString(2, link);
                 statement.setString(3, type);
                 statement.setInt(4, count);
                 executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (url, link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, url, link, type, dbCount});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (" + Download.PROP_ID + ", link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, uuid, link, type, dbCount});
                 statement.close();
             }
 
@@ -448,7 +455,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update/insert");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + url + " " + link + " " + type, ex);
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + uuid + " " + link + " " + type, ex);
             throw new IllegalStateException("There was an SQL Exception", ex);
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
@@ -456,32 +463,32 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void saveWord(String url, String word) {
+    public void saveWord(UUID uuid, String word) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         long wordIndex = 0;
         try {
             Statement statement = connection.createStatement();
-            String query = "select max(wordindex) from word where url = '" + url + "'";
+            String query = "select max(wordindex) from word where " + Download.PROP_ID + " = '" + uuid + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query);
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
                 wordIndex = rs.getLong(1) + 1;
             }
-            PreparedStatement insert = connection.prepareStatement("insert into word\n(url, word, wordindex)\nvalues\n(?, ?, ?)");
-            insert.setString(1, url);
+            PreparedStatement insert = connection.prepareStatement("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n(?, ?, ?)");
+            insert.setString(1, uuid.toString());
             insert.setString(2, word);
             insert.setLong(3, wordIndex);
             executeUpdate = insert.executeUpdate();
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on insert into word (url, word, wordindex) values ({1}, {2}, {3})", new Object[]{executeUpdate, url, word, wordIndex});
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on insert into word (" + Download.PROP_ID + ", word, wordindex) values ({1}, {2}, {3})", new Object[]{executeUpdate, uuid, word, wordIndex});
             insert.close();
 
             if (executeUpdate != 1) {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 insert");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving word " + url + " " + word, ex);
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Exception saving word " + uuid + " " + word, ex);
             throw new IllegalStateException("There was an SQL Exception", ex);
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
@@ -489,39 +496,39 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void saveProperty(String url, String name, Object property) {
+    public void saveProperty(UUID uuid, String name, Object property) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select name from property where url = '" + url + "' and name = '" + name + "'";
+            String query = "select name from property where " + Download.PROP_ID + " = '" + uuid + "' and name = '" + name + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query);
             ResultSet rs = statement.executeQuery(query);
             int executeUpdate = 0;
             if (rs.next()) {
                 statement.close();
-                PreparedStatement insert = connection.prepareStatement("update property set property = ? where url = ? and name = ?");
+                PreparedStatement insert = connection.prepareStatement("update property set property = ? where " + Download.PROP_ID + " = ? and name = ?");
                 insert.setObject(1, property);
-                insert.setString(2, url);
+                insert.setString(2, uuid.toString());
                 insert.setString(3, name);
                 executeUpdate = insert.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update property set property = {1} where url = {2} and name = {3}", new Object[]{executeUpdate, property, url, name});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update property set property = {1} where " + Download.PROP_ID + " = {2} and name = {3}", new Object[]{executeUpdate, property, uuid, name});
                 insert.close();
             } else {
                 statement.close();
-                PreparedStatement insert = connection.prepareStatement("insert into property\n(url, name, property)\nvalues\n(?, ?, ?)");
-                insert.setString(1, url);
+                PreparedStatement insert = connection.prepareStatement("insert into property\n(" + Download.PROP_ID + ", name, property)\nvalues\n(?, ?, ?)");
+                insert.setString(1, uuid.toString());
                 insert.setString(2, name);
                 insert.setObject(3, property);
                 executeUpdate = insert.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on insert into property (url, name, property) values ({1}, {2}, {3})", new Object[]{executeUpdate, url, name, property});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on insert into property (" + Download.PROP_ID + ", name, property) values ({1}, {2}, {3})", new Object[]{executeUpdate, uuid, name, property});
                 insert.close();
             }
             if (executeUpdate != 1) {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update/insert");
             }
         } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "There was an Exception saving property " + url + " " + name + " " + property, ex);
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "There was an Exception saving property " + uuid + " " + name + " " + property, ex);
             throw new IllegalStateException("There was an SQL Exception", ex);
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
@@ -529,17 +536,17 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void deleteDownload(String url) {
-        if (!downloadExists(url)) {
-            throw new IllegalArgumentException(url + " does not exist in db");
+    public void deleteDownload(UUID uuid) {
+        if (!downloadExists(uuid)) {
+            throw new IllegalArgumentException(uuid + " does not exist in db");
         }
-        deleteLinks(url);
-        deleteWords(url);
-        deleteProperties(url);
+        deleteLinks(uuid);
+        deleteWords(uuid);
+        deleteProperties(uuid);
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "delete from download where url = '" + url + "'";
+            String query = "delete from download where " + Download.PROP_ID + " = '" + uuid + "'";
             int executeUpdate = statement.executeUpdate(query);
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
             statement.close();
@@ -552,12 +559,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void deleteLinks(String url) {
+    public void deleteLinks(UUID uuid) {
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int executeUpdate = 0;
             Statement statement = connection.createStatement();
-            String query = "delete from url where url = '" + url + "'";
+            String query = "delete from url where " + Download.PROP_ID + " = '" + uuid + "'";
             executeUpdate = statement.executeUpdate(query);
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
         } catch (SQLException ex) {
@@ -569,12 +576,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void deleteWords(String url) {
+    public void deleteWords(UUID uuid) {
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int executeUpdate = 0;
             Statement statement = connection.createStatement();
-            String query = "delete from word where url = '" + url + "'";
+            String query = "delete from word where " + Download.PROP_ID + " = '" + uuid + "'";
             executeUpdate = statement.executeUpdate(query);
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
         } catch (SQLException ex) {
@@ -586,12 +593,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void deleteProperties(String url) {
+    public void deleteProperties(UUID uuid) {
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int executeUpdate = 0;
             Statement statement = connection.createStatement();
-            String query = "delete from property where url = '" + url + "'";
+            String query = "delete from property where " + Download.PROP_ID + " = '" + uuid + "'";
             executeUpdate = statement.executeUpdate(query);
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
         } catch (SQLException ex) {
@@ -603,12 +610,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void deleteProperty(String url, String name) {
+    public void deleteProperty(UUID uuid, String name) {
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             int executeUpdate = 0;
             Statement statement = connection.createStatement();
-            String query = "delete from property where url = '" + url + "' and name = '" + name + "'";
+            String query = "delete from property where " + Download.PROP_ID + " = '" + uuid + "' and name = '" + name + "'";
             executeUpdate = statement.executeUpdate(query);
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
         } catch (SQLException ex) {
@@ -620,9 +627,9 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     }
 
     @Override
-    public void clearDownloads(List<DownloadData> downloads) {
-        for (DownloadData d : downloads) {
-            deleteDownload(d.getUrl().toString());
+    public void clearDownloads(List<Download> downloads) {
+        for (Download d : downloads) {
+            deleteDownload(d.getId());
         }
     }
 
@@ -652,12 +659,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         }
     }
 
-    private boolean downloadExists(String url) {
+    private boolean downloadExists(UUID uuid) {
         boolean r = false;
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
-            String query = "select url from download where url = '" + url + "'";
+            String query = "select " + Download.PROP_ID + " from download where " + Download.PROP_ID + " = '" + uuid + "'";
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, query);
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
@@ -769,8 +776,8 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         return count;
     }
 
-    private static void printDownloads(List<DownloadData> downloads) {
-        for (DownloadData d : downloads) {
+    private static void printDownloads(List<Download> downloads) {
+        for (Download d : downloads) {
             System.out.println(d);
             for (String s : d.getHrefLinks()) {
                 System.out.println("    href: " + s);
@@ -790,21 +797,24 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
         DownloadDAO dao = DAOFactory.getInstance().getDownloadDAO();
-        DownloadData google = new DownloadData(new URL("http://www.google.com/"));
+        Download google = new Download(UUID.randomUUID());
+        google.setUrl(new URL("http://www.google.com/"));
         google.addHrefLink("http://www.gmail.com/");
         google.addHrefLink("http://www.gmail.com/");
         google.addHrefLink("http://www.gmail.com/asdf");
         google.addSrcLink("http://www.igoogle.com/logo.jpg");
         dao.insertDownload(google);
-        dao.insertDownload(new DownloadData(new URL("http://www.gmail.com/")));
+        Download gmail = new Download(UUID.randomUUID());
+        gmail.setUrl(new URL("http://www.gmail.com/"));
+        dao.insertDownload(gmail);
         google.addHrefLink("http://www.hotmail.com/");
-        dao.saveLink("http://www.gmail.com/", "http://www.yahoo.com/", "src");
-        dao.saveLink("http://www.gmail.com/", "http://www.yahoo.com/", "src");
-        dao.saveLink("http://www.gmail.com/", "http://www.yahoo.com/", "href");
+        dao.saveLink(gmail.getId(), "http://www.yahoo.com/", "src");
+        dao.saveLink(gmail.getId(), "http://www.yahoo.com/", "src");
+        dao.saveLink(gmail.getId(), "http://www.yahoo.com/", "href");
         google.setDownloaded(80);
-        dao.updateDownload(google, DownloadData.PROP_DOWNLOADED);
+        dao.updateDownload(google, Download.PROP_DOWNLOADED);
         printDownloads(dao.getDownloads());
-        dao.deleteDownload(google.getUrl().toString());
+        dao.deleteDownload(google.getId());
         printDownloads(dao.getDownloads());
         dao.clearDownloads();
         printDownloads(dao.getDownloads());

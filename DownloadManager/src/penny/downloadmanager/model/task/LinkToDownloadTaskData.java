@@ -5,7 +5,7 @@
 
 package penny.downloadmanager.model.task;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,9 +27,9 @@ public class LinkToDownloadTaskData extends TaskData {
     private int progress;
 
     private LinkedList<String> links;
-    private List<DownloadData> downloads;
+    private List<Download> downloads;
 
-    public LinkToDownloadTaskData(List<DownloadData> downloads) {
+    public LinkToDownloadTaskData(List<Download> downloads) {
         name = "Link To Download Task";
         this.status = Status.QUEUED;
         links = new LinkedList<String>();
@@ -44,7 +44,7 @@ public class LinkToDownloadTaskData extends TaskData {
         return progress;
     }
 
-    public List<DownloadData> getDownloads() {
+    public List<Download> getDownloads() {
         return downloads;
     }
 
@@ -56,7 +56,7 @@ public class LinkToDownloadTaskData extends TaskData {
 
     public boolean moveOneLink() {
         try {
-            DownloadData download = new DownloadData(new URL(links.pop()));
+            Download download = new Download(new URL(links.pop()));
             downloads.add(download);
             int oldValue = progress;
             progress++;

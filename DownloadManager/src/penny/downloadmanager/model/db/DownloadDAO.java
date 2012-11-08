@@ -8,8 +8,8 @@
  */
 
 package penny.downloadmanager.model.db;
-import penny.download.DownloadStatus;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -17,33 +17,35 @@ import java.util.List;
  */
 public interface DownloadDAO {
 
-    public List<DownloadData> getDownloads();
+    public List<Download> getDownloads();
     
-    public void insertDownload(DownloadData download);
+    public Download getDownload(UUID uuid);
+    
+    public void insertDownload(Download download);
 
-    public void updateDownload(DownloadData download, String property);
+    public void updateDownload(Download download, String property);
 
-    public void updateDownload(DownloadData download);
+    public void updateDownload(Download download);
 
-    public void saveLink(String url, String link, String type);
+    public void saveLink(UUID uuid, String link, String type);
 
-    public void saveLink(String url, String link, String type, int count);
+    public void saveLink(UUID uuid, String link, String type, int count);
 
-    public void saveWord(String url, String word);
+    public void saveWord(UUID uuid, String word);
 
-    public void saveProperty(String url, String name, Object property);
+    public void saveProperty(UUID uuid, String name, Object property);
 
-    public void deleteDownload(String url);
+    public void deleteDownload(UUID uuid);
 
-    public void deleteLinks(String url);
+    public void deleteLinks(UUID uuid);
 
-    public void deleteWords(String url);
+    public void deleteWords(UUID uuid);
 
-    public void deleteProperties(String url);
+    public void deleteProperties(UUID uuid);
 
-    public void deleteProperty(String url, String name);
+    public void deleteProperty(UUID uuid, String name);
 
-    public void clearDownloads(List<DownloadData> downloads);
+    public void clearDownloads(List<Download> downloads);
     
     public void clearDownloads();
 

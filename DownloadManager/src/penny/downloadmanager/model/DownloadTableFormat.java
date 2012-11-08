@@ -4,7 +4,7 @@
  */
 package penny.downloadmanager.model;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import penny.download.DownloadStatus;
 import penny.download.Downloads;
@@ -17,7 +17,7 @@ import javax.swing.JProgressBar;
  *
  * @author john
  */
-public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
+public class DownloadTableFormat implements AdvancedTableFormat<Download> {
 
     private Map<String, Class> columns;
     public static final String PROP_PROGRESS = "progress";
@@ -38,7 +38,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
         columns.put(PROP_TIMELEFT, String.class);
     }
 
-    public boolean getColumns(DownloadData d) {
+    public boolean getColumns(Download d) {
         boolean r = false;
         for (String s : d.getPropertyNames()) {
             if (!columns.containsKey(s)) {
@@ -70,7 +70,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
     }
 
     @Override
-    public Object getColumnValue(DownloadData download, int column) {
+    public Object getColumnValue(Download download, int column) {
         String name = getColumnName(column);
         if(name.equals(PROP_TIMELEFT)) {
             long rate = (download.getDownloadTime() / 1000000 == 0 ? 0 : download.getDownloaded() / (download.getDownloadTime() / 1000000));
@@ -87,28 +87,28 @@ public class DownloadTableFormat implements AdvancedTableFormat<DownloadData> {
         if (name.equals(PROP_RATE)) {
             return Downloads.getRate(download);
         }
-        if (name.equals(DownloadData.PROP_DOWNLOADED)) {
+        if (name.equals(Download.PROP_DOWNLOADED)) {
             return Downloads.formatByteSize(download.getDownloaded());
         }
-        if (name.equals(DownloadData.PROP_SIZE)) {
+        if (name.equals(Download.PROP_SIZE)) {
             return Downloads.formatByteSize(download.getSize());
         }
-        if (name.equals(DownloadData.PROP_DOWNLOADTIME)) {
+        if (name.equals(Download.PROP_DOWNLOADTIME)) {
             return Downloads.formatMilliTimeMilli(download.getDownloadTime() / 1000000);
         }
-        if (name.equals(DownloadData.PROP_RETRYTIME)) {
+        if (name.equals(Download.PROP_RETRYTIME)) {
             return Downloads.formatMilliTimeMilli(download.getRetryTime() / 1000000);
         }
-        if(name.equals(DownloadData.PROP_HREFLINKS)) {
+        if(name.equals(Download.PROP_HREFLINKS)) {
             return download.getHrefLinks().size();
         }
-        if(name.equals(DownloadData.PROP_SRCLINKS)) {
+        if(name.equals(Download.PROP_SRCLINKS)) {
             return download.getSrcLinks().size();
         }
-        if(name.equals(DownloadData.PROP_WORDS)) {
+        if(name.equals(Download.PROP_WORDS)) {
             return download.getWords().size();
         }
-        if(name.equals(DownloadData.PROP_LOCATIONS)) {
+        if(name.equals(Download.PROP_LOCATIONS)) {
             return download.getLocations().size();
         }
         return download.getProperty(name);

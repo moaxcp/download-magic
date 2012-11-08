@@ -4,10 +4,10 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.download.Download;
+import penny.download.AbstractDownload;
 import penny.download.DownloadStatus;
 import penny.download.DownloadProcessor;
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.gui.SavingModel;
 import java.io.File;
@@ -35,7 +35,7 @@ public class TempFileSaver implements DownloadProcessor {
         this.savingModel = Model.getApplicationSettings().getSavingModel();
     }
 
-    private void closeFile(Download d) {
+    private void closeFile(AbstractDownload d) {
         try {
             if (out != null) {
                 out.close();
@@ -47,8 +47,8 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void onInit(Download d) {
-        DownloadData i = (DownloadData) d;
+    public void onInit(AbstractDownload d) {
+        Download i = (Download) d;
         save = new File(savingModel.getSaveFolder() + "/" + Downloads.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
         temp = new File(savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
 
@@ -89,9 +89,9 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public boolean onCheck(Download d) {
+    public boolean onCheck(AbstractDownload d) {
         boolean r = false;
-        DownloadData i = (DownloadData) d;
+        Download i = (Download) d;
 
         if (save.exists()) {
             r = i.getDownloaded() == save.length() && i.getStatus() == DownloadStatus.COMPLETE;
@@ -121,9 +121,9 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(Download d) {
+    public void onStartInput(AbstractDownload d) {
         if (Model.save(d)) {
-            DownloadData i = (DownloadData) d;
+            Download i = (Download) d;
             File file = new File(i.getTempPath());
             String realPath = savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName());
             File newFile = new File(realPath);
@@ -146,7 +146,7 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void doChunck(Download d, int read, byte[] buffer) {
+    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
         try {
             if (Model.save(d)) {
                 out.write(buffer, 0, read);
@@ -158,20 +158,20 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void onReset(Download d) {
+    public void onReset(AbstractDownload d) {
         Model.remove(save);
         Model.remove(temp);
     }
 
     @Override
-    public void onEndInput(Download d) {
+    public void onEndInput(AbstractDownload d) {
         closeFile(d);
     }
 
     @Override
-    public void onCompleted(Download d) {
+    public void onCompleted(AbstractDownload d) {
 
-        DownloadData i = (DownloadData) d;
+        Download i = (Download) d;
         File file = new File(i.getTempPath());
         if (file.exists()) {
             if (i.getContentType() == null || i.getContentType().equals("")) {

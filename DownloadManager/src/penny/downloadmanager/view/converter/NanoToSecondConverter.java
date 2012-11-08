@@ -5,7 +5,7 @@
 
 package penny.downloadmanager.view.converter;
 
-import penny.downloadmanager.model.db.DownloadData;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.SavingModel.FileExistsAction;
 import penny.recmd5.MD5State;
 import org.jdesktop.beansbinding.Converter;
