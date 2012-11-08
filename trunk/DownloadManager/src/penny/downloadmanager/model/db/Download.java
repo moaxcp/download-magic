@@ -327,7 +327,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
 
     @Override
     public int compareTo(Download o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return id.compareTo(o.id);
     }
 
     @Override
