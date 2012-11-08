@@ -53,7 +53,8 @@ public class DownloadTask extends Task {
         processors.add(new ByteBufferUpdater());
         
         data.setStatus(Status.RUNNING);
-        Downloader downloader = new Downloader(settings.getDownloadingModel().getDownloadSettings(), processors);
+        Downloader downloader = new Downloader(settings.getDownloadingModel().getDownloadSettings());
+        downloader.setProcessors(processors);
         data.setDownload(data.getNextDownload());
         while (data.getDownload() != null && data.getStatus() == Status.RUNNING) {
             downloader.setDownload(data.getDownload());

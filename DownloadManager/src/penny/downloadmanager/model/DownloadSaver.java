@@ -146,7 +146,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     wordStateValuesMap.remove(d1);
 
                     if (saveDelete) {
-                        dao.deleteDownload(d1.getUrl().toString());
+                        dao.deleteDownload(d1.getId());
                     }
                     break;
                 case ListEvent.INSERT:
@@ -185,11 +185,11 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
         } else if(saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
         } else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
-            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), Download.SRC);
+            dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.SRC);
         } else if (evt.getPropertyName().equals(Download.PROP_HREFLINKS)) {
-            dao.saveLink(d.getUrl().toString(), (String) evt.getNewValue(), Download.HREF);
+            dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.HREF);
         } else if (evt.getPropertyName().equals(Download.PROP_WORDS)) {
-            dao.saveWord(d.getUrl().toString(), (String) evt.getNewValue());
+            dao.saveWord(d.getId(), (String) evt.getNewValue());
         }
     }
 }

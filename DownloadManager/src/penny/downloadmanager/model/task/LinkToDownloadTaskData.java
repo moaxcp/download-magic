@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package penny.downloadmanager.model.task;
 
 import penny.downloadmanager.model.db.Download;
@@ -11,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,10 +22,8 @@ public class LinkToDownloadTaskData extends TaskData {
 
     public static final String PROP_SIZE = "size";
     private int size;
-
     public static final String PROP_PROGRESS = "progress";
     private int progress;
-
     private LinkedList<String> links;
     private List<Download> downloads;
 
@@ -56,7 +54,8 @@ public class LinkToDownloadTaskData extends TaskData {
 
     public boolean moveOneLink() {
         try {
-            Download download = new Download(new URL(links.pop()));
+            Download download = new Download(UUID.randomUUID());
+            download.setUrl(new URL(links.pop()));
             downloads.add(download);
             int oldValue = progress;
             progress++;
@@ -65,7 +64,7 @@ public class LinkToDownloadTaskData extends TaskData {
             size--;
             Logger.getLogger(LinkToDownloadTaskData.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(progress < size) {
+        if (progress < size) {
             return true;
         } else {
             return false;

@@ -85,7 +85,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         propertyNames = Collections.unmodifiableList(l);
     }
 
-    Download(UUID id) {
+    public Download(UUID id) {
         super();
         this.id = id;
         hrefLinks = new BasicEventList<String>();

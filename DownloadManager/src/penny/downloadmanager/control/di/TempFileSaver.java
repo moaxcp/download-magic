@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.FileDataSource;
 import penny.download.Downloads;
+import penny.downloadmanager.util.DownloadUtil;
 
 /**
  *
@@ -49,8 +50,8 @@ public class TempFileSaver implements DownloadProcessor {
     @Override
     public void onInit(AbstractDownload d) {
         Download i = (Download) d;
-        save = new File(savingModel.getSaveFolder() + "/" + Downloads.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
-        temp = new File(savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
+        save = new File(savingModel.getSaveFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
+        temp = new File(savingModel.getTempFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
 
         if (save.exists()) {
             i.setDownloaded(save.length());
@@ -84,7 +85,7 @@ public class TempFileSaver implements DownloadProcessor {
         } else if(!save.exists()) {
             Logger.getLogger(TempFileSaver.class.getName()).fine("temp file does not exist");
             i.setDownloaded(0);
-            i.setTempPath(savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
+            i.setTempPath(savingModel.getTempFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
         }
     }
 
@@ -125,16 +126,16 @@ public class TempFileSaver implements DownloadProcessor {
         if (Model.save(d)) {
             Download i = (Download) d;
             File file = new File(i.getTempPath());
-            String realPath = savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName());
+            String realPath = savingModel.getTempFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName());
             File newFile = new File(realPath);
 
             if (file.exists() && !file.equals(newFile)) {
                 newFile.getParentFile().mkdirs();
                 file.renameTo(newFile);
-                i.setTempPath(savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
+                i.setTempPath(savingModel.getTempFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
             } else {
                 newFile.getParentFile().mkdirs();
-                i.setTempPath(savingModel.getTempFolder() + "/" + Downloads.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
+                i.setTempPath(savingModel.getTempFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getTempNameFormat(), savingModel.getDefaultFileName()));
             }
 
             try {
@@ -186,7 +187,7 @@ public class TempFileSaver implements DownloadProcessor {
             }
         }
 
-        i.setSavePath(savingModel.getSaveFolder() + "/" + Downloads.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
+        i.setSavePath(savingModel.getSaveFolder() + "/" + DownloadUtil.getFileName(i, savingModel.getSaveNameFormat(), savingModel.getDefaultFileName()));
         temp = new File(i.getTempPath());
         save = new File(i.getSavePath());
 

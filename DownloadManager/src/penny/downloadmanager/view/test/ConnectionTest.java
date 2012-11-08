@@ -18,15 +18,22 @@ import java.beans.PropertyChangeListener;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import penny.download.DownloadSettings;
 
 /**
  *
  * @author  John J Mercier
  */
 public class ConnectionTest extends javax.swing.JFrame implements PropertyChangeListener, ListDataListener {
+    
+    class Download extends AbstractDownload {
+        Download(URL url) {
+            setUrl(url);
+        }
+    }
 
     DefaultListModel eventList = new DefaultListModel();
-    AbstractDownload download = null;
+    Download download = null;
     TextUpdater tu;
 
     /** Creates new form ConnectionTest */
@@ -132,12 +139,12 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 goButton.setText("Stop");
                 download = null;
                 try {
-                    download = new AbstractDownload(new URL(addressBox.getText()));
+                    download = new Download(new URL(addressBox.getText()));
                     download.addPropertyChangeListener(ConnectionTest.this);
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(ConnectionTest.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                Downloader downloader = new Downloader();
+                Downloader downloader = new Downloader(new DownloadSettings());
                 downloader.setDownload(download);
                 downloader.addProcessor(tu);
                 downloader.download();
