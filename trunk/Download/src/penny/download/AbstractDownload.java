@@ -232,13 +232,6 @@ public abstract class AbstractDownload {
     public AbstractDownload(URL url) {
         this();
         this.setUrl(url);
-        if (this.query == null) {
-            this.query = "";
-        }
-        
-        if (this.protocol == null) {
-            this.protocol = "";
-        }
     }
 
     /**
@@ -258,6 +251,13 @@ public abstract class AbstractDownload {
         setPath(Downloads.getPath(url.getPath()));
         setProtocol(url.getProtocol());
         setQuery(url.getQuery());
+        if (this.query == null) {
+            setQuery("");
+        }
+        
+        if (this.protocol == null) {
+            setProtocol("");
+        }
     }
 
     /**
@@ -737,11 +737,6 @@ public abstract class AbstractDownload {
         this.setRetryTime((System.nanoTime() - this.getRetryStartTime()) + this.getRetryTime());
         this.setRetryStartTime(System.nanoTime());
         propertySupport.firePropertyChange(PROP_RETRYTIME, oldValue, getRetryTime());
-    }
-
-    @Override
-    public String toString() {
-        return url.toString();
     }
 
     /**
