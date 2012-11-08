@@ -293,7 +293,7 @@ public class Model {
                         if (!file.exists()) {
                             file = new File(d.getSavePath());
                         }
-                        Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl().toString());
+                        Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl());
                         if (file.exists()) {
                             d.setDownloaded(file.length());
                         } else {
@@ -310,7 +310,7 @@ public class Model {
                         if (!file.exists()) {
                             file = new File(d.getSavePath());
                         }
-                        Logger.getLogger(Model.class.getName()).fine("Checking MD5 for " + d.getUrl().toString());
+                        Logger.getLogger(Model.class.getName()).fine("Checking MD5 for " + d.getUrl());
                         if (file.exists()) {
                             d.getMD5().copy(getFileMD5(file));
                         }

@@ -109,6 +109,12 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
             ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
+                try {
+                    d.setUrl(new URL(rs.getString(Download.PROP_URL)));
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new IllegalStateException("There is a bad url in the db " + rs.getString(Download.PROP_URL));
+                }
                 d.setAttempts(rs.getInt(Download.PROP_ATTEMPTS));
                 d.setContentType(rs.getString(Download.PROP_CONTENTTYPE));
                 d.setDownloadTime(rs.getLong(Download.PROP_DOWNLOADTIME));
