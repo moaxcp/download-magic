@@ -20,11 +20,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.swing.JTable;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.view.View;
@@ -81,7 +77,8 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     }
 
     public void add(URL url) {
-        Download d = new Download(url);
+        Download d = new Download(UUID.randomUUID());
+        d.setUrl(url);
         mainModel.getDownloads().add(d);
     }
 

@@ -15,14 +15,15 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.util.RandomChanges;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.util.RandomChanges;
 
 /**
  *
@@ -113,7 +114,9 @@ public class DownloadFrame extends javax.swing.JFrame {
 
     private void urlTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_urlTextActionPerformed
         try {
-            downloadList.add(new Download(new URL(urlText.getText())));
+            Download download = new Download(UUID.randomUUID());
+            download.setUrl(new URL(urlText.getText()));
+            downloadList.add(download);
             urlText.setText("");
         } catch (MalformedURLException ex) {
             Logger.getLogger(DownloadFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,7 +154,8 @@ public class DownloadFrame extends javax.swing.JFrame {
 
         for (String s : urls) {
             try {
-                Download d = new Download(new URL(s));
+                Download d = new Download(UUID.randomUUID());
+                d.setUrl(new URL(s));
                 downloads.add(d);
             } catch (MalformedURLException ex) {
                 Logger.getLogger(DownloadFrame.class.getName()).log(Level.SEVERE, null, ex);
