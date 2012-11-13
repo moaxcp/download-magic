@@ -196,6 +196,7 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
 
             public void run() {
                 if (evt instanceof IndexedPropertyChangeEvent) {
+                    
                 } else if (evt.getPropertyName().equals(AbstractDownload.PROP_STATUS)) {
                     if (((AbstractDownload) evt.getSource()).getStatus() == DownloadStatus.STOPPED) {
                         goButton.setEnabled(true);
