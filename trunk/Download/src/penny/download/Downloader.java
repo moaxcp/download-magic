@@ -26,6 +26,8 @@ public class Downloader {
 
     public Downloader(DownloadSettings ds) {
         this.dSettings = ds;
+        downloaders = new HashMap<String, ProtocolDownloader>();
+        processors = new ArrayList<DownloadProcessor>();
     }
 
     public void addProcessor(DownloadProcessor di) {
@@ -181,6 +183,7 @@ public class Downloader {
     }
 
     public void download() {
+        //attempts are for errors. hops are for redirects!
         for (int a = 1; a <= getdSettings().getMaxDownloadAttempts(); a++) {
             if (download.getStatus() == DownloadStatus.RETRY) {
                 download.setStatus(DownloadStatus.RETRYING);
@@ -203,7 +206,15 @@ public class Downloader {
             }
             if (download.getStatus() != DownloadStatus.COMPLETE) {
                 try {
-                    getDownloader(download.getProtocol()).download(download);
+                    for (int h = 0; h < dSettings.getMaxHops(); h++) {
+                        download.setHops(h);
+                        getDownloader(download.getProtocol()).download(download);
+                        
+                        if(download.getStatus() != DownloadStatus.REDIRECTED) {
+                            break;
+                        }
+                    }
+
                 } catch (IllegalArgumentException e) {
                     download.setStatus(DownloadStatus.ERROR, e.toString());
                 }
