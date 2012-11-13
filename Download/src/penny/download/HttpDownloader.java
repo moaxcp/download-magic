@@ -7,6 +7,7 @@ package penny.download;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.Header;
@@ -75,8 +76,7 @@ class HttpDownloader extends ProtocolDownloader {
             }
             params.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
         }
-
-        //TODO add params for user agent in httpClient constructor
+        
         //TODO do not follow redirects. add current url to locations and change url to new url
         //TODO add support for HTTP proxy through DEFAULT_PROXY PName and SOCKS proxy
 
@@ -94,6 +94,22 @@ class HttpDownloader extends ProtocolDownloader {
             httpget = new HttpGet(d.getUrl().toURI());
             d.setStatus(DownloadStatus.CONNECTING);
             HttpResponse response = httpClient.execute(httpget);
+            d.setResponseCode(response.getStatusLine().getStatusCode());
+            
+            if(response.getStatusLine().getStatusCode() / 100 == 3) {
+                Header[] headers = response.getHeaders("Location");
+                if(headers.length > 0 && headers[0] != null) {
+                    d.setUrl(new URL(headers[0].getValue()));
+                    d.getLocations().add(d.getUrl());
+                    d.setStatus(DownloadStatus.REDIRECTED);
+                } else {
+                    d.setStatus(DownloadStatus.ERROR, "Could not find location for redirection");
+                }
+                HttpEntity entity = response.getEntity();
+                instream = entity.getContent();
+                return;
+            }
+            
             boolean restart = true;
             for (Header h : response.getAllHeaders()) {
                 if (h.getName().equals("Content-Range")) {
@@ -106,8 +122,8 @@ class HttpDownloader extends ProtocolDownloader {
             if (restart && d.getDownloaded() > 0) {
                 downloader.resetProcessors(d);
             }
+            
             HttpEntity entity = response.getEntity();
-            d.setResponseCode(response.getStatusLine().getStatusCode());
             for (Header h : response.getAllHeaders()) {
                 if (h.getName().equals("Content-Disposition")) {
                     for (HeaderElement he : h.getElements()) {

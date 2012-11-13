@@ -12,29 +12,32 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * This class represents a AbstractDownload. It is the base class for all other downloads.
- * This class and all classes that extend it should be used to track information
- * on a download only. All other logic such as getting connections and save files
- * should be implementend elseware. ex. DownloadConnectionFactory.
+ * This class represents a AbstractDownload. It is the base class for all other
+ * downloads. This class and all classes that extend it should be used to track
+ * information on a download only. All other logic such as getting connections
+ * and save files should be implementend elseware. ex.
+ * DownloadConnectionFactory.
  *
- * AbstractDownload can be used to update a table model with property change listeners.
+ * AbstractDownload can be used to update a table model with property change
+ * listeners.
  *
  * It can also be used as a model object to update the download.db which uses
  * DAO objects for different databases.
  *
- * It is important to understand how to update the two times stored in AbstractDownload:
- * retryTime and downloadTime. Before each operation, for instance read() for
- * AbstractDownload, initDownloadTime() must be called, then the operation, then
- * updateDownloadTime(). This should be done in a loop so the time is constantly
- * updated.
+ * It is important to understand how to update the two times stored in
+ * AbstractDownload: retryTime and downloadTime. Before each operation, for
+ * instance read() for AbstractDownload, initDownloadTime() must be called, then
+ * the operation, then updateDownloadTime(). This should be done in a loop so
+ * the time is constantly updated.
  *
  * It is also important to know that setting the status can cause an
  * IllegalStateException. Since this is a runtime exception make sure to look
  * for it.
+ *
  * @author John J Mercier
  */
 public abstract class AbstractDownload {
-    
+
     public static final String FILE = "file";
     /**
      * FTP protocol
@@ -52,6 +55,10 @@ public abstract class AbstractDownload {
      * Property string for attempts.
      */
     public static final String PROP_ATTEMPTS = "attempts";
+    /**
+     * Property string for hops.
+     */
+    public static final String PROP_HOPS = "hops";
     /**
      * Property string for contentType.
      */
@@ -149,6 +156,10 @@ public abstract class AbstractDownload {
      */
     protected int attempts;
     /**
+     * The number of hops for this AbstractDownload.
+     */
+    protected int hops;
+    /**
      * The content type of this AbstractDownload.
      */
     protected String contentType;
@@ -185,9 +196,9 @@ public abstract class AbstractDownload {
      */
     protected String fileExtention;
     /**
-     * The set of URLs the AbstractDownload has been redirected from. In HTTP when a
-     * connection is supposed to be redirected the AbstractDownload url will change and
-     * locations will store the previous urls.
+     * The set of URLs the AbstractDownload has been redirected from. In HTTP
+     * when a connection is supposed to be redirected the AbstractDownload url
+     * will change and locations will store the previous urls.
      */
     protected List<URL> locations;
     public static final String PROP_LOCATIONS = "locations";
@@ -197,7 +208,6 @@ public abstract class AbstractDownload {
      */
     protected int responseCode;
     public static final String PROP_RESPONSECODE = "responseCode";
-
     /**
      * propertySupport.
      */
@@ -220,6 +230,7 @@ public abstract class AbstractDownload {
         downloaded = 0;
         status = DownloadStatus.QUEUED;
         attempts = 0;
+        hops = -1;
         contentType = "";
         downloadStartTime = 0;
         downloadTime = 0;
@@ -235,8 +246,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Sets the url of this AbstractDownload. Setting the url will also set the file,
-     * file extention, host, path, protocol, and query.
+     * Sets the url of this AbstractDownload. Setting the url will also set the
+     * file, file extention, host, path, protocol, and query.
+     *
      * @param url
      */
     public void setUrl(URL url) {
@@ -254,7 +266,7 @@ public abstract class AbstractDownload {
         if (this.query == null) {
             setQuery("");
         }
-        
+
         if (this.protocol == null) {
             setProtocol("");
         }
@@ -262,6 +274,7 @@ public abstract class AbstractDownload {
 
     /**
      * returns the url of this AbstractDownload.
+     *
      * @return The url
      */
     public URL getUrl() {
@@ -270,6 +283,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the number of attempts for this AbstractDownload.
+     *
      * @param attempts
      */
     public void setAttempts(int attempts) {
@@ -280,6 +294,7 @@ public abstract class AbstractDownload {
 
     /**
      * returns the number of attempts for this AbstractDownload.
+     *
      * @return
      */
     public int getAttempts() {
@@ -287,7 +302,28 @@ public abstract class AbstractDownload {
     }
 
     /**
+     * Sets the number of hops for this AbstractDownload.
+     *
+     * @param hops
+     */
+    public void setHops(int hops) {
+        int oldValue = this.hops;
+        this.hops = hops;
+        propertySupport.firePropertyChange(PROP_HOPS, oldValue, this.hops);
+    }
+
+    /**
+     * returns the number of hops for this AbstractDownload.
+     *
+     * @return
+     */
+    public int getHops() {
+        return hops;
+    }
+
+    /**
      * Sets the total size of the AbstractDownload.
+     *
      * @param size
      */
     public void setSize(long size) {
@@ -298,6 +334,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the total size of the AbstractDownload.
+     *
      * @return the size in bytes
      */
     public long getSize() {
@@ -306,6 +343,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the bytes downloaded for this AbstractDownload.
+     *
      * @param downloaded
      */
     public void setDownloaded(long downloaded) {
@@ -316,6 +354,7 @@ public abstract class AbstractDownload {
 
     /**
      * returns the number of bytes downloaded for this AbstractDownload.
+     *
      * @return bytes downloaded
      */
     public long getDownloaded() {
@@ -340,6 +379,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the status and a message for the status.
+     *
      * @param status the status of the download
      * @param message the message
      */
@@ -349,8 +389,10 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Sets the status of this AbstractDownload. If an attempt is made to set the
-     * AbstractDownload to the wrong status an IllegalStateException is thrown.
+     * Sets the status of this AbstractDownload. If an attempt is made to set
+     * the AbstractDownload to the wrong status an IllegalStateException is
+     * thrown.
+     *
      * @param status
      */
     void setStatus(DownloadStatus status) {
@@ -416,6 +458,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the status of this AbstractDownload.
+     *
      * @return
      */
     public DownloadStatus getStatus() {
@@ -424,6 +467,7 @@ public abstract class AbstractDownload {
 
     /**
      * returns the download start time.
+     *
      * @return
      */
     protected long getDownloadStartTime() {
@@ -432,6 +476,7 @@ public abstract class AbstractDownload {
 
     /**
      * sets the download start time.
+     *
      * @param downloadStartTime
      */
     protected void setDownloadStartTime(long downloadStartTime) {
@@ -440,6 +485,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the total time spent downloading this AbstractDownload.
+     *
      * @param downloadTime
      */
     public void setDownloadTime(long downloadTime) {
@@ -450,6 +496,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the total time spent downloading this AbstractDownload.
+     *
      * @return
      */
     public long getDownloadTime() {
@@ -458,6 +505,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the current retry start time for this AbstractDownload.
+     *
      * @param retryStartTime
      */
     protected void setRetryStartTime(long retryStartTime) {
@@ -466,6 +514,7 @@ public abstract class AbstractDownload {
 
     /**
      * returns the current retry start time for this AbstractDownload.
+     *
      * @return
      */
     protected long getRetryStartTime() {
@@ -474,6 +523,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the retry time for this download.
+     *
      * @return
      */
     public long getRetryTime() {
@@ -482,6 +532,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the retry time for this download.
+     *
      * @param retryTime
      */
     protected void setRetryTime(long retryTime) {
@@ -492,6 +543,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the content type for this AbstractDownload.
+     *
      * @return
      */
     public String getContentType() {
@@ -500,6 +552,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the content type for this AbstractDownload.
+     *
      * @param contentType
      */
     public void setContentType(String contentType) {
@@ -510,6 +563,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the message for this AbstractDownload.
+     *
      * @return message
      */
     public String getMessage() {
@@ -518,6 +572,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the message for this AbstractDownload.
+     *
      * @param message
      */
     public void setMessage(String message) {
@@ -528,6 +583,7 @@ public abstract class AbstractDownload {
 
     /**
      * Gets the host for this AbstractDownload.
+     *
      * @return String host
      */
     public String getHost() {
@@ -536,6 +592,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the host for this AbstractDownload.
+     *
      * @param host
      */
     protected void setHost(String host) {
@@ -546,6 +603,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the protocol for this AbstractDownload.
+     *
      * @return
      */
     public String getProtocol() {
@@ -554,6 +612,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the Protocol for this AbstractDownload.
+     *
      * @param protocol
      */
     protected void setProtocol(String protocol) {
@@ -564,6 +623,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the Query for this AbstractDownload.
+     *
      * @return
      */
     public String getQuery() {
@@ -572,6 +632,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the query for this AbstractDownload.
+     *
      * @param query
      */
     protected void setQuery(String query) {
@@ -581,7 +642,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Returns the path for this AbstractDownload. This does not include the file name.
+     * Returns the path for this AbstractDownload. This does not include the
+     * file name.
+     *
      * @return
      */
     public String getPath() {
@@ -590,6 +653,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the path for this AbstractDownload.
+     *
      * @param path
      */
     protected void setPath(String path) {
@@ -599,7 +663,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Gets the file name for this AbstractDownload. This does not include the path.
+     * Gets the file name for this AbstractDownload. This does not include the
+     * path.
+     *
      * @return
      */
     public String getFile() {
@@ -607,7 +673,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Sets the file name for this AbstractDownload. This does not include the path.
+     * Sets the file name for this AbstractDownload. This does not include the
+     * path.
+     *
      * @param file
      */
     protected void setFile(String file) {
@@ -617,7 +685,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Gets the protocol file name for this AbstractDownload. This does not include the path.
+     * Gets the protocol file name for this AbstractDownload. This does not
+     * include the path.
+     *
      * @return
      */
     public String getProtocolFileName() {
@@ -625,7 +695,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Sets the protocol file name for this AbstractDownload. This does not include the path.
+     * Sets the protocol file name for this AbstractDownload. This does not
+     * include the path.
+     *
      * @param file
      */
     protected void setProtocolFileName(String file) {
@@ -636,6 +708,7 @@ public abstract class AbstractDownload {
 
     /**
      * Returns the file extention for this AbstractDownload.
+     *
      * @return
      */
     public String getFileExtention() {
@@ -644,6 +717,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the file Extention for this AbstractDownload.
+     *
      * @param fileExtention
      */
     protected void setFileExtention(String fileExtention) {
@@ -653,7 +727,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Returns the locations where this AbstractDownload has been redirected from.
+     * Returns the locations where this AbstractDownload has been redirected
+     * from.
+     *
      * @return
      */
     public List<URL> getLocations() {
@@ -663,6 +739,7 @@ public abstract class AbstractDownload {
     /**
      * Add a location to the list of locations this download has been redirected
      * from
+     *
      * @param location
      */
     public void addLocation(URL location) {
@@ -672,7 +749,9 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Returns the response code recieved when connecting to this AbstractDownload.
+     * Returns the response code recieved when connecting to this
+     * AbstractDownload.
+     *
      * @return
      */
     public int getResponseCode() {
@@ -681,6 +760,7 @@ public abstract class AbstractDownload {
 
     /**
      * Sets the response code recieved when connecting to this AbstractDownload.
+     *
      * @param responseCode
      */
     public void setResponseCode(int responseCode) {
@@ -741,6 +821,7 @@ public abstract class AbstractDownload {
 
     /**
      * adds a PropertyChangeListener to the download
+     *
      * @param listener
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -749,6 +830,7 @@ public abstract class AbstractDownload {
 
     /**
      * removes a PropertyChangeListener from this download
+     *
      * @param listener
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
@@ -757,7 +839,7 @@ public abstract class AbstractDownload {
 
     public void removePropertyChangeListeners() {
         PropertyChangeListener[] listeners = propertySupport.getPropertyChangeListeners();
-        for(PropertyChangeListener l : listeners) {
+        for (PropertyChangeListener l : listeners) {
             removePropertyChangeListener(l);
         }
     }
