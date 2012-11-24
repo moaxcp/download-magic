@@ -10,11 +10,13 @@ public enum DownloadStatus {
      * Download is Queued.
      */
     QUEUED("Queued"),
+    
+    INITIALIZING("Initializing"),
 
     /**
-     * Download is Starting
+     * Download is Preparing
      */
-    STARTED("Started"),
+    PREPARING("Preparing"),
 
     /**
      * Download is being connected.
@@ -22,29 +24,28 @@ public enum DownloadStatus {
     CONNECTING("Connecting"),
 
     /**
-     * Download has connected.
-     */
-    CONNECTED("Connected"),
-
-    /**
      * Download is being downloaded.
      */
     DOWNLOADING("Downloading"),
+    
+    FINALIZING("Finalizing"),
 
     /**
-     * Download will retry.
+     * Download is complete.
      */
-    RETRY("Retry"),
+    COMPLETE("Complete"),
+
+    /**
+     * Download has been Redirecting
+     */
+    REDIRECTING("Redirecting"),
 
     /**
      * Download is retrying.
      */
     RETRYING("Retrying"),
-
-    /**
-     * Download has been redirected
-     */
-    REDIRECTED("Redirected"),
+    
+    STOPPING("Stopping"),
 
     /**
      * download has been stopped.
@@ -54,11 +55,7 @@ public enum DownloadStatus {
      * Download has encountered an error.
      */
     ERROR("Error"),
-
-    /**
-     * Download is complete.
-     */
-    COMPLETE("Complete");
+    SKIPPED("Skipped");
 
     
     private String str;

@@ -22,11 +22,11 @@ public class Downloader {
     private AbstractDownload download;
     private List<DownloadProcessor> processors;
     private DownloadSettings dSettings;
-    private Map<String, ProtocolDownloader> downloaders;
+    private Map<String, ProtocolClient> clients;
 
     public Downloader(DownloadSettings ds) {
         this.dSettings = ds;
-        downloaders = new HashMap<String, ProtocolDownloader>();
+        clients = new HashMap<String, ProtocolClient>();
         processors = new ArrayList<DownloadProcessor>();
     }
 
@@ -83,6 +83,9 @@ public class Downloader {
     void resetProcessors(AbstractDownload d) {
         d.setDownloaded(0);
         for (DownloadProcessor i : getProcessors()) {
+            if (d.getStatus() != DownloadStatus.INITIALIZING) {
+                break;
+            }
             i.onReset(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetInterfaces", "reset interfaces for " + d, d);
@@ -90,50 +93,55 @@ public class Downloader {
 
     void runInput(InputStream in, AbstractDownload d) throws IOException {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
-        startInputProcessors(d);
-        int read = -1;
-        byte buffer[] = new byte[getdSettings().getBufferSize()];
-        read = in.read(buffer);
-        while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
-            d.updateDownloadTime();
-            d.setDownloaded(d.getDownloaded() + read);
-            chunckProcessors(d, read, buffer);
+        if (d.getStatus() == DownloadStatus.DOWNLOADING) {
+            int read = -1;
+            byte buffer[] = new byte[getdSettings().getBufferSize()];
             read = in.read(buffer);
+            while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
+                d.updateDownloadTime();
+                d.setDownloaded(d.getDownloaded() + read);
+                chunckProcessors(d, read, buffer);
+                read = in.read(buffer);
+            }
         }
-        endInputProcessors(d);
         Logger.getLogger(Downloader.class.getName()).exiting(Downloader.class.getName(), "runInput");
     }
 
     private void initProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
+            if (d.getStatus() != DownloadStatus.INITIALIZING) {
+                break;
+            }
             i.onInit(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetProcessors", "reset processors for " + d, d);
     }
 
-    private void startInputProcessors(AbstractDownload d) {
+    private void prepareInputProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
-            i.onStartInput(d);
+            if (d.getStatus() != DownloadStatus.PREPARING) {
+                break;
+            }
+            i.onPrepare(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "startProcessors", "start processors for " + d, d);
     }
 
-    private void endInputProcessors(AbstractDownload d) {
+    private void finalizeProcessors(AbstractDownload d) {
         for (DownloadProcessor i : getProcessors()) {
-            i.onEndInput(d);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "stopProcessors", "stop processors for " + d, d);
-    }
-
-    private void completeProcessors(AbstractDownload d) {
-        for (DownloadProcessor i : getProcessors()) {
-            i.onCompleted(d);
+            if (d.getStatus() != DownloadStatus.FINALIZING) {
+                break;
+            }
+            i.onFinalize(d);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "completeProcessors", "complete processors for " + d, d);
     }
 
     private void chunckProcessors(AbstractDownload d, int read, byte[] buffer) {
         for (DownloadProcessor i : getProcessors()) {
+            if (d.getStatus() != DownloadStatus.DOWNLOADING) {
+                break;
+            }
             i.doChunck(d, read, buffer);
         }
         Logger.getLogger(Downloader.class.getName()).logp(Level.FINER, Downloader.class.getName(), "chunkProcessors", "chunck processors for " + d, d);
@@ -142,6 +150,9 @@ public class Downloader {
     private boolean checkProcessors(AbstractDownload d) {
         boolean r = true;
         for (DownloadProcessor i : getProcessors()) {
+            if (d.getStatus() != DownloadStatus.INITIALIZING) {
+                break;
+            }
             r = i.onCheck(d);
             if (r == false) {
                 return r;
@@ -163,71 +174,131 @@ public class Downloader {
         }
     }
 
-    private ProtocolDownloader getDownloader(String protocol) {
-        ProtocolDownloader d = downloaders.get(protocol);
-        if (d == null) {
-            d = ProtocolDownloader.getDownloader(protocol, this);
-            if (d != null) {
-                downloaders.put(protocol, d);
+    private ProtocolClient getClient(AbstractDownload download) {
+        ProtocolClient client = clients.get(download.getProtocol());
+        if (client == null) {
+            client = ProtocolClient.getClient(download.getProtocol(), dSettings);
+            if (client != null) {
+                clients.put(download.getProtocol(), client);
             } else {
-                throw new IllegalArgumentException(protocol + " does not have a ProtocolDownloader");
+                throw new IllegalArgumentException(download.getProtocol() + " does not have a ProtocolDownloader");
             }
         }
-        return d;
+        return client;
     }
 
     public void shutdown() {
-        for (ProtocolDownloader d : downloaders.values()) {
+        for (ProtocolClient d : clients.values()) {
             d.shutdown();
         }
     }
 
     public void download() {
-        //attempts are for errors. hops are for redirects!
         for (int a = 1; a <= getdSettings().getMaxDownloadAttempts(); a++) {
-            if (download.getStatus() == DownloadStatus.RETRY) {
+            if (download.getStatus() == DownloadStatus.ERROR) {
                 download.setStatus(DownloadStatus.RETRYING);
-                download.initRetryTime();
-                startRetryTimer(download);
-            } else if (download.getStatus() == DownloadStatus.STOPPED) {
-                break;
             }
 
-            download.setStatus(DownloadStatus.STARTED);
+            if (download.getStatus() == DownloadStatus.RETRYING) {
+                download.initRetryTime();
+                startRetryTimer(download);
+            }
+
+            if (download.getStatus() != DownloadStatus.QUEUED && download.getStatus() != DownloadStatus.RETRYING) {
+                if (download.getStatus() == DownloadStatus.STOPPED) {
+                    download.setStatus(DownloadStatus.STOPPED);
+                    return;
+                }
+                continue;
+            }
+
+            download.setStatus(DownloadStatus.INITIALIZING);
 
             download.setAttempts(a);
             download.initDownloadTime();
 
             initProcessors(download);
+
             if (!checkProcessors(download)) {
                 resetProcessors(download);
                 download.setDownloaded(0);
                 download.setDownloadTime(0);
             }
-            if (download.getStatus() != DownloadStatus.COMPLETE) {
+
+            ProtocolClient client = getClient(download);
+            client.setDownload(download);
+
+            for (int h = 0; h < dSettings.getMaxHops(); h++) {
                 try {
-                    for (int h = 0; h < dSettings.getMaxHops(); h++) {
-                        download.setHops(h);
-                        getDownloader(download.getProtocol()).download(download);
-                        
-                        if(download.getStatus() != DownloadStatus.REDIRECTED) {
-                            break;
+                    if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
+                        if (download.getStatus() == DownloadStatus.STOPPED) {
+                            download.setStatus(DownloadStatus.STOPPED);
+                            return;
                         }
+                        break;
+                    }
+                    download.setStatus(DownloadStatus.CONNECTING);
+
+                    download.setHops(h);
+                    client.connect();
+                    if (client.isDataRestarting()) {
+                        resetProcessors(download);
                     }
 
-                } catch (IllegalArgumentException e) {
-                    download.setStatus(DownloadStatus.ERROR, e.toString());
+                    if (download.getStatus() == DownloadStatus.REDIRECTING) {
+                        continue;
+                    } else {
+                        if (download.getStatus() != DownloadStatus.CONNECTING) {
+                            if (download.getStatus() == DownloadStatus.STOPPED) {
+                                download.setStatus(DownloadStatus.STOPPED);
+                                return;
+                            }
+                            break;
+                        }
+                        download.setStatus(DownloadStatus.PREPARING);
+
+                        prepareInputProcessors(download);
+
+                        if (download.getStatus() != DownloadStatus.PREPARING) {
+                            if (download.getStatus() == DownloadStatus.STOPPED) {
+                                download.setStatus(DownloadStatus.STOPPED);
+                                return;
+                            }
+                            break;
+                        }
+                        download.setStatus(DownloadStatus.DOWNLOADING);
+
+                        InputStream in = client.getContent();
+                        runInput(in, download);
+
+                        break;
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Downloader.class.getName()).log(Level.SEVERE, null, ex);
+                    download.setStatus(DownloadStatus.ERROR, ex.toString());
+                } finally {
+                    client.close();
                 }
             }
-            if (download.getStatus() == DownloadStatus.COMPLETE) {
-                completeProcessors(download);
-            }
 
-            if (download.getStatus() == DownloadStatus.ERROR && download.getAttempts() < getdSettings().getMaxDownloadAttempts()) {
-                download.setStatus(DownloadStatus.RETRY);
+            if (download.getStatus() != DownloadStatus.DOWNLOADING) {
+                if (download.getStatus() == DownloadStatus.STOPPED) {
+                    download.setStatus(DownloadStatus.STOPPED);
+                    return;
+                }
+                continue;
             }
-            if (download.getStatus() != DownloadStatus.RETRY) {
-                break;
+            download.setStatus(DownloadStatus.FINALIZING);
+
+            finalizeProcessors(download);
+
+            if (download.getStatus() != DownloadStatus.FINALIZING) {
+                if (download.getStatus() == DownloadStatus.STOPPED) {
+                    download.setStatus(DownloadStatus.STOPPED);
+                }
+                return;
+            } else {
+                download.setStatus(DownloadStatus.COMPLETE);
             }
         }
     }

@@ -115,6 +115,8 @@ public abstract class AbstractDownload {
      * Property string for status.
      */
     public static final String PROP_STATUS = "downloadStatus";
+    public static final String PROP_CANQUEUE = "canQueue";
+    public static final String PROP_CANSTOP = "canStop";
     /**
      * Property string for url.
      */
@@ -361,19 +363,25 @@ public abstract class AbstractDownload {
         return downloaded;
     }
 
+    public boolean isCanQueue() {
+        return status == DownloadStatus.STOPPED || status == DownloadStatus.ERROR;
+    }
     public void queue() {
         setStatus(DownloadStatus.QUEUED);
     }
 
+    public boolean isCanStop() {
+        return status == DownloadStatus.PREPARING || status == DownloadStatus.RETRYING || status == DownloadStatus.CONNECTING || status == DownloadStatus.DOWNLOADING || status == DownloadStatus.FINALIZING;
+    }
     public void stop() {
         setStatus(DownloadStatus.STOPPED);
     }
 
-    public void complete() {
+    void complete() {
         setStatus(DownloadStatus.COMPLETE);
     }
 
-    public void error() {
+    void error() {
         setStatus(DownloadStatus.ERROR);
     }
 
@@ -399,61 +407,85 @@ public abstract class AbstractDownload {
         DownloadStatus oldValue = getStatus();
         switch (status) {
             case QUEUED:
-                if (!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.STOPPED || oldValue == DownloadStatus.QUEUED)) {
-                    throw new IllegalStateException("Download status must be ERROR or STOPPED before setting to QUEUED. oldValue=" + oldValue);
+                if (!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.STOPPED || oldValue == DownloadStatus.SKIPPED)) {
+                    throw new IllegalStateException("Download status must be ERROR, STOPPED, or SKIPPED before setting to QUEUED. status=" + oldValue);
                 }
                 break;
-            case STARTED:
+            case INITIALIZING:
                 if (!(oldValue == DownloadStatus.QUEUED || oldValue == DownloadStatus.RETRYING)) {
-                    throw new IllegalStateException("Download status must be QUEUED or RETRYING before setting to STARTED. oldValue=" + oldValue);
+                    throw new IllegalStateException("Download status must be QUEUED or RETRYING before setting to INITIALIZING. status=" + oldValue);
                 }
                 break;
             case CONNECTING:
-                if (!(oldValue == DownloadStatus.STARTED || oldValue == DownloadStatus.REDIRECTED)) {
-                    throw new IllegalStateException("Download status must be STARTING before setting to CONNECTING. oldValue=" + oldValue);
+                if (!(oldValue == DownloadStatus.INITIALIZING || oldValue == DownloadStatus.REDIRECTING)) {
+                    throw new IllegalStateException("Download status must be INITIALIZING or REDIRECTING before setting to CONNECTING. status=" + oldValue);
                 }
                 break;
-            case CONNECTED:
+            case PREPARING:
                 if (!(oldValue == DownloadStatus.CONNECTING)) {
-                    throw new IllegalStateException("Download status must be CONNECTING before setting to CONNECTED. oldValue=" + oldValue);
+                    throw new IllegalStateException("Download status must be CONNECTING before setting to PREPARING. status=" + oldValue);
                 }
                 break;
             case DOWNLOADING:
-                if (!(oldValue == DownloadStatus.CONNECTED)) {
-                    throw new IllegalStateException("Download status must be CONNECTED before setting to DOWNLOADING. oldValue=" + oldValue);
+                if (!(oldValue == DownloadStatus.PREPARING)) {
+                    throw new IllegalStateException("Download status must be PREPARING before setting to DOWNLOADING. status=" + oldValue);
                 }
                 break;
-            case STOPPED:
-                break;
-            case ERROR:
-                if (oldValue == DownloadStatus.COMPLETE) {
-                    throw new IllegalStateException("Download status cannot be COMPLETE before setting to ERROR. oldValue=" + oldValue);
-                }
-                break;
-            case RETRY:
-                if (!(oldValue == DownloadStatus.ERROR || oldValue == DownloadStatus.REDIRECTED)) {
-                    throw new IllegalStateException("Download status must be ERROR or REDIRECTED before setting to RETRY. oldValue=" + oldValue);
-                }
-                break;
-            case RETRYING:
-                if (!(oldValue == DownloadStatus.RETRY)) {
-                    throw new IllegalStateException("Download status must be RETRY before setting to RETRYING. oldValue=" + oldValue);
-                }
-                break;
-            case REDIRECTED:
-                if (!(oldValue == DownloadStatus.CONNECTING)) {
-                    throw new IllegalStateException("Download status must be CONNECTING before setting to REDIRECTED. oldValue=" + oldValue);
+            case FINALIZING:
+                if (!(oldValue == DownloadStatus.DOWNLOADING)) {
+                    throw new IllegalStateException("Download status must be DOWNLOADING before setting to FINALIZING. status=" + oldValue);
                 }
                 break;
             case COMPLETE:
-                if (!(oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.QUEUED)) {
-                    throw new IllegalStateException("Download status must be DOWNLOADING before setting to COMPLETE. oldValue=" + oldValue);
+                if (!(oldValue == DownloadStatus.FINALIZING)) {
+                    throw new IllegalStateException("Download status must be FINALIZING before setting to COMPLETE. status=" + oldValue);
+                }
+                break;
+            case STOPPING:
+                if (!(oldValue == DownloadStatus.INITIALIZING || oldValue == DownloadStatus.PREPARING || oldValue == DownloadStatus.CONNECTING || oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.FINALIZING || oldValue == DownloadStatus.RETRYING)) {
+                    throw new IllegalStateException("Download status must be INITIALIZING, PREPARING, CONNECTING, DOWNLOADING, FINALIZING, or RETRYING before setting to STOPPING. status=" + oldValue);
+                }
+                break;
+            case STOPPED:
+                if (!(oldValue == DownloadStatus.STOPPING)) {
+                    throw new IllegalStateException("Download status must be STOPPING before setting to STOPPED. status=" + oldValue);
+                }
+                break;
+            case ERROR:
+                if (!(oldValue == DownloadStatus.INITIALIZING || oldValue == DownloadStatus.CONNECTING || oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.FINALIZING)) {
+                    throw new IllegalStateException("Download status must be INITIALIZING, CONNECTING, DOWNLOADING, or FINALIZING before setting to ERROR. status=" + oldValue);
+                }
+                break;
+            case RETRYING:
+                if (!(oldValue == DownloadStatus.ERROR)) {
+                    throw new IllegalStateException("Download status must be ERROR before setting to RETRYING. status=" + oldValue);
+                }
+                break;
+            case REDIRECTING:
+                if (!(oldValue == DownloadStatus.CONNECTING)) {
+                    throw new IllegalStateException("Download status must be CONNECTING before setting to REDIRECTING. status=" + oldValue);
+                }
+                break;
+            case SKIPPED:
+                if (!(oldValue == DownloadStatus.QUEUED)) {
+                    throw new IllegalStateException("Download status must be QUEUED before setting to SKIPPED. status=" + oldValue);
                 }
                 break;
         }
         this.setMessage("");
         this.status = status;
         propertySupport.firePropertyChange(PROP_STATUS, oldValue, getStatus());
+        
+        if(isCanStop()) {
+            propertySupport.firePropertyChange(PROP_CANSTOP, false, true);
+        } else {
+            propertySupport.firePropertyChange(PROP_CANSTOP, true, false);
+        }
+        if(isCanQueue()) {
+            propertySupport.firePropertyChange(PROP_CANQUEUE, false, true);
+        } else {
+            propertySupport.firePropertyChange(PROP_CANQUEUE, true, false);
+        }
     }
 
     /**
@@ -817,6 +849,11 @@ public abstract class AbstractDownload {
         this.setRetryTime((System.nanoTime() - this.getRetryStartTime()) + this.getRetryTime());
         this.setRetryStartTime(System.nanoTime());
         propertySupport.firePropertyChange(PROP_RETRYTIME, oldValue, getRetryTime());
+    }
+    
+    @Override
+    public String toString() {
+        return url.toString();
     }
 
     /**
