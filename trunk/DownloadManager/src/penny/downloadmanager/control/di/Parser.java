@@ -4,15 +4,14 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.download.AbstractDownload;
-import penny.download.DownloadProcessor;
-import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.Model;
-import penny.downloadmanager.model.gui.ParsingModel;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.download.AbstractDownload;
+import penny.download.DownloadProcessor;
+import penny.downloadmanager.model.Model;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.gui.ParsingModel;
 import penny.parser.LinkEater;
 import penny.parser.LinkExtractor;
 import penny.parser.WordEater;
@@ -35,7 +34,7 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
         curDownload = (Download) d;
         try {
             linkExtractor = new LinkExtractor(curDownload.getUrl().toURI(), this);
@@ -47,11 +46,7 @@ public class Parser implements DownloadProcessor, LinkEater, WordEater {
     }
 
     @Override
-    public void onEndInput(AbstractDownload d) {
-    }
-
-    @Override
-    public void onCompleted(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
     }
 
     @Override

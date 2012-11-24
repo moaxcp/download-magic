@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.control.di;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
@@ -32,7 +33,7 @@ public class ByteBufferUpdater implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
     }
 
     @Override
@@ -41,16 +42,12 @@ public class ByteBufferUpdater implements DownloadProcessor {
     }
 
     @Override
-    public void onEndInput(AbstractDownload d) {
-    }
-
-    @Override
-    public void onCompleted(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
         int rate = (int) (d.getDownloadTime() / 1000000000 == 0 ? 0 : d.getDownloaded() / (d.getDownloadTime() / 1000000000));
         if (rate != 0) {
             Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().setBufferSize(rate / 5);
             Model.getSettingsSaver().save();
-            Logger.getLogger(ByteBufferUpdater.class.getName()).fine("Set buffer size to " + Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().getBufferSize());
+            Logger.getLogger(ByteBufferUpdater.class.getName()).log(Level.FINE, "Set buffer size to {0}", Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().getBufferSize());
         }
     }
 }
