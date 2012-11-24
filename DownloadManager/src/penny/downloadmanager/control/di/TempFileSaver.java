@@ -122,7 +122,7 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
         if (Model.save(d)) {
             Download i = (Download) d;
             File file = new File(i.getTempPath());
@@ -165,13 +165,9 @@ public class TempFileSaver implements DownloadProcessor {
     }
 
     @Override
-    public void onEndInput(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
+        
         closeFile(d);
-    }
-
-    @Override
-    public void onCompleted(AbstractDownload d) {
-
         Download i = (Download) d;
         File file = new File(i.getTempPath());
         if (file.exists()) {

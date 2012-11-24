@@ -33,18 +33,14 @@ public class MD5Updater implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
         if (md5Model.isGenerateMD5()) {
             init(d);
         }
     }
 
     @Override
-    public void onEndInput(AbstractDownload d) {
-    }
-
-    @Override
-    public void onCompleted(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
         Download i = (Download) d;
         if (Model.generateMD5(i)) {
             md5.digest();

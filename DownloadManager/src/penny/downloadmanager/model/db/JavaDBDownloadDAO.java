@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import penny.download.DownloadStatus;
+import penny.download.Downloads;
 import penny.parser.LinkState;
 import penny.recmd5.MD5State;
 
@@ -124,11 +125,11 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 d.setSize(rs.getLong(Download.PROP_SIZE));
                 DownloadStatus s = (DownloadStatus) rs.getObject(Download.PROP_STATUS);
                 if (s == DownloadStatus.COMPLETE) {
-                    d.complete();
+                    Downloads.setStatus(d, DownloadStatus.COMPLETE);
                 } else if (s == DownloadStatus.STOPPED) {
                     d.stop();
                 } else if (s == DownloadStatus.ERROR) {
-                    d.error();
+                    Downloads.setStatus(d, DownloadStatus.ERROR);
                 }
                 d.setMD5((MD5State) rs.getObject(Download.PROP_MD5));
                 d.setLinkState((LinkState) rs.getObject(Download.PROP_LINKSTATE));

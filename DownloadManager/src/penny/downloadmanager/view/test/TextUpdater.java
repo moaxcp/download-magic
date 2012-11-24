@@ -22,7 +22,7 @@ public class TextUpdater implements DownloadProcessor {
         this.text = text;
     }
 
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
     }
 
     public void onEndInput(AbstractDownload d) {
@@ -44,7 +44,7 @@ public class TextUpdater implements DownloadProcessor {
 
     }
 
-    public void onCompleted(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
         
     }
 

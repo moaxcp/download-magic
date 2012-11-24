@@ -4,8 +4,6 @@
  */
 package penny.downloadmanager.control.di;
 
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.Model;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +13,8 @@ import javax.activation.FileDataSource;
 import javax.imageio.ImageIO;
 import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
+import penny.downloadmanager.model.Model;
+import penny.downloadmanager.model.db.Download;
 
 /**
  *
@@ -36,15 +36,11 @@ public class ImageInfo implements DownloadProcessor {
     }
 
     @Override
-    public void onStartInput(AbstractDownload d) {
+    public void onPrepare(AbstractDownload d) {
     }
 
     @Override
-    public void onEndInput(AbstractDownload d) {
-    }
-
-    @Override
-    public void onCompleted(AbstractDownload d) {
+    public void onFinalize(AbstractDownload d) {
         if (Model.getApplicationSettings().getImageModel().isWidthAndHeight()) {
             Download i = (Download) d;
             File file = new File(i.getTempPath());

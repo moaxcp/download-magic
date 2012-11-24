@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.6" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
@@ -95,7 +95,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="testConnectionMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Test Connection"/>
+                <Property name="text" type="java.lang.String" value="Downloader Test"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="addDownloadMenu">
@@ -173,7 +173,7 @@
                   <Component id="stopButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" pref="341" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -216,7 +216,7 @@
                           <Component id="queueDownloadButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane4" pref="265" max="32767" attributes="0"/>
+                      <Component id="jScrollPane4" pref="275" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -299,7 +299,7 @@
                           <Component id="removeTaskButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="265" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="275" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

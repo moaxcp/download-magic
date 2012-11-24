@@ -146,7 +146,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(removeDownloadButton)
                     .addComponent(queueDownloadButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Downloads", jPanel2);
@@ -180,7 +180,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(addTaskButton)
                     .addComponent(removeTaskButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Task Manager", jPanel3);
@@ -240,7 +240,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         jMenu4.setText("Tools");
 
-        testConnectionMenu.setText("Test Connection");
+        testConnectionMenu.setText("Downloader Test");
         jMenu4.add(testConnectionMenu);
 
         addDownloadMenu.setText("Add Downloads");
@@ -283,7 +283,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(startButton)
                     .addComponent(stopButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
                 .addContainerGap())
         );
 
