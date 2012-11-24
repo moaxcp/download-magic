@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package penny.test;
 
 import java.beans.PropertyChangeEvent;
@@ -16,44 +15,41 @@ import penny.download.AbstractDownload;
 import penny.download.DownloadProcessor;
 import penny.download.DownloadSettings;
 import penny.download.Downloader;
+import penny.download.Downloads;
 
 /**
  *
  * @author john
  */
 public class DownloaderTest implements DownloadProcessor, PropertyChangeListener {
-    
+
     List<String> http;
     List<String> ftp;
     List<String> file;
     List<String> paths;
     Map<String, String> md5s;
-    
+    long percent;
+
     public DownloaderTest() {
 
         paths = new ArrayList<String>();
-        paths.add("/DownloadManagerTestSite/downloads/DSC00761.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00786.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00785.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00760.JPG");
         paths.add("/DownloadManagerTestSite/downloads/AutoCompleteSupportTableColumn.wmv");
-        paths.add("/DownloadManagerTestSite/downloads/tango-icon-theme-0.8.90.tar.gz");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00726.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/google-chrome-stable_current_amd64.deb");
-        paths.add("/DownloadManagerTestSite/downloads/Non-Zero%20Possibility.m4a");
         paths.add("/DownloadManagerTestSite/downloads/jhepwork-2.9.zip");
+        paths.add("/DownloadManagerTestSite/downloads/flower.html");
+        paths.add("/DownloadManagerTestSite/downloads/index.html");
+        paths.add("/DownloadManagerTestSite/downloads/tango-icon-theme-0.8.90.tar.gz");
+        paths.add("/DownloadManagerTestSite/downloads/Non-Zero%20Possibility.m4a");
         paths.add("/DownloadManagerTestSite/downloads/DSC00725.JPG");
+        paths.add("/DownloadManagerTestSite/downloads/javascript.js");
         paths.add("/DownloadManagerTestSite/downloads/saga_gui.cfg");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00727.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00762.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00759.JPG");
-        paths.add("/DownloadManagerTestSite/downloads/DSC00758.JPG");
+        paths.add("/DownloadManagerTestSite/downloads/google-chrome-stable_current_amd64.deb");
         paths.add("/DownloadManagerTestSite/downloads/binding.pdf");
 
         ftp = new ArrayList<String>();
         http = new ArrayList<String>();
-        for(String s : paths) {
-            http.add("http://localhost:8081" + s);
+        file = new ArrayList<String>();
+        for (String s : paths) {
+            http.add("http://localhost:8084" + s);
             ftp.add("ftp://localhost" + s);
             file.add("file:///home/john/NetBeansProjects" + s);
         }
@@ -64,8 +60,22 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
         DownloadSettings ds = new DownloadSettings();
         Downloader downloader = new Downloader(ds);
         downloader.addProcessor(this);
-        for(String url : http) {
+        for (String url : http) {
             class Download extends AbstractDownload {
+
+                Download(URL url) {
+                    setUrl(url);
+                }
+            }
+            AbstractDownload d = new Download(new URL(url));
+            d.addPropertyChangeListener(this);
+            downloader.setDownload(d);
+            downloader.download();
+            d.removePropertyChangeListener(this);
+        }
+        for (String url : ftp) {
+            class Download extends AbstractDownload {
+
                 Download(URL url) {
                     setUrl(url);
                 }
@@ -85,41 +95,41 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
 
     public void onInit(AbstractDownload d) {
         System.out.println("init " + d);
+        percent = 0;
     }
 
     public boolean onCheck(AbstractDownload d) {
-        System.out.println("onCheck " + d);
+        System.out.println("onCheck " + d.getStatus());
         return true;
     }
 
     public void onReset(AbstractDownload d) {
-        System.out.println("onReset " + d);
+        System.out.println("onReset " + d.getStatus());
     }
 
-    public void onStartInput(AbstractDownload d) {
-        System.out.println("onStarted " + d);
+    public void onPrepare(AbstractDownload d) {
+        System.out.println("onPrepare " + d.getStatus() + " size " + d.getSize());
     }
 
     public void doChunck(AbstractDownload d, int read, byte[] buffer) {
-        //System.out.println("doChunck " + d);
+        if(Downloads.getProgress(d) >= percent) {
+            percent = (int) Downloads.getProgress(d);
+            System.out.println("doChunck " + d.getStatus() + " " + percent + "%");
+            percent++;
+        }
     }
 
-    public void onEndInput(AbstractDownload d) {
-        System.out.println("onStopped " + d);
-    }
-
-    public void onCompleted(AbstractDownload d) {
-        System.out.println("onCompleted " + d);
+    public void onFinalize(AbstractDownload d) {
+        System.out.println("onFinalize " + d.getStatus());
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if(evt.getPropertyName().equals(AbstractDownload.PROP_STATUS)) {
+        if (evt.getPropertyName().equals(AbstractDownload.PROP_STATUS)) {
             AbstractDownload d = (AbstractDownload) evt.getSource();
             System.out.println(d.getStatus() + " " + d.getUrl());
-        } else if(evt.getPropertyName().equals(AbstractDownload.PROP_MESSAGE)) {
+        } else if (evt.getPropertyName().equals(AbstractDownload.PROP_MESSAGE)) {
             AbstractDownload d = (AbstractDownload) evt.getSource();
             System.out.println("Message: " + d.getMessage());
         }
     }
-
 }

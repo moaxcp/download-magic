@@ -273,4 +273,14 @@ public class Downloads {
         String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
         return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
     }
+    
+    public static void setStatus(AbstractDownload d, DownloadStatus s) {
+        if(s == DownloadStatus.COMPLETE) {
+            d.complete();
+        } else if(s == DownloadStatus.ERROR) {
+            d.error();
+        } else {
+            throw new IllegalArgumentException("DownloadStatus invalid " + s);
+        }
+    }
 }
