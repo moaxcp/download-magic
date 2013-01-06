@@ -4,18 +4,18 @@
  */
 package penny.downloadmanager.control.task;
 
-import penny.download.DownloadProcessor;
-import penny.download.Downloader;
-import penny.downloadmanager.control.di.ImageInfo;
-import penny.downloadmanager.control.di.MD5Updater;
-import penny.downloadmanager.control.di.Parser;
-import penny.downloadmanager.control.di.TempFileSaver;
-import penny.downloadmanager.model.ApplicationSettingsModel;
-import penny.downloadmanager.model.task.Status;
-import penny.downloadmanager.model.task.DTaskData;
 import java.util.ArrayList;
 import java.util.List;
-import penny.downloadmanager.control.di.ByteBufferUpdater;
+import penny.download.DownloadProcessor;
+import penny.download.Downloader;
+import penny.downloadmanager.control.processor.BufferSizeUpdater;
+import penny.downloadmanager.control.processor.FileSaver;
+import penny.downloadmanager.control.processor.MD5er;
+import penny.downloadmanager.control.processor.Parser;
+import penny.downloadmanager.control.processor.Processor;
+import penny.downloadmanager.model.ApplicationSettingsModel;
+import penny.downloadmanager.model.task.DTaskData;
+import penny.downloadmanager.model.task.Status;
 
 /**
  *
@@ -24,37 +24,22 @@ import penny.downloadmanager.control.di.ByteBufferUpdater;
 public class DownloadTask extends Task {
 
     private DTaskData data;
-    private List<DownloadProcessor> processors;
+    private Processor processor;
     private ApplicationSettingsModel settings;
 
     public DownloadTask(DTaskData data, ApplicationSettingsModel settings) {
         this.data = data;
 
-        processors = new ArrayList<DownloadProcessor>();
+        processor = new Processor();
         this.settings = settings;
     }
 
     @Override
     public void run() {
-        processors.clear();
-        if(settings.getSavingModel().isSave()) {
-            processors.add(new TempFileSaver());
-        }
-        if(settings.getImageModel().isWidthAndHeight()) {
-            processors.add(new ImageInfo());
-        }
-        if(settings.getMd5ingModel().isGenerateMD5()) {
-            processors.add(new MD5Updater());
-        }
-        if(settings.getParsingModel().isParseLinks() || settings.getParsingModel().isParseWords()) {
-            processors.add(new Parser());
-        }
-
-        processors.add(new ByteBufferUpdater());
         
         data.setStatus(Status.RUNNING);
         Downloader downloader = new Downloader(settings.getDownloadingModel().getDownloadSettings());
-        downloader.setProcessors(processors);
+        downloader.setProcessor(processor);
         data.setDownload(data.getNextDownload());
         while (data.getDownload() != null && data.getStatus() == Status.RUNNING) {
             downloader.setDownload(data.getDownload());

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import penny.download.AbstractDownload;
 import penny.downloadmanager.model.gui.StartupDialogModel;
+import penny.downloadmanager.util.Util;
 import penny.recmd5.MD5MessageDigest;
 import penny.recmd5.MD5State;
 
@@ -153,24 +154,6 @@ public class Model {
         startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
     }
 
-    public static void remove(File f) {
-        if (f != null) {
-            if (f.isFile()) {
-                f.delete();
-                remove(f.getParentFile());
-            } else if (f.isDirectory()) {
-                if (f.listFiles().length == 0) {
-                    File tempFolder = new File(applicationSettings.getSavingModel().getTempFolder());
-                    File saveFolder = new File(applicationSettings.getSavingModel().getSaveFolder());
-                    if (!f.equals(tempFolder) && !f.equals(saveFolder)) {
-                        f.delete();
-                        remove(f.getParentFile());
-                    }
-                }
-            }
-        }
-    }
-
     public static boolean typeMatches(String contentType, List<String> types) {
         if (contentType != null && !contentType.equals("")) {
             for (String s : types) {
@@ -199,7 +182,7 @@ public class Model {
         return r;
     }
 
-    public static boolean parseLinks(AbstractDownload d) {
+    public static boolean parseLinks(Download d) {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseLinks()) {
             if (applicationSettings.getParsingModel().isParseUnknownLinks()) {
@@ -214,7 +197,7 @@ public class Model {
         return r;
     }
 
-    public static boolean parseWords(AbstractDownload d) {
+    public static boolean parseWords(Download d) {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseWords()) {
             if (applicationSettings.getParsingModel().isParseUnknownWords()) {
@@ -229,7 +212,7 @@ public class Model {
         return r;
     }
 
-    public static boolean save(AbstractDownload d) {
+    public static boolean save(Download d) {
         boolean r = false;
         if (applicationSettings.getSavingModel().isSave()) {
             if (applicationSettings.getSavingModel().isSaveUnknown()) {
@@ -242,27 +225,6 @@ public class Model {
             }
         }
         return r;
-    }
-
-    public static MD5State getFileMD5(File file) {
-        MD5MessageDigest md5er = new MD5MessageDigest();
-        try {
-            InputStream in = new FileInputStream(file);
-            byte[] buffer = new byte[applicationSettings.getDownloadingModel().getDownloadSettings().getBufferSize()];
-            int len = in.read(buffer);
-            while (len != -1) {
-                md5er.update(buffer, 0, len);
-                len = in.read(buffer);
-            }
-
-            md5er.digest();
-
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return md5er.getState();
     }
 
     public static void loadData() {
@@ -281,7 +243,7 @@ public class Model {
             mainWindowModel.setDownloadSaver(downloadSaver);
 
             for (Download d : downloads1) {
-                if (d.getStatus() != DownloadStatus.COMPLETE) {
+                if (d.getStatus() != DownloadStatus.COMPLETE && d.getStatus() != DownloadStatus.QUEUED) {
                     d.queue();
                 }
             }
@@ -312,7 +274,7 @@ public class Model {
                         }
                         Logger.getLogger(Model.class.getName()).fine("Checking MD5 for " + d.getUrl());
                         if (file.exists()) {
-                            d.getMD5().copy(getFileMD5(file));
+                            d.getMD5().copy(Util.getMD5State(file));
                         }
                     }
                 }

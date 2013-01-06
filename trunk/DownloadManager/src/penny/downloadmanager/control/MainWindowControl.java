@@ -1,17 +1,5 @@
 package penny.downloadmanager.control;
 
-import penny.download.DownloadStatus;
-import penny.downloadmanager.control.task.TaskManager;
-import penny.downloadmanager.model.gui.SettingsDialogModel;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.gui.AddDialogModel;
-import penny.downloadmanager.model.gui.AddTaskModel;
-import penny.downloadmanager.model.gui.MainWindowModel;
-import penny.downloadmanager.model.task.Status;
-import penny.downloadmanager.model.task.TaskData;
-import penny.downloadmanager.util.RandomChanges;
-import penny.downloadmanager.view.DownloadDataView;
-import penny.downloadmanager.view.test.ConnectionTest;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -22,8 +10,21 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 import javax.swing.JTable;
+import penny.download.DownloadStatus;
+import penny.downloadmanager.control.task.TaskManager;
 import penny.downloadmanager.model.Model;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.gui.AddDialogModel;
+import penny.downloadmanager.model.gui.AddTaskModel;
+import penny.downloadmanager.model.gui.MainWindowModel;
+import penny.downloadmanager.model.gui.SettingsDialogModel;
+import penny.downloadmanager.model.task.Status;
+import penny.downloadmanager.model.task.TaskData;
+import penny.downloadmanager.util.RandomChanges;
+import penny.downloadmanager.util.Util;
+import penny.downloadmanager.view.DownloadDataView;
 import penny.downloadmanager.view.View;
+import penny.downloadmanager.view.test.ConnectionTest;
 
 /**
  *
@@ -126,7 +127,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             openDownloadView(mainModel.getSelectedDownload());
 
         } else if (e.getActionCommand().equals(COM_REMOVEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
-            Model.remove(new File(mainModel.getSelectedDownload().getTempPath()));
+            Util.remove(new File(mainModel.getSelectedDownload().getTempPath()));
             mainModel.getDownloads().remove(mainModel.getSelectedDownload());
         } else if (e.getActionCommand().equals(COM_QUEUEDOWNLOAD) && mainModel.getSelectedDownload() != null) {
             mainModel.getSelectedDownload().queue();
@@ -171,7 +172,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     private void startTasks() {
         mainModel.getDownloads().getReadWriteLock().writeLock().lock();
         for (Download i : mainModel.getDownloads()) {
-            if (!i.getStatus().equals(DownloadStatus.COMPLETE)) {
+            if (!(i.getStatus().equals(DownloadStatus.COMPLETE) || i.getStatus().equals(DownloadStatus.QUEUED))) {
                 i.queue();
             }
         }
