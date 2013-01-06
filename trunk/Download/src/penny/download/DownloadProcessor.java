@@ -8,12 +8,11 @@ package penny.download;
 public interface DownloadProcessor {
     //initializing
     public void onInit(AbstractDownload d);
-    public boolean onCheck(AbstractDownload d);
-    public void onReset(AbstractDownload d);
+    public void onReset();
     //preparing
-    public void onPrepare(AbstractDownload d);
+    public void onPrepare();
     //Downloading
-    public void doChunck(AbstractDownload d, int read, byte[] buffer);
+    public void doChunck(int read, byte[] buffer);
     //finalizing
-    public void onFinalize(AbstractDownload d);
+    public void onFinalize();
 }
