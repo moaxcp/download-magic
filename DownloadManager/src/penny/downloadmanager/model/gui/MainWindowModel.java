@@ -10,19 +10,20 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.UniqueList;
-import penny.download.DownloadStatus;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.DownloadSaver;
-import penny.downloadmanager.model.DownloadTableFormat;
-import penny.downloadmanager.model.db.DAOFactory;
-import penny.downloadmanager.model.db.DownloadDAO;
-import penny.downloadmanager.model.task.TaskData;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
+import penny.download.DownloadStatus;
+import penny.downloadmanager.model.DownloadSaver;
+import penny.downloadmanager.model.DownloadTableFormat;
 import penny.downloadmanager.model.Model;
+import penny.downloadmanager.model.db.DAOFactory;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.db.DownloadDAO;
+import penny.downloadmanager.model.task.TaskData;
+import penny.downloadmanager.util.Util;
 
 /**
  *
@@ -73,7 +74,7 @@ public class MainWindowModel {
     public void clearDownloads() {
         downloadSaver.setSaveDelete(false);
         for(Download d : downloads) {
-            Model.remove(new File(d.getTempPath()));
+            Util.remove(new File(d.getTempPath()));
         }
         downloads.clear();
         DAOFactory.getInstance().getDownloadDAO().clearDownloads();
@@ -91,7 +92,7 @@ public class MainWindowModel {
             }
         }
         for(Download d : remove) {
-            Model.remove(new File(d.getTempPath()));
+            Util.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();
@@ -111,7 +112,7 @@ public class MainWindowModel {
             }
         }
         for(Download d : remove) {
-            Model.remove(new File(d.getTempPath()));
+            Util.remove(new File(d.getTempPath()));
         }
         downloads.removeAll(remove);
         downloads.getReadWriteLock().writeLock().unlock();

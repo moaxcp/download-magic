@@ -146,7 +146,7 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 }
                 Downloader downloader = new Downloader(new DownloadSettings());
                 downloader.setDownload(download);
-                downloader.addProcessor(tu);
+                downloader.setProcessor(tu);
                 downloader.download();
                 goButton.setText("Go");
                 goButton.setEnabled(true);

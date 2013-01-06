@@ -127,7 +127,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 if (s == DownloadStatus.COMPLETE) {
                     Downloads.setStatus(d, DownloadStatus.COMPLETE);
                 } else if (s == DownloadStatus.STOPPED) {
-                    d.stop();
+                    Downloads.setStatus(d, DownloadStatus.STOPPED);
                 } else if (s == DownloadStatus.ERROR) {
                     Downloads.setStatus(d, DownloadStatus.ERROR);
                 }
