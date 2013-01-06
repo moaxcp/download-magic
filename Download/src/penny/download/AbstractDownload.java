@@ -374,15 +374,15 @@ public abstract class AbstractDownload {
         return status == DownloadStatus.PREPARING || status == DownloadStatus.RETRYING || status == DownloadStatus.CONNECTING || status == DownloadStatus.DOWNLOADING || status == DownloadStatus.FINALIZING;
     }
     public void stop() {
-        setStatus(DownloadStatus.STOPPED);
+        setStatus(DownloadStatus.STOPPING);
     }
 
     void complete() {
-        setStatus(DownloadStatus.COMPLETE);
+        status = DownloadStatus.COMPLETE;
     }
 
     void error() {
-        setStatus(DownloadStatus.ERROR);
+        status = DownloadStatus.ERROR;
     }
 
     /**

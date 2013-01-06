@@ -279,6 +279,8 @@ public class Downloads {
             d.complete();
         } else if(s == DownloadStatus.ERROR) {
             d.error();
+        } else if(s == DownloadStatus.STOPPED) {
+            d.status = DownloadStatus.STOPPED;
         } else {
             throw new IllegalArgumentException("DownloadStatus invalid " + s);
         }

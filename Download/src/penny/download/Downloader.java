@@ -6,9 +6,7 @@ package penny.download;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,22 +18,17 @@ import java.util.logging.Logger;
 public class Downloader {
 
     private AbstractDownload download;
-    private List<DownloadProcessor> processors;
+    private DownloadProcessor processor;
     private DownloadSettings dSettings;
     private Map<String, ProtocolClient> clients;
 
     public Downloader(DownloadSettings ds) {
         this.dSettings = ds;
         clients = new HashMap<String, ProtocolClient>();
-        processors = new ArrayList<DownloadProcessor>();
     }
-
-    public void addProcessor(DownloadProcessor di) {
-        this.getProcessors().add(di);
-    }
-
-    public void removeProcessor(DownloadProcessor di) {
-        this.getProcessors().remove(di);
+    
+    public void setProcessor(DownloadProcessor processor) {
+        this.processor = processor;
     }
 
     /**
@@ -53,20 +46,6 @@ public class Downloader {
     }
 
     /**
-     * @return the dInterfaces
-     */
-    public List<DownloadProcessor> getProcessors() {
-        return processors;
-    }
-
-    /**
-     * @param processors the dInterfaces to set
-     */
-    public void setProcessors(List<DownloadProcessor> processors) {
-        this.processors = processors;
-    }
-
-    /**
      * @return the dSettings
      */
     public DownloadSettings getdSettings() {
@@ -80,17 +59,6 @@ public class Downloader {
         this.dSettings = dSettings;
     }
 
-    void resetProcessors(AbstractDownload d) {
-        d.setDownloaded(0);
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.INITIALIZING) {
-                break;
-            }
-            i.onReset(d);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetInterfaces", "reset interfaces for " + d, d);
-    }
-
     void runInput(InputStream in, AbstractDownload d) throws IOException {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
         if (d.getStatus() == DownloadStatus.DOWNLOADING) {
@@ -100,66 +68,14 @@ public class Downloader {
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
                 d.updateDownloadTime();
                 d.setDownloaded(d.getDownloaded() + read);
-                chunckProcessors(d, read, buffer);
+                processor.doChunck(read, buffer);
+                if(buffer.length != getdSettings().getBufferSize()) {
+                    buffer = new byte[getdSettings().getBufferSize()];
+                }
                 read = in.read(buffer);
             }
         }
         Logger.getLogger(Downloader.class.getName()).exiting(Downloader.class.getName(), "runInput");
-    }
-
-    private void initProcessors(AbstractDownload d) {
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.INITIALIZING) {
-                break;
-            }
-            i.onInit(d);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "resetProcessors", "reset processors for " + d, d);
-    }
-
-    private void prepareInputProcessors(AbstractDownload d) {
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.PREPARING) {
-                break;
-            }
-            i.onPrepare(d);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "startProcessors", "start processors for " + d, d);
-    }
-
-    private void finalizeProcessors(AbstractDownload d) {
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.FINALIZING) {
-                break;
-            }
-            i.onFinalize(d);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "completeProcessors", "complete processors for " + d, d);
-    }
-
-    private void chunckProcessors(AbstractDownload d, int read, byte[] buffer) {
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.DOWNLOADING) {
-                break;
-            }
-            i.doChunck(d, read, buffer);
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINER, Downloader.class.getName(), "chunkProcessors", "chunck processors for " + d, d);
-    }
-
-    private boolean checkProcessors(AbstractDownload d) {
-        boolean r = true;
-        for (DownloadProcessor i : getProcessors()) {
-            if (d.getStatus() != DownloadStatus.INITIALIZING) {
-                break;
-            }
-            r = i.onCheck(d);
-            if (r == false) {
-                return r;
-            }
-        }
-        Logger.getLogger(Downloader.class.getName()).logp(Level.FINE, Downloader.class.getName(), "checkProcessors", "check processors for " + d, d);
-        return r;
     }
 
     private void startRetryTimer(AbstractDownload d) {
@@ -205,7 +121,7 @@ public class Downloader {
             }
 
             if (download.getStatus() != DownloadStatus.QUEUED && download.getStatus() != DownloadStatus.RETRYING) {
-                if (download.getStatus() == DownloadStatus.STOPPED) {
+                if (download.getStatus() == DownloadStatus.STOPPING) {
                     download.setStatus(DownloadStatus.STOPPED);
                     return;
                 }
@@ -217,13 +133,7 @@ public class Downloader {
             download.setAttempts(a);
             download.initDownloadTime();
 
-            initProcessors(download);
-
-            if (!checkProcessors(download)) {
-                resetProcessors(download);
-                download.setDownloaded(0);
-                download.setDownloadTime(0);
-            }
+            processor.onInit(download);
 
             ProtocolClient client = getClient(download);
             client.setDownload(download);
@@ -231,7 +141,7 @@ public class Downloader {
             for (int h = 0; h < dSettings.getMaxHops(); h++) {
                 try {
                     if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
-                        if (download.getStatus() == DownloadStatus.STOPPED) {
+                        if (download.getStatus() == DownloadStatus.STOPPING) {
                             download.setStatus(DownloadStatus.STOPPED);
                             return;
                         }
@@ -242,14 +152,14 @@ public class Downloader {
                     download.setHops(h);
                     client.connect();
                     if (client.isDataRestarting()) {
-                        resetProcessors(download);
+                        processor.onReset();
                     }
 
                     if (download.getStatus() == DownloadStatus.REDIRECTING) {
                         continue;
                     } else {
                         if (download.getStatus() != DownloadStatus.CONNECTING) {
-                            if (download.getStatus() == DownloadStatus.STOPPED) {
+                            if (download.getStatus() == DownloadStatus.STOPPING) {
                                 download.setStatus(DownloadStatus.STOPPED);
                                 return;
                             }
@@ -257,10 +167,10 @@ public class Downloader {
                         }
                         download.setStatus(DownloadStatus.PREPARING);
 
-                        prepareInputProcessors(download);
+                        processor.onPrepare();
 
                         if (download.getStatus() != DownloadStatus.PREPARING) {
-                            if (download.getStatus() == DownloadStatus.STOPPED) {
+                            if (download.getStatus() == DownloadStatus.STOPPING) {
                                 download.setStatus(DownloadStatus.STOPPED);
                                 return;
                             }
@@ -282,7 +192,7 @@ public class Downloader {
             }
 
             if (download.getStatus() != DownloadStatus.DOWNLOADING) {
-                if (download.getStatus() == DownloadStatus.STOPPED) {
+                if (download.getStatus() == DownloadStatus.STOPPING) {
                     download.setStatus(DownloadStatus.STOPPED);
                     return;
                 }
@@ -290,10 +200,10 @@ public class Downloader {
             }
             download.setStatus(DownloadStatus.FINALIZING);
 
-            finalizeProcessors(download);
+            processor.onFinalize();
 
             if (download.getStatus() != DownloadStatus.FINALIZING) {
-                if (download.getStatus() == DownloadStatus.STOPPED) {
+                if (download.getStatus() == DownloadStatus.STOPPING) {
                     download.setStatus(DownloadStatus.STOPPED);
                 }
                 return;

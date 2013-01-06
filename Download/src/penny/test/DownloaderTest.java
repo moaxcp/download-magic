@@ -29,6 +29,8 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     List<String> paths;
     Map<String, String> md5s;
     long percent;
+    
+    AbstractDownload d;
 
     public DownloaderTest() {
 
@@ -59,7 +61,7 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     public void go() throws MalformedURLException {
         DownloadSettings ds = new DownloadSettings();
         Downloader downloader = new Downloader(ds);
-        downloader.addProcessor(this);
+        downloader.setProcessor(this);
         for (String url : http) {
             class Download extends AbstractDownload {
 
@@ -94,24 +96,25 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     }
 
     public void onInit(AbstractDownload d) {
+        this.d = d;
         System.out.println("init " + d);
         percent = 0;
     }
 
-    public boolean onCheck(AbstractDownload d) {
+    public boolean onCheck() {
         System.out.println("onCheck " + d.getStatus());
         return true;
     }
 
-    public void onReset(AbstractDownload d) {
+    public void onReset() {
         System.out.println("onReset " + d.getStatus());
     }
 
-    public void onPrepare(AbstractDownload d) {
+    public void onPrepare() {
         System.out.println("onPrepare " + d.getStatus() + " size " + d.getSize());
     }
 
-    public void doChunck(AbstractDownload d, int read, byte[] buffer) {
+    public void doChunck(int read, byte[] buffer) {
         if(Downloads.getProgress(d) >= percent) {
             percent = (int) Downloads.getProgress(d);
             System.out.println("doChunck " + d.getStatus() + " " + percent + "%");
@@ -119,7 +122,7 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
         }
     }
 
-    public void onFinalize(AbstractDownload d) {
+    public void onFinalize() {
         System.out.println("onFinalize " + d.getStatus());
     }
 
