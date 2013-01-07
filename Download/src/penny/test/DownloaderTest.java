@@ -52,7 +52,7 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
         file = new ArrayList<String>();
         for (String s : paths) {
             http.add("http://localhost:8084" + s);
-            ftp.add("ftp://localhost" + s);
+            ftp.add("ftp://anonymous@localhost" + s);
             file.add("file:///home/john/NetBeansProjects" + s);
         }
 
@@ -115,11 +115,7 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     }
 
     public void doChunck(int read, byte[] buffer) {
-        if(Downloads.getProgress(d) >= percent) {
-            percent = (int) Downloads.getProgress(d);
-            System.out.println("doChunck " + d.getStatus() + " " + percent + "%");
-            percent++;
-        }
+        System.out.println("doChunck " + d.getStatus() + " " + Downloads.getProgress(d) + "%");
     }
 
     public void onFinalize() {

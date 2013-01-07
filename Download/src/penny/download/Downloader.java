@@ -4,12 +4,15 @@
  */
 package penny.download;
 
+import it.unimi.dsi.fastutil.bytes.ByteArrayList;
+import it.unimi.dsi.fastutil.bytes.ByteList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.util.StopWatch;
 
 /**
  *
@@ -63,16 +66,27 @@ public class Downloader {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
         if (d.getStatus() == DownloadStatus.DOWNLOADING) {
             int read = -1;
-            byte buffer[] = new byte[getdSettings().getBufferSize()];
+            StopWatch watch = new StopWatch();
+            ByteArrayList timeBuffer = new ByteArrayList(128);
+            byte buffer[] = new byte[128];
+            watch.start();
             read = in.read(buffer);
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
-                d.updateDownloadTime();
-                d.setDownloaded(d.getDownloaded() + read);
-                processor.doChunck(read, buffer);
-                if(buffer.length != getdSettings().getBufferSize()) {
-                    buffer = new byte[getdSettings().getBufferSize()];
+                timeBuffer.addElements(timeBuffer.size(), buffer, 0, read);
+                watch.add();
+                if(watch.getTimeMillis() >= getdSettings().getBufferTime()) {
+                    d.updateDownloadTime();
+                    d.setDownloaded(d.getDownloaded() + timeBuffer.size());
+                    processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
+                    watch.restart();
+                    timeBuffer.clear();
                 }
                 read = in.read(buffer);
+            }
+            if(timeBuffer.size() > 0) {
+                d.updateDownloadTime();
+                d.setDownloaded(d.getDownloaded() + timeBuffer.size());
+                processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
             }
         }
         Logger.getLogger(Downloader.class.getName()).exiting(Downloader.class.getName(), "runInput");

@@ -29,8 +29,8 @@ public class DownloadSettings implements Serializable {
     private int maxDownloadAttempts;
 
 
-    public static String PROP_BUFFERSIZE = "bufferSize";
-    private int bufferSize;
+    public static String PROP_BUFFERTIME = "bufferTime";
+    private int bufferTime;
 
     public static String PROP_DOWNLOADPROXYSERVER = "downloadProxyServer";
     private String downloadProxyServer;
@@ -111,7 +111,7 @@ public class DownloadSettings implements Serializable {
         maxHops = 3;
         this.maxRetryTime = 5000000000l;
         this.maxDownloadAttempts = 3;
-        this.bufferSize = 10240;
+        this.bufferTime = 1000 / 3;
         downloadProxyServer = null;
         downloadProxyPort = -1;
         downloadConnectTimeout = 10000;
@@ -151,7 +151,7 @@ public class DownloadSettings implements Serializable {
 
     public synchronized void copy(DownloadSettings dSettings) {
         this.setAutoFollowRedirects(dSettings.isAutoFollowRedirects());
-        this.setBufferSize(dSettings.getBufferSize());
+        this.setBufferTime(dSettings.getBufferTime());
         this.setDownloadConnectTimeout(dSettings.getDownloadConnectTimeout());
         this.setDownloadProxyPort(dSettings.getDownloadProxyPort());
         this.setDownloadProxyServer(dSettings.getDownloadProxyServer());
@@ -215,17 +215,17 @@ public class DownloadSettings implements Serializable {
     /**
      * @return the bufferSize
      */
-    public synchronized int getBufferSize() {
-        return bufferSize;
+    public synchronized int getBufferTime() {
+        return bufferTime;
     }
 
     /**
      * @param bufferSize the bufferSize to set
      */
-    public synchronized void setBufferSize(int bufferSize) {
-        int oldValue = this.bufferSize;
-        this.bufferSize = bufferSize;
-        propertySupport.firePropertyChange(DownloadSettings.PROP_BUFFERSIZE, oldValue, bufferSize);
+    public synchronized void setBufferTime(int bufferTime) {
+        int oldValue = this.bufferTime;
+        this.bufferTime = bufferTime;
+        propertySupport.firePropertyChange(DownloadSettings.PROP_BUFFERTIME, oldValue, bufferTime);
     }
 
     /**

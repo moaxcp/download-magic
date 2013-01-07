@@ -40,7 +40,6 @@ class FtpClient extends ProtocolClient {
     @Override
     void connect() {
         try {
-            client.setBufferSize(settings.getBufferSize());
             client.setDefaultTimeout(settings.getFtpConnectTimeout());
             client.setConnectTimeout(settings.getFtpConnectTimeout());
             client.connect(download.getUrl().getHost(), download.getUrl().getPort() < 0 ? 21 : download.getUrl().getPort());
