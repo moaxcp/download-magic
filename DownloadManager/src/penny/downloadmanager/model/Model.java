@@ -4,35 +4,28 @@
  */
 package penny.downloadmanager.model;
 
-import penny.downloadmanager.model.db.Download;
 import ca.odell.glazedlists.ObservableElementList;
-import java.io.FileNotFoundException;
-import penny.download.DownloadStatus;
-import penny.downloadmanager.control.Application;
-import penny.downloadmanager.model.db.DAOFactory;
-import penny.downloadmanager.model.db.DownloadDAO;
-import penny.downloadmanager.model.db.JavaDBDataSource;
-import penny.downloadmanager.model.gui.AddDialogModel;
-import penny.downloadmanager.model.gui.AddTaskModel;
-import penny.downloadmanager.model.gui.SettingsDialogModel;
-import penny.downloadmanager.model.gui.MainWindowModel;
-import penny.downloadmanager.model.task.DTaskData;
-import penny.downloadmanager.model.task.TaskData;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import penny.download.AbstractDownload;
+import penny.download.DownloadStatus;
+import penny.downloadmanager.control.Application;
+import penny.downloadmanager.model.db.DAOFactory;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.db.DownloadDAO;
+import penny.downloadmanager.model.db.JavaDBDataSource;
+import penny.downloadmanager.model.gui.AddDialogModel;
+import penny.downloadmanager.model.gui.AddTaskModel;
+import penny.downloadmanager.model.gui.MainWindowModel;
+import penny.downloadmanager.model.gui.SettingsDialogModel;
 import penny.downloadmanager.model.gui.StartupDialogModel;
+import penny.downloadmanager.model.task.DTaskData;
+import penny.downloadmanager.model.task.TaskData;
 import penny.downloadmanager.util.Util;
-import penny.recmd5.MD5MessageDigest;
-import penny.recmd5.MD5State;
 
 /**
  *

@@ -707,7 +707,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel17" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="214" max="32767" attributes="0"/>
+                              <EmptySpace pref="216" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -824,12 +824,12 @@
                         </Property>
                       </Properties>
                       <BindingProperties>
-                        <BindingProperty name="value" source="applicationSettings1" sourcePath="${downloadingModel.downloadSettings.bufferSize}" target="jSpinner4" targetPath="value" updateStrategy="0" immediately="false"/>
+                        <BindingProperty name="value" source="applicationSettings1" sourcePath="${downloadingModel.downloadSettings.bufferTime}" target="jSpinner4" targetPath="value" updateStrategy="0" immediately="false"/>
                       </BindingProperties>
                     </Component>
                     <Component class="javax.swing.JLabel" name="jLabel9">
                       <Properties>
-                        <Property name="text" type="java.lang.String" value="Buffer Size"/>
+                        <Property name="text" type="java.lang.String" value="Buffer Time (ms)"/>
                       </Properties>
                     </Component>
                     <Component class="javax.swing.JSpinner" name="jSpinner2">

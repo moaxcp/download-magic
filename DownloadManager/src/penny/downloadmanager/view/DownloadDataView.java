@@ -480,7 +480,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         } else if(key.equals(Download.PROP_RETRYTIME)) {
             return Downloads.formatMilliTimeMilli(d.getRetryTime() / 1000000);
         }
-
+        
         return d.getProperty(key).toString();
     }
 

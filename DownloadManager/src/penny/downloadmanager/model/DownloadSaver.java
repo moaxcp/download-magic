@@ -18,6 +18,7 @@ import penny.download.DownloadStatus;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.DownloadDAO;
 import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.util.PropertyChangeCounter;
 import penny.parser.LinkState;
 import penny.recmd5.MD5State;
 
@@ -63,8 +64,10 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
         dao = DAOFactory.getInstance().getDownloadDAO();
         saveDelete = true;
         this.downloads.addListEventListener(this);
+        PropertyChangeCounter counter = new PropertyChangeCounter("downloads");
         for (Download d : downloads) {
             d.addPropertyChangeListener(this);
+            d.addPropertyChangeListener(counter);
         }
 
         md5ValuesMap = new HashMap<Download, MD5State>();
@@ -83,7 +86,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
     public void saveAllDownloads() {
         downloads.getReadWriteLock().readLock().lock();
-        for(Download d : downloads) {
+        for (Download d : downloads) {
             dao.updateDownload(d);
         }
         downloads.getReadWriteLock().readLock().unlock();
@@ -98,7 +101,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                 doUpdate = true;
             }
             if (doUpdate) {
-                if(oldValue == null) {
+                if (oldValue == null) {
                     oldValue = new MD5State();
                 }
                 oldValue.copy(md5);
@@ -116,7 +119,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                 doUpdate = true;
             }
             if (doUpdate) {
-                if(oldValue == null) {
+                if (oldValue == null) {
                     oldValue = new LinkState();
                 }
                 oldValue.copy(state);
@@ -174,15 +177,10 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
     public void propertyChange(PropertyChangeEvent evt) {
         Download d = (Download) evt.getSource();
 
-        if(d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(Download.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(Download.PROP_DOWNLOADED))) {
-            long lastTime = lastSaveTime.get(d) == null ? 0 : lastSaveTime.get(d);
-            if(d.getDownloadTime() - lastTime > 1000000000) {
-                dao.updateDownload(d, Download.PROP_DOWNLOADTIME);
-                dao.updateDownload(d, Download.PROP_DOWNLOADED);
-                lastSaveTime.put(d, d.getDownloadTime());
-            }
-
-        } else if(saveProps.contains(evt.getPropertyName())) {
+        if (d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(Download.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(Download.PROP_DOWNLOADED))) {
+            dao.updateDownload(d, Download.PROP_DOWNLOADTIME);
+            dao.updateDownload(d, Download.PROP_DOWNLOADED);
+        } else if (saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
         } else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
             dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.SRC);

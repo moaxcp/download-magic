@@ -27,11 +27,11 @@ public class BufferSizeUpdater {
     }
     
     public void complete() {
-        int rate = (int) (download.getDownloadTime() / 1000000000 == 0 ? 0 : download.getDownloaded() / (download.getDownloadTime() / 1000000000));
-        if (rate != 0) {
-            Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().setBufferSize(rate / 5);
-            Model.getSettingsSaver().save();
-            Logger.getLogger(BufferSizeUpdater.class.getName()).log(Level.FINE, "Set buffer size to {0}", Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().getBufferSize());
-        }
+//        int rate = (int) (download.getDownloadTime() / 1000000000 == 0 ? 0 : download.getDownloaded() / (download.getDownloadTime() / 1000000000));
+//        if (rate != 0) {
+//            Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().setBufferSize(rate / 5);
+//            Model.getSettingsSaver().save();
+//            Logger.getLogger(BufferSizeUpdater.class.getName()).log(Level.FINE, "Set buffer size to {0}", Model.getApplicationSettings().getDownloadingModel().getDownloadSettings().getBufferSize());
+//        }
     }
 }
