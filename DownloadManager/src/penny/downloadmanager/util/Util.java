@@ -43,11 +43,11 @@ public class Util {
     }
 
     public static String getTempFile(Download d) {
-        return Model.getApplicationSettings().getSavingModel().getTempFolder() + File.pathSeparator + getFileName(d, Model.getApplicationSettings().getSavingModel().getTempNameFormat(), Model.getApplicationSettings().getSavingModel().getDefaultFileName());
+        return Model.getApplicationSettings().getSavingModel().getTempFolder() + File.separator + getFileName(d, Model.getApplicationSettings().getSavingModel().getTempNameFormat(), Model.getApplicationSettings().getSavingModel().getDefaultFileName());
     }
 
     public static String getSaveFile(Download d) {
-        return Model.getApplicationSettings().getSavingModel().getSaveFolder() + File.pathSeparator + getFileName(d, Model.getApplicationSettings().getSavingModel().getSaveNameFormat(), Model.getApplicationSettings().getSavingModel().getDefaultFileName());
+        return Model.getApplicationSettings().getSavingModel().getSaveFolder() + File.separator + getFileName(d, Model.getApplicationSettings().getSavingModel().getSaveNameFormat(), Model.getApplicationSettings().getSavingModel().getDefaultFileName());
     }
 
     private static String getFileName(Download d, String saveNameFormat, String defaultFileName) {
