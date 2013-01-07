@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.control;
 
+import java.awt.Toolkit;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.JavaDBDataSource;
 import penny.downloadmanager.util.SwingExceptionHandler;
@@ -12,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import penny.downloadmanager.util.EventRateCounter;
 
 /**
  *
@@ -42,6 +44,8 @@ public class Application {
      * @param args the command line arguments
      */
     public static void main(String args[]) throws Exception {
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new EventRateCounter());
+        
         //System.setProperty("socksProxyHost", "localhost");
         //System.setProperty("socksProxyPort", "9050");
         Runtime.getRuntime().addShutdownHook(new Thread() {

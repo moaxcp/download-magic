@@ -567,10 +567,10 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
 
         jSpinner4.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(128), Integer.valueOf(128), null, Integer.valueOf(128)));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.downloadSettings.bufferSize}"), jSpinner4, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, applicationSettings1, org.jdesktop.beansbinding.ELProperty.create("${downloadingModel.downloadSettings.bufferTime}"), jSpinner4, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
-        jLabel9.setText("Buffer Size");
+        jLabel9.setText("Buffer Time (ms)");
 
         jSpinner2.setModel(new javax.swing.SpinnerNumberModel(Long.valueOf(0L), Long.valueOf(0L), null, Long.valueOf(1L)));
 
@@ -642,7 +642,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(214, Short.MAX_VALUE))
+                .addContainerGap(216, Short.MAX_VALUE))
         );
 
         jTabbedPane4.addTab("General", jPanel12);
