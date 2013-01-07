@@ -244,9 +244,9 @@ public class Model {
             if (Model.getApplicationSettings().getStartupModel().isCheckSizes()) {
                 for (Download d : downloads1) {
                     if (save(d)) {
-                        File file = new File(d.getTempPath());
+                        File file = new File(Util.getTempFile(d));
                         if (!file.exists()) {
-                            file = new File(d.getSavePath());
+                            file = new File(Util.getSaveFile(d));
                         }
                         Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl());
                         if (file.exists()) {

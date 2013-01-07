@@ -120,6 +120,9 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 d.setContentType(rs.getString(Download.PROP_CONTENTTYPE));
                 d.setDownloadTime(rs.getLong(Download.PROP_DOWNLOADTIME));
                 d.setDownloaded(rs.getLong(Download.PROP_DOWNLOADED));
+                if(d.getDownloaded() > 0) {
+                    System.out.println(d.getDownloaded() + " " + d.getUrl());
+                }
                 d.setMessage(rs.getString(Download.PROP_MESSAGE));
                 d.setResponseCode(rs.getInt(Download.PROP_RESPONSECODE));
                 d.setSize(rs.getLong(Download.PROP_SIZE));
@@ -292,7 +295,6 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
     @Override
     public void updateDownload(Download download, String property) {
-
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         int executeUpdate = 0;
         try {

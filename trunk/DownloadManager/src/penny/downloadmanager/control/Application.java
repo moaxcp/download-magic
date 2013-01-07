@@ -56,7 +56,7 @@ public class Application {
                     Model.getTaskSaver().saveList();
                     System.out.println("saved tasks");
                 } catch (Exception ex) {
-                    System.out.println("saved tasks");
+                    System.out.println("could not save tasks");
                     System.out.println(ex);
                 }
 
@@ -64,7 +64,7 @@ public class Application {
                     Model.getDownloadSaver().saveAllDownloads();
                     System.out.println("saved downloads");
                 } catch (Exception ex) {
-                    System.out.println("saved downloads");
+                    System.out.println("could not save downloads");
                     System.out.println(ex);
                 }
                 
@@ -72,7 +72,7 @@ public class Application {
                     JavaDBDataSource.getInstance().shutdownDB();
                     System.out.println("shutdownDB()");
                 } catch (Exception ex) {
-                    System.out.println("shutdownDB()");
+                    System.out.println("shutdownDB() exception is normal");
                     System.out.println(ex);
                 }
             }
