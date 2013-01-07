@@ -5,15 +5,9 @@
 
 package penny.downloadmanager.control;
 
-import penny.download.DownloadStatus;
 import penny.downloadmanager.control.task.TaskManager;
-import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.Model;
-import penny.downloadmanager.model.db.DAOFactory;
-import penny.downloadmanager.model.db.DownloadDAO;
-import penny.downloadmanager.model.db.JavaDBDataSource;
 import penny.downloadmanager.view.View;
-import java.util.List;
 
 /**
  *

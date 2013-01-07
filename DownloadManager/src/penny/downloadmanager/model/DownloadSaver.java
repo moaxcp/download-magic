@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.model.db.DAOFactory;
-import penny.downloadmanager.model.db.DownloadDAO;
 import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.db.DownloadDAO;
 import penny.downloadmanager.util.PropertyChangeCounter;
 import penny.parser.LinkState;
 import penny.recmd5.MD5State;
@@ -177,10 +177,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
     public void propertyChange(PropertyChangeEvent evt) {
         Download d = (Download) evt.getSource();
 
-        if (d.getStatus() == DownloadStatus.DOWNLOADING && (evt.getPropertyName().equals(Download.PROP_DOWNLOADTIME) || evt.getPropertyName().equals(Download.PROP_DOWNLOADED))) {
-            dao.updateDownload(d, Download.PROP_DOWNLOADTIME);
-            dao.updateDownload(d, Download.PROP_DOWNLOADED);
-        } else if (saveProps.contains(evt.getPropertyName())) {
+        if (saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
         } else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
             dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.SRC);
