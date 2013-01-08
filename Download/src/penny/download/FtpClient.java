@@ -125,7 +125,7 @@ class FtpClient extends ProtocolClient {
     void close() {
         if (client.isConnected()) {
             try {
-                if(content != null) {
+                if (content != null) {
                     content.close();
                 }
                 client.logout();
@@ -138,14 +138,17 @@ class FtpClient extends ProtocolClient {
 
     @Override
     void shutdown() {
-        try {
-            if (!client.completePendingCommand()) {
+        if (client.isConnected()) {
+            try {
+                if (content != null) {
+                    content.close();
+                }
                 client.logout();
                 client.disconnect();
                 Logger.getLogger(FtpClient.class.getName()).severe("client.completePendingCommand() failed");
+            } catch (IOException ex) {
+                Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (IOException ex) {
-            Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
