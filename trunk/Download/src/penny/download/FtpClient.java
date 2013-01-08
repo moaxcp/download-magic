@@ -44,6 +44,14 @@ class FtpClient extends ProtocolClient {
             client.setConnectTimeout(settings.getFtpConnectTimeout());
             client.connect(download.getUrl().getHost(), download.getUrl().getPort() < 0 ? 21 : download.getUrl().getPort());
             download.setResponseCode(client.getReplyCode());
+
+            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
+                client.disconnect();
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                download.setStatus(DownloadStatus.ERROR, "failed to connect " + client.getReplyString());
+                return;
+            }
+
             client.setSoTimeout(settings.getFtpReadTimeout());
             String user = "anonymous";
             String password = "";
@@ -56,10 +64,16 @@ class FtpClient extends ProtocolClient {
                         user = s[0];
                 }
             }
-            client.login(user, password);
+            if (!client.login(user, password)) {
+                client.logout();
+                client.disconnect();
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
+                return;
+            }
             download.setResponseCode(client.getReplyCode());
 
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
                 client.disconnect();
                 Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
                 download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
@@ -111,10 +125,11 @@ class FtpClient extends ProtocolClient {
     void close() {
         if (client.isConnected()) {
             try {
-                if (!client.completePendingCommand()) {
-                    client.logout();
-                    client.disconnect();
+                if(content != null) {
+                    content.close();
                 }
+                client.logout();
+                client.disconnect();
             } catch (IOException ex) {
                 Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
             }
