@@ -27,8 +27,8 @@ public class Processor implements DownloadProcessor {
     private Parser parser;
     private MD5er md5er;
     private FileSaver saver;
-    private BufferSizeUpdater bufferUpdater;
     private boolean previouslyMd5ed;
+    private boolean previouslyParsed;
 
     public Processor() {
     }
@@ -40,8 +40,8 @@ public class Processor implements DownloadProcessor {
             parser = new Parser(download);
             md5er = new MD5er(download);
             previouslyMd5ed = Model.generateMD5(download);
+            previouslyParsed = Model.parseLinks(download) || Model.parseWords(download);
             saver = new FileSaver(download);
-            bufferUpdater = new BufferSizeUpdater(download);
         } catch (URISyntaxException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,6 +77,15 @@ public class Processor implements DownloadProcessor {
                 download.setMessage("finished Md5ing file");
                 previouslyMd5ed = Model.generateMD5(download);
             }
+            if (!previouslyParsed) {
+                download.setMessage("parsing file");
+                parser.resetParseFromFile();
+                download.setMessage("finished parsing file");
+                previouslyParsed = Model.parseLinks(download) || Model.parseWords(download);
+            }
+        } catch (URISyntaxException ex) {
+            download.setStatus(DownloadStatus.ERROR, ex.toString());
+            Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
@@ -95,7 +104,6 @@ public class Processor implements DownloadProcessor {
             parser.parse(read, buffer);
             md5er.update(read, buffer);
             saver.save(read, buffer);
-            bufferUpdater.update(read);
         } catch (IOException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
@@ -105,18 +113,28 @@ public class Processor implements DownloadProcessor {
     @Override
     public void onFinalize() {
         try {
+            saver.complete();
+            if (download.getContentType() == null || download.getContentType().equals("")) {
+                System.out.println("no content type");
+            }
             if (!previouslyMd5ed) {
                 download.setMessage("Md5ing file");
                 md5er.resetMD5FromFile();
                 download.setMessage("finished Md5ing file");
             }
-            bufferUpdater.complete();
+            if (!previouslyParsed) {
+                download.setMessage("parsing file");
+                parser.resetParseFromFile();
+                download.setMessage("finished parsing file");
+            }
             md5er.complete();
-            saver.complete();
             download.setMessage("getting image info");
             Map<String, Object> imageInfo = Util.getImageInfo(saver.getSave());
             download.setMessage("finished getting image info");
             download.addExtraProperties(imageInfo);
+        } catch (URISyntaxException ex) {
+            download.setStatus(DownloadStatus.ERROR, ex.toString());
+            Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
