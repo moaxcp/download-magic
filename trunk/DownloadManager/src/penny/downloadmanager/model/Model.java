@@ -244,15 +244,29 @@ public class Model {
             if (Model.getApplicationSettings().getStartupModel().isCheckSizes()) {
                 for (Download d : downloads1) {
                     if (save(d)) {
-                        File file = new File(Util.getTempFile(d));
-                        if (!file.exists()) {
-                            file = new File(Util.getSaveFile(d));
-                        }
                         Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl());
+                        File file = new File(d.getTempPath());
                         if (file.exists()) {
                             d.setDownloaded(file.length());
                         } else {
-                            d.setDownloaded(0);
+                            file = new File(Util.getTempFile(d));
+                            if (file.exists()) {
+                                d.setTempPath(Util.getTempFile(d));
+                                d.setDownloaded(file.length());
+                            } else {
+                                file = new File(d.getSavePath());
+                                if (file.exists()) {
+                                    d.setDownloaded(file.length());
+                                } else {
+                                    file = new File(Util.getSaveFile(d));
+                                    if (file.exists()) {
+                                        d.setSavePath(Util.getSaveFile(d));
+                                        d.setDownloaded(file.length());
+                                    } else {
+                                        d.setDownloaded(0);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

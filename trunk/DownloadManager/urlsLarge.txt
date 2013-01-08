@@ -1,0 +1,12 @@
+http://localhost:8084/DownloadManagerTestSite/downloads/AutoCompleteSupportTableColumn.wmv
+http://localhost:8084/DownloadManagerTestSite/downloads/jhepwork-2.9.zip
+http://localhost:8084/DownloadManagerTestSite/downloads/tango-icon-theme-0.8.90.tar.gz
+http://localhost:8084/DownloadManagerTestSite/downloads/Non-Zero Possibility.m4a
+http://localhost:8084/DownloadManagerTestSite/downloads/DSC00725.JPG
+http://localhost:8084/DownloadManagerTestSite/downloads/google-chrome-stable_current_amd64.deb
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/AutoCompleteSupportTableColumn.wmv
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/jhepwork-2.9.zip
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/tango-icon-theme-0.8.90.tar.gz
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/Non-Zero Possibility.m4a
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/DSC00725.JPG
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/google-chrome-stable_current_amd64.deb
