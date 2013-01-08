@@ -41,8 +41,8 @@ public class MD5er {
         if (Model.generateMD5(download)) {
             download.setMD5(new MD5State());
             md5 = new MD5MessageDigest(download.getMD5());
-            File temp = new File(Util.getTempFile(download));
-            File save = new File(Util.getSaveFile(download));
+            File temp = new File(download.getTempPath());
+            File save = new File(download.getSavePath());
             File file = null;
             if (temp.exists()) {
                 file = temp;
@@ -51,14 +51,17 @@ public class MD5er {
             }
 
             InputStream in = null;
-            in = new FileInputStream(file);
-            byte[] buffer = new byte[10240];
-            int read = in.read(buffer);
-            while (read != -1) {
-                update(read, buffer);
-                read = in.read(buffer);
+            try {
+                in = new FileInputStream(file);
+                byte[] buffer = new byte[10240];
+                int read = in.read(buffer);
+                while (read != -1) {
+                    update(read, buffer);
+                    read = in.read(buffer);
+                }
+            } finally {
+                in.close();
             }
-            in.close();
         }
     }
 

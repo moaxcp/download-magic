@@ -4,14 +4,7 @@
  */
 package penny.downloadmanager.control.task;
 
-import java.util.ArrayList;
-import java.util.List;
-import penny.download.DownloadProcessor;
 import penny.download.Downloader;
-import penny.downloadmanager.control.processor.BufferSizeUpdater;
-import penny.downloadmanager.control.processor.FileSaver;
-import penny.downloadmanager.control.processor.MD5er;
-import penny.downloadmanager.control.processor.Parser;
 import penny.downloadmanager.control.processor.Processor;
 import penny.downloadmanager.model.ApplicationSettingsModel;
 import penny.downloadmanager.model.task.DTaskData;
