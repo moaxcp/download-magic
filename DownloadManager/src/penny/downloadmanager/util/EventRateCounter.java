@@ -26,7 +26,7 @@ public class EventRateCounter extends EventQueue {
         watch.add();
         if(watch.getTimeMillis() > 1000) {
             float rate = count / ((float) watch.getTimeMillis() / (float)1000);
-            System.out.println("swing event rate: " + rate + "/s");
+            //System.out.println("swing event rate: " + rate + "/s");
             watch.restart();
             count = 0;
         }

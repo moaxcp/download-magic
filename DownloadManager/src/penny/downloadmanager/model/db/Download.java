@@ -115,7 +115,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      * @param MD5 the MD5 to set
      */
     public void setMD5(MD5State md5) {
+        MD5State oldValue = this.md5;
         this.md5 = md5;
+        propertySupport.firePropertyChange(PROP_MD5, oldValue, this.md5);
     }
 
     /**
@@ -129,7 +131,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      * @param MD5 the MD5 to setDownload
      */
     public void setLinkState(LinkState linkState) {
+        LinkState oldValue = this.linkState;
         this.linkState = linkState;
+        propertySupport.firePropertyChange(PROP_LINKSTATE, oldValue, this.linkState);
     }
 
     /**
@@ -143,7 +147,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      * @param MD5 the MD5 to set
      */
     public void setWordBuffer(String wordBuffer) {
+        String oldValue = this.wordBuffer;
         this.wordBuffer = wordBuffer;
+        propertySupport.firePropertyChange(PROP_WORDBUFFER, oldValue, this.wordBuffer);
     }
 
     /**
@@ -157,7 +163,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      * @param savePath the savePath to set
      */
     public void setSavePath(String savePath) {
+        String oldValue = this.savePath;
         this.savePath = savePath;
+        propertySupport.firePropertyChange(PROP_SAVEPATH, oldValue, this.savePath);
     }
 
     /**
@@ -171,7 +179,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      * @param tempPath the tempPath to set
      */
     public void setTempPath(String tempPath) {
+        String oldValue = this.tempPath;
         this.tempPath = tempPath;
+        propertySupport.firePropertyChange(PROP_TEMPPATH, oldValue, this.tempPath);
     }
 
     /**

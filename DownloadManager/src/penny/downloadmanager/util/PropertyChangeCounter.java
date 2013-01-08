@@ -28,7 +28,7 @@ public class PropertyChangeCounter implements PropertyChangeListener {
         watch.add();
         if(watch.getTimeMillis() > 1000) {
             float rate = count / ((float) watch.getTimeMillis() / (float)1000);
-            System.out.println(Thread.currentThread().getName() + ": " + name + " event rate: " + rate + "/s");
+            //System.out.println(Thread.currentThread().getName() + ": " + name + " event rate: " + rate + "/s");
             watch.restart();
             count = 0;
         }

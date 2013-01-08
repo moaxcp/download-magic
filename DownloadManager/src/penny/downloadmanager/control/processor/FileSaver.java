@@ -74,8 +74,12 @@ public class FileSaver {
     }
 
     private void setPaths() {
-        download.setTempPath(Util.getTempFile(download));
-        download.setSavePath(Util.getSaveFile(download));
+        if(download.getTempPath() == null || download.getTempPath().equals("")) {
+            download.setTempPath(Util.getTempFile(download));
+        }
+        if(download.getSavePath() == null || download.getSavePath().equals("")) {
+            download.setSavePath(Util.getSaveFile(download));
+        }
         temp = new File(download.getTempPath());
         save = new File(download.getSavePath());
     }
