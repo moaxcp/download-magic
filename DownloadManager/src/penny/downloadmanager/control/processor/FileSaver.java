@@ -12,8 +12,6 @@ import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.FileDataSource;
-import penny.download.AbstractDownload;
-import penny.download.DownloadProcessor;
 import penny.download.DownloadStatus;
 import penny.download.Downloads;
 import penny.downloadmanager.model.Model;
@@ -32,56 +30,70 @@ public class FileSaver {
     private File save;
     private File temp;
     private Download download;
-    
-    public File getSave() {
-        return save;
+
+    public File getCurrentFile() {
+        if (temp.exists()) {
+            return temp;
+        } else {
+            return save;
+        }
     }
 
-    public FileSaver(Download download) {
-        this.download = download;
-        this.savingModel = Model.getApplicationSettings().getSavingModel();
-        setPaths();
+    private File setupCorrectFile(String filePath, String newFilePath) {
+        File file = new File(filePath);
+        File newFile = new File(newFilePath);
+
+        if (file.exists() && !file.equals(newFile)) {
+            newFile.getParentFile().mkdirs();
+            File delete = new File(file.getPath());
+            file.renameTo(newFile);
+            Util.remove(delete.getParentFile());
+        } else {
+            newFile.getParentFile().mkdirs();
+        }
+        
+        return newFile;
+    }
+    
+    private void initFiles() {
+        temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
 
         if (save.exists()) {
             switch (Model.getApplicationSettings().getSavingModel().getSaveExistsAction()) {
                 case OVERWRITE:
                     Util.remove(save);
-                    Logger.getLogger(Processor.class.getName()).fine("Overwriting saveFile " + save);
+                    Logger.getLogger(Processor.class.getName()).log(Level.FINE, "Overwriting saveFile {0}", save);
                     break;
                 case COMPLETE:
+                    //move save to temp and resume download from there.
                     Util.remove(temp);
-                    download.setDownloaded(save.length());
+                    File file = new File(save.getPath());
+                    temp.mkdirs();
+                    file.renameTo(temp);
+                    Util.remove(save.getParentFile());
+                    Logger.getLogger(Processor.class.getName()).log(Level.FINE, "Continuing with save file {0}", save);
                     break;
             }
-        }
-
-        if (temp.exists()) {
-            Logger.getLogger(Processor.class.getName()).fine("temp file exists and is " + Downloads.formatByteSize(temp.length()));
+        } else if (temp.exists()) {
+            Logger.getLogger(Processor.class.getName()).log(Level.FINE, "temp file exists and is {0}", Downloads.formatByteSize(temp.length()));
             switch (savingModel.getTempExistsAction()) {
                 case OVERWRITE:
-                    Logger.getLogger(Processor.class.getName()).fine("overwrite tempFile " + temp);
+                    Logger.getLogger(Processor.class.getName()).log(Level.FINE, "overwrite tempFile {0}", temp);
                     Util.remove(temp);
                     break;
                 case COMPLETE:
-                    download.setDownloaded(temp.length());
-                    Logger.getLogger(Processor.class.getName()).fine("continuing with tempFile " + temp);
+                    Logger.getLogger(Processor.class.getName()).log(Level.FINE, "continuing with tempFile {0}", temp);
                     break;
             }
-        } else if (!save.exists()) {
-            Logger.getLogger(Processor.class.getName()).fine("temp file does not exist");
-            download.setDownloaded(0);
         }
     }
 
-    private void setPaths() {
-        if(download.getTempPath() == null || download.getTempPath().equals("")) {
-            download.setTempPath(Util.getTempFile(download));
-        }
-        if(download.getSavePath() == null || download.getSavePath().equals("")) {
-            download.setSavePath(Util.getSaveFile(download));
-        }
-        temp = new File(download.getTempPath());
-        save = new File(download.getSavePath());
+    public FileSaver(Download download) {
+        this.download = download;
+        this.savingModel = Model.getApplicationSettings().getSavingModel();
+        initFiles();
+        download.setDownloaded(temp.length());
     }
 
     private void closeFile() throws IOException {
@@ -89,58 +101,44 @@ public class FileSaver {
             out.close();
         }
     }
-    
+
     public void reset() {
+        try {
+            closeFile();
+        } catch (IOException ex) {
+            Logger.getLogger(FileSaver.class.getName()).log(Level.SEVERE, null, ex);
+        }
         Util.remove(save);
         Util.remove(temp);
     }
 
     public void prepare() throws FileNotFoundException {
-        if (Model.save(download)) {
-            File file = new File(download.getTempPath());
-            String realPath = Util.getTempFile(download);
-            File newFile = new File(realPath);
-
-            if (file.exists() && !file.equals(newFile)) {
-                newFile.getParentFile().mkdirs();
-                file.renameTo(newFile);
-                download.setTempPath(realPath);
-            } else {
-                newFile.getParentFile().mkdirs();
-                download.setTempPath(Util.getTempFile(download));
-            }
-
-            out = new FileOutputStream(download.getTempPath(), true);
-        }
+        temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
+        out = new FileOutputStream(temp, true);
     }
 
     public void save(int read, byte[] buffer) throws IOException {
-        if (Model.save(download)) {
-            out.write(buffer, 0, read);
+        out.write(buffer, 0, read);
+    }
+
+    public void checkFileType() {
+        temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        if (temp.exists()) {
+            if (download.getContentType() == null || download.getContentType().equals("")) {
+                FileDataSource dataSource = new FileDataSource(temp);
+                download.setContentType(dataSource.getContentType());
+            }
         }
+
     }
 
     public void complete() throws IOException {
         closeFile();
-
-        File file = new File(download.getTempPath());
-        if (file.exists()) {
-            if (download.getContentType() == null || download.getContentType().equals("")) {
-                FileDataSource dataSource = new FileDataSource(file);
-                download.setContentType(dataSource.getContentType());
-            }
-        } else {
-            file = new File(download.getSavePath());
-            if (file.exists() && (download.getContentType() == null || download.getContentType().equals(""))) {
-                FileDataSource dataSource = new FileDataSource(file);
-                download.setContentType(dataSource.getContentType());
-            }
-        }
-
-        download.setSavePath(Util.getSaveFile(download));
-        temp = new File(download.getTempPath());
-        save = new File(download.getSavePath());
-
+        
+        temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
+        
         if (Model.save(download)) {
             save.getParentFile().mkdirs();
             temp.renameTo(save);

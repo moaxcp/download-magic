@@ -73,13 +73,13 @@ public class Processor implements DownloadProcessor {
             saver.prepare();
             if (!previouslyMd5ed) {
                 download.setMessage("Md5ing file");
-                md5er.resetMD5FromFile();
+                md5er.resetMD5FromFile(saver.getCurrentFile());
                 download.setMessage("finished Md5ing file");
                 previouslyMd5ed = Model.generateMD5(download);
             }
             if (!previouslyParsed) {
                 download.setMessage("parsing file");
-                parser.resetParseFromFile();
+                parser.resetParseFromFile(saver.getCurrentFile());
                 download.setMessage("finished parsing file");
                 previouslyParsed = Model.parseLinks(download) || Model.parseWords(download);
             }
@@ -113,23 +113,21 @@ public class Processor implements DownloadProcessor {
     @Override
     public void onFinalize() {
         try {
-            saver.complete();
-            if (download.getContentType() == null || download.getContentType().equals("")) {
-                System.out.println("no content type");
-            }
+            saver.checkFileType();
             if (!previouslyMd5ed) {
                 download.setMessage("Md5ing file");
-                md5er.resetMD5FromFile();
+                md5er.resetMD5FromFile(saver.getCurrentFile());
                 download.setMessage("finished Md5ing file");
             }
             if (!previouslyParsed) {
                 download.setMessage("parsing file");
-                parser.resetParseFromFile();
+                parser.resetParseFromFile(saver.getCurrentFile());
                 download.setMessage("finished parsing file");
             }
+            saver.complete();
             md5er.complete();
             download.setMessage("getting image info");
-            Map<String, Object> imageInfo = Util.getImageInfo(saver.getSave());
+            Map<String, Object> imageInfo = Util.getImageInfo(saver.getCurrentFile());
             download.setMessage("finished getting image info");
             download.addExtraProperties(imageInfo);
         } catch (URISyntaxException ex) {

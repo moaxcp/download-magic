@@ -10,14 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import penny.download.AbstractDownload;
-import penny.download.DownloadProcessor;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.MD5ingModel;
-import penny.downloadmanager.util.Util;
 import penny.recmd5.MD5MessageDigest;
 import penny.recmd5.MD5State;
 
@@ -37,18 +32,10 @@ public class MD5er {
         md5 = new MD5MessageDigest(download.getMD5());
     }
 
-    public void resetMD5FromFile() throws FileNotFoundException, IOException {
+    public void resetMD5FromFile(File file) throws FileNotFoundException, IOException {
         if (Model.generateMD5(download)) {
             download.setMD5(new MD5State());
             md5 = new MD5MessageDigest(download.getMD5());
-            File temp = new File(download.getTempPath());
-            File save = new File(download.getSavePath());
-            File file = null;
-            if (temp.exists()) {
-                file = temp;
-            } else if (save.exists()) {
-                file = save;
-            }
 
             InputStream in = null;
             try {

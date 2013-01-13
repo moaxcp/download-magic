@@ -17,8 +17,6 @@ import penny.parser.LinkEater;
 import penny.parser.LinkExtractor;
 import penny.parser.WordEater;
 import penny.parser.WordExtractor;
-import penny.recmd5.MD5MessageDigest;
-import penny.recmd5.MD5State;
 
 /**
  *
@@ -51,21 +49,12 @@ public class Parser implements LinkEater, WordEater {
         }
     }
 
-    public void resetParseFromFile() throws URISyntaxException, FileNotFoundException, IOException {
+    public void resetParseFromFile(File file) throws URISyntaxException, FileNotFoundException, IOException {
         if (Model.parseLinks(download) || Model.parseWords(download)) {
             wordExtractor = new WordExtractor(this);
             linkExtractor = new LinkExtractor(download.getUrl().toURI(), this);
             download.setWordBuffer("");
             download.setLinkState(linkExtractor.getLinkState());
-            File temp = new File(download.getTempPath());
-            File save = new File(download.getSavePath());
-            File file = null;
-            if (temp.exists()) {
-                file = temp;
-            } else if (save.exists()) {
-                file = save;
-            }
-
             InputStream in = null;
             try {
                 in = new FileInputStream(file);
