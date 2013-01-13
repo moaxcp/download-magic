@@ -331,6 +331,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
 
     public void addExtraProperties(Map<String, Object> props) {
         for(String s : props.keySet()) {
+            System.out.println(s);
             setExtraProperty(s, props.get(s));
         }
     }
