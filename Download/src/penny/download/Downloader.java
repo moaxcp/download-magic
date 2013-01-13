@@ -27,9 +27,9 @@ public class Downloader {
 
     public Downloader(DownloadSettings ds) {
         this.dSettings = ds;
-        clients = new HashMap<String, ProtocolClient>();
+        clients = new HashMap<>();
     }
-    
+
     public void setProcessor(DownloadProcessor processor) {
         this.processor = processor;
     }
@@ -74,7 +74,7 @@ public class Downloader {
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
                 timeBuffer.addElements(timeBuffer.size(), buffer, 0, read);
                 watch.add();
-                if(watch.getTimeMillis() >= getdSettings().getBufferTime()) {
+                if (watch.getTimeMillis() >= getdSettings().getBufferTime()) {
                     d.updateDownloadTime();
                     d.setDownloaded(d.getDownloaded() + timeBuffer.size());
                     processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
@@ -83,7 +83,7 @@ public class Downloader {
                 }
                 read = in.read(buffer);
             }
-            if(timeBuffer.size() > 0) {
+            if (timeBuffer.size() > 0) {
                 d.updateDownloadTime();
                 d.setDownloaded(d.getDownloaded() + timeBuffer.size());
                 processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
@@ -143,69 +143,70 @@ public class Downloader {
             }
 
             download.setStatus(DownloadStatus.INITIALIZING);
-
             download.setAttempts(a);
             download.initDownloadTime();
 
             processor.onInit(download);
 
-            ProtocolClient client = getClient(download);
-            client.setDownload(download);
+            if (download.getSize() > 0 ? download.getDownloaded() < download.getSize() : true) {
+                ProtocolClient client = getClient(download);
+                client.setDownload(download);
 
-            for (int h = 0; h < dSettings.getMaxHops(); h++) {
-                try {
-                    if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
-                        if (download.getStatus() == DownloadStatus.STOPPING) {
-                            download.setStatus(DownloadStatus.STOPPED);
-                            return;
-                        }
-                        break;
-                    }
-                    download.setStatus(DownloadStatus.CONNECTING);
-
-                    download.setHops(h);
-                    client.connect();
-                    if (client.isDataRestarting()) {
-                        processor.onReset();
-                    }
-
-                    if (download.getStatus() == DownloadStatus.REDIRECTING) {
-                        continue;
-                    } else {
-                        if (download.getStatus() != DownloadStatus.CONNECTING) {
+                for (int h = 0; h < dSettings.getMaxHops(); h++) {
+                    try {
+                        if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
                             if (download.getStatus() == DownloadStatus.STOPPING) {
                                 download.setStatus(DownloadStatus.STOPPED);
                                 return;
                             }
                             break;
                         }
-                        download.setStatus(DownloadStatus.PREPARING);
+                        download.setStatus(DownloadStatus.CONNECTING);
 
-                        processor.onPrepare();
+                        download.setHops(h);
+                        client.connect();
+                        if (client.isDataRestarting()) {
+                            processor.onReset();
+                        }
 
-                        if (download.getStatus() != DownloadStatus.PREPARING) {
-                            if (download.getStatus() == DownloadStatus.STOPPING) {
-                                download.setStatus(DownloadStatus.STOPPED);
-                                return;
+                        if (download.getStatus() == DownloadStatus.REDIRECTING) {
+                            continue;
+                        } else {
+                            if (download.getStatus() != DownloadStatus.CONNECTING) {
+                                if (download.getStatus() == DownloadStatus.STOPPING) {
+                                    download.setStatus(DownloadStatus.STOPPED);
+                                    return;
+                                }
+                                break;
                             }
+                            download.setStatus(DownloadStatus.PREPARING);
+
+                            processor.onPrepare();
+
+                            if (download.getStatus() != DownloadStatus.PREPARING) {
+                                if (download.getStatus() == DownloadStatus.STOPPING) {
+                                    download.setStatus(DownloadStatus.STOPPED);
+                                    return;
+                                }
+                                break;
+                            }
+                            download.setStatus(DownloadStatus.DOWNLOADING);
+
+                            InputStream in = client.getContent();
+                            runInput(in, download);
+
                             break;
                         }
-                        download.setStatus(DownloadStatus.DOWNLOADING);
-
-                        InputStream in = client.getContent();
-                        runInput(in, download);
-
-                        break;
+                    } catch (IOException ex) {
+                        Logger.getLogger(Downloader.class.getName()).log(Level.SEVERE, null, ex);
+                        download.setStatus(DownloadStatus.ERROR, ex.toString());
+                    } finally {
+                        client.close();
                     }
-                } catch (IOException ex) {
-                    Logger.getLogger(Downloader.class.getName()).log(Level.SEVERE, null, ex);
-                    download.setStatus(DownloadStatus.ERROR, ex.toString());
-                } finally {
-                    client.close();
                 }
             }
-
-            if (download.getStatus() != DownloadStatus.DOWNLOADING) {
+            
+            if (download.getStatus() != DownloadStatus.DOWNLOADING && download.getStatus() != DownloadStatus.INITIALIZING) {
                 if (download.getStatus() == DownloadStatus.STOPPING) {
                     download.setStatus(DownloadStatus.STOPPED);
                     return;

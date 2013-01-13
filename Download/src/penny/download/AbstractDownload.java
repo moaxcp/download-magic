@@ -432,8 +432,8 @@ public abstract class AbstractDownload {
                 }
                 break;
             case FINALIZING:
-                if (!(oldValue == DownloadStatus.DOWNLOADING)) {
-                    throw new IllegalStateException("Download status must be DOWNLOADING before setting to FINALIZING. status=" + oldValue);
+                if (!(oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.INITIALIZING)) {
+                    throw new IllegalStateException("Download status must be DOWNLOADING or INITIALIZING before setting to FINALIZING. status=" + oldValue);
                 }
                 break;
             case COMPLETE:
