@@ -9,16 +9,16 @@ import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
-import ca.odell.glazedlists.UniqueList;
+import ca.odell.glazedlists.SortedList;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.model.DownloadSaver;
 import penny.downloadmanager.model.DownloadTableFormat;
-import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.db.DownloadDAO;
@@ -54,8 +54,15 @@ public class MainWindowModel {
     private SwingPropertyChangeSupport propertySupport;
 
     public MainWindowModel() {
+        Comparator<Download> comp = new Comparator<Download>() {
+
+            @Override
+            public int compare(Download o1, Download o2) {
+                return o1.getUrl().getPath().toString().compareTo(o2.getUrl().getPath().toString());
+            }
+        };
         downloads = new ObservableElementList<Download>(
-                GlazedLists.threadSafeList(new UniqueList<Download>(new BasicEventList<Download>())),
+                GlazedLists.threadSafeList(new SortedList(new BasicEventList<Download>(), comp)),
                 GlazedLists.beanConnector(Download.class));
         DAOFactory.setDB(DAOFactory.JAVADB);
 
