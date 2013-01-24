@@ -112,10 +112,10 @@ public class Processor implements DownloadProcessor {
     @Override
     public void doChunck(int read, byte[] buffer) {
         try {
+            saver.save(read, buffer);
+            md5er.update(read, buffer);
             linkParser.parse(read, buffer);
             wordParser.parse(read, buffer);
-            md5er.update(read, buffer);
-            saver.save(read, buffer);
         } catch (IOException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);

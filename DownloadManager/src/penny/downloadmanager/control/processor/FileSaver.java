@@ -12,7 +12,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.activation.FileDataSource;
 import penny.download.DownloadStatus;
 import penny.download.Downloads;
 import penny.downloadmanager.model.Model;
@@ -58,7 +57,9 @@ public class FileSaver {
     
     private void initFiles() {
         temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        download.setTempPath(Util.getTempFile(download));
         save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
+        download.setSavePath(Util.getSaveFile(download));
 
         if (save.exists()) {
             switch (Model.getApplicationSettings().getSavingModel().getSaveExistsAction()) {
@@ -115,7 +116,9 @@ public class FileSaver {
 
     public void prepare() throws FileNotFoundException {
         temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        download.setTempPath(Util.getTempFile(download));
         save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
+        download.setSavePath(Util.getSaveFile(download));
         out = new FileOutputStream(temp, true);
     }
 
@@ -125,6 +128,7 @@ public class FileSaver {
 
     public void checkFileType() {
         temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        download.setTempPath(Util.getTempFile(download));
         if (temp.exists()) {
             if (download.getContentType() == null || download.getContentType().equals("")) {
                 try {
@@ -141,7 +145,9 @@ public class FileSaver {
         closeFile();
         
         temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
+        download.setTempPath(Util.getTempFile(download));
         save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
+        download.setSavePath(Util.getSaveFile(download));
         
         if (Model.save(download)) {
             save.getParentFile().mkdirs();
