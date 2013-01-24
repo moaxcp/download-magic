@@ -84,6 +84,10 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         
         propertyNames = Collections.unmodifiableList(l);
     }
+    
+    public Download() {
+        System.out.println("only use Download() in an IDE visual editor");
+    }
 
     public Download(UUID id) {
         super();
@@ -241,10 +245,12 @@ public class Download extends AbstractDownload implements Comparable<Download> {
 
     public void setWords(EventList<String> list) {
         //TODO may need to fire property change event for clearing list
+        words.getReadWriteLock().writeLock().lock();
         words.clear();
         for(String s : list) {
             addWord(s);
         }
+        words.getReadWriteLock().writeLock().unlock();
     }
 
     /**
@@ -252,7 +258,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
      */
     public void addWord(String word) {
         int i = words.size();
+        words.getReadWriteLock().writeLock().lock();
         words.add(word);
+        words.getReadWriteLock().writeLock().unlock();
         propertySupport.fireIndexedPropertyChange(PROP_WORDS, i, null, word);
     }
 
@@ -312,7 +320,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
             return this.getWordBuffer();
         }
 
-        return null;
+        return "";
     }
 
     public void setExtraProperty(String key, Object value) {
@@ -331,7 +339,6 @@ public class Download extends AbstractDownload implements Comparable<Download> {
 
     public void addExtraProperties(Map<String, Object> props) {
         for(String s : props.keySet()) {
-            System.out.println(s);
             setExtraProperty(s, props.get(s));
         }
     }
