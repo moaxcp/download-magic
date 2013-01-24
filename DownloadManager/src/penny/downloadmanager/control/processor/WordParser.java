@@ -22,27 +22,20 @@ import penny.parser.WordExtractor;
  *
  * @author john
  */
-public class Parser implements LinkEater, WordEater {
+public class WordParser implements LinkEater, WordEater {
 
-    private LinkExtractor linkExtractor;
     private WordExtractor wordExtractor;
     private ParsingModel parsingModel;
     private Download download;
 
-    public Parser(Download download) throws URISyntaxException {
+    public WordParser(Download download) throws URISyntaxException {
         this.download = download;
         parsingModel = Model.getApplicationSettings().getParsingModel();
         wordExtractor = new WordExtractor(this);
-        linkExtractor = new LinkExtractor(download.getUrl().toURI(), this);
-        linkExtractor.setLinkState(download.getLinkState());
         wordExtractor.setWordBuffer(download.getWordBuffer());
     }
 
     public void parse(int read, byte[] buffer) {
-        if (Model.parseLinks(download)) {
-            linkExtractor.put(buffer, 0, read);
-            download.setLinkState(linkExtractor.getLinkState());
-        }
         if (Model.parseWords(download)) {
             wordExtractor.put(buffer, 0, read);
             download.setWordBuffer(wordExtractor.getWordBuffer());
@@ -50,11 +43,9 @@ public class Parser implements LinkEater, WordEater {
     }
 
     public void resetParseFromFile(File file) throws URISyntaxException, FileNotFoundException, IOException {
-        if (Model.parseLinks(download) || Model.parseWords(download)) {
+        if (Model.parseWords(download)) {
             wordExtractor = new WordExtractor(this);
-            linkExtractor = new LinkExtractor(download.getUrl().toURI(), this);
             download.setWordBuffer("");
-            download.setLinkState(linkExtractor.getLinkState());
             InputStream in = null;
             try {
                 in = new FileInputStream(file);
@@ -72,9 +63,7 @@ public class Parser implements LinkEater, WordEater {
 
     public void reset() throws URISyntaxException {
         wordExtractor = new WordExtractor(this);
-        linkExtractor = new LinkExtractor(download.getUrl().toURI(), this);
         download.setWordBuffer("");
-        download.setLinkState(linkExtractor.getLinkState());
     }
 
     @Override
