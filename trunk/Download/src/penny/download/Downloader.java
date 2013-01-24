@@ -66,19 +66,19 @@ public class Downloader {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
         if (d.getStatus() == DownloadStatus.DOWNLOADING) {
             int read = -1;
-            StopWatch watch = new StopWatch();
+            StopWatch bufferWatch = new StopWatch();
             ByteArrayList timeBuffer = new ByteArrayList(128);
             byte buffer[] = new byte[128];
-            watch.start();
+            bufferWatch.start();
             read = in.read(buffer);
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
                 timeBuffer.addElements(timeBuffer.size(), buffer, 0, read);
-                watch.add();
-                if (watch.getTimeMillis() >= getdSettings().getBufferTime()) {
+                bufferWatch.add();
+                if (bufferWatch.getTimeMillis() >= getdSettings().getBufferTime()) {
                     d.updateDownloadTime();
-                    d.setDownloaded(d.getDownloaded() + timeBuffer.size());
                     processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
-                    watch.restart();
+                    d.setDownloaded(d.getDownloaded() + timeBuffer.size());
+                    bufferWatch.restart();
                     timeBuffer.clear();
                 }
                 read = in.read(buffer);
