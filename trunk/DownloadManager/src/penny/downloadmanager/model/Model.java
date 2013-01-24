@@ -152,7 +152,7 @@ public class Model {
             for (String s : types) {
                 if (s.equals("*")) {
                     return true;
-                } else if (s.contains(contentType)) {
+                } else if (contentType.contains(s)) {
                     return true;
                 }
             }
@@ -179,7 +179,7 @@ public class Model {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseLinks()) {
             if (applicationSettings.getParsingModel().isParseUnknownLinks()) {
-                if (d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
+                if (d.getContentType() == null || d.getContentType().equals("")) {
                     r = true;
                 }
             }
@@ -194,7 +194,7 @@ public class Model {
         boolean r = false;
         if (applicationSettings.getParsingModel().isParseWords()) {
             if (applicationSettings.getParsingModel().isParseUnknownWords()) {
-                if (d.getContentType() == null || (d.getContentType() != null && d.getContentType().equals(""))) {
+                if (d.getContentType() == null || d.getContentType().equals("")) {
                     r = true;
                 }
             }
