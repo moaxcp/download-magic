@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.activation.FileDataSource;
@@ -31,12 +32,12 @@ public class FileSaver {
     private File temp;
     private Download download;
 
-    public File getCurrentFile() {
-        if (temp.exists()) {
-            return temp;
-        } else {
-            return save;
-        }
+    public File getSaveFile() {
+        return save;
+    }
+
+    public File getTempFile() {
+        return temp;
     }
 
     private File setupCorrectFile(String filePath, String newFilePath) {
@@ -69,7 +70,7 @@ public class FileSaver {
                     //move save to temp and resume download from there.
                     Util.remove(temp);
                     File file = new File(save.getPath());
-                    temp.mkdirs();
+                    temp.getParentFile().mkdirs();
                     file.renameTo(temp);
                     Util.remove(save.getParentFile());
                     Logger.getLogger(Processor.class.getName()).log(Level.FINE, "Continuing with save file {0}", save);
@@ -126,8 +127,11 @@ public class FileSaver {
         temp = setupCorrectFile(download.getTempPath(), Util.getTempFile(download));
         if (temp.exists()) {
             if (download.getContentType() == null || download.getContentType().equals("")) {
-                FileDataSource dataSource = new FileDataSource(temp);
-                download.setContentType(dataSource.getContentType());
+                try {
+                    download.setContentType(Files.probeContentType(temp.toPath()));
+                } catch (IOException ex) {
+                    Logger.getLogger(FileSaver.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 

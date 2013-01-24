@@ -24,11 +24,13 @@ import penny.downloadmanager.util.Util;
 public class Processor implements DownloadProcessor {
 
     private Download download;
-    private Parser parser;
+    private LinkParser linkParser;
+    private WordParser wordParser;
     private MD5er md5er;
     private FileSaver saver;
     private boolean previouslyMd5ed;
-    private boolean previouslyParsed;
+    private boolean wordsParsed;
+    private boolean linksParsed;
 
     public Processor() {
     }
@@ -37,10 +39,12 @@ public class Processor implements DownloadProcessor {
     public void onInit(AbstractDownload d) {
         try {
             this.download = (Download) d;
-            parser = new Parser(download);
+            linkParser = new LinkParser(download);
+            wordParser = new WordParser(download);
             md5er = new MD5er(download);
             previouslyMd5ed = Model.generateMD5(download);
-            previouslyParsed = Model.parseLinks(download) || Model.parseWords(download);
+            linksParsed = Model.parseLinks(download);
+            wordsParsed = Model.parseWords(download);
             saver = new FileSaver(download);
         } catch (URISyntaxException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
@@ -54,7 +58,8 @@ public class Processor implements DownloadProcessor {
     @Override
     public void onReset() {
         try {
-            parser.reset();
+            linkParser.reset();
+            wordParser.reset();
             md5er.reset();
             saver.reset();
         } catch (URISyntaxException ex) {
@@ -73,15 +78,21 @@ public class Processor implements DownloadProcessor {
             saver.prepare();
             if (!previouslyMd5ed) {
                 download.setMessage("Md5ing file");
-                md5er.resetMD5FromFile(saver.getCurrentFile());
+                md5er.resetMD5FromFile(saver.getTempFile());
                 download.setMessage("finished Md5ing file");
                 previouslyMd5ed = Model.generateMD5(download);
             }
-            if (!previouslyParsed) {
-                download.setMessage("parsing file");
-                parser.resetParseFromFile(saver.getCurrentFile());
-                download.setMessage("finished parsing file");
-                previouslyParsed = Model.parseLinks(download) || Model.parseWords(download);
+            if (!linksParsed) {
+                download.setMessage("parsing links");
+                linkParser.resetParseFromFile(saver.getTempFile());
+                download.setMessage("finished parsing links");
+                linksParsed = Model.parseLinks(download);
+            }
+            if (!wordsParsed) {
+                download.setMessage("parsing words");
+                wordParser.resetParseFromFile(saver.getTempFile());
+                download.setMessage("finished parsing words");
+                wordsParsed = Model.parseWords(download);
             }
         } catch (URISyntaxException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
@@ -101,7 +112,8 @@ public class Processor implements DownloadProcessor {
     @Override
     public void doChunck(int read, byte[] buffer) {
         try {
-            parser.parse(read, buffer);
+            linkParser.parse(read, buffer);
+            wordParser.parse(read, buffer);
             md5er.update(read, buffer);
             saver.save(read, buffer);
         } catch (IOException ex) {
@@ -116,20 +128,29 @@ public class Processor implements DownloadProcessor {
             saver.checkFileType();
             if (!previouslyMd5ed) {
                 download.setMessage("Md5ing file");
-                md5er.resetMD5FromFile(saver.getCurrentFile());
+                md5er.resetMD5FromFile(saver.getTempFile());
                 download.setMessage("finished Md5ing file");
             }
-            if (!previouslyParsed) {
-                download.setMessage("parsing file");
-                parser.resetParseFromFile(saver.getCurrentFile());
-                download.setMessage("finished parsing file");
+            if (!linksParsed) {
+                download.setMessage("parsing links");
+                linkParser.resetParseFromFile(saver.getTempFile());
+                download.setMessage("finished parsing links");
+                linksParsed = Model.parseLinks(download);
             }
-            saver.complete();
+            if (!wordsParsed) {
+                download.setMessage("parsing words");
+                wordParser.resetParseFromFile(saver.getTempFile());
+                download.setMessage("finished parsing words");
+                wordsParsed = Model.parseWords(download);
+            }
+            if (download.getContentType().contains("image")) {
+                download.setMessage("getting image info");
+                Map<String, Object> imageInfo = Util.getImageInfo(saver.getTempFile());
+                download.setMessage("finished getting image info");
+                download.addExtraProperties(imageInfo);
+            }
             md5er.complete();
-            download.setMessage("getting image info");
-            Map<String, Object> imageInfo = Util.getImageInfo(saver.getCurrentFile());
-            download.setMessage("finished getting image info");
-            download.addExtraProperties(imageInfo);
+            saver.complete();
         } catch (URISyntaxException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
