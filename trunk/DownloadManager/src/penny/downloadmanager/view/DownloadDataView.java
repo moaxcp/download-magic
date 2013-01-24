@@ -13,14 +13,14 @@ package penny.downloadmanager.view;
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
-import penny.downloadmanager.view.converter.NumberToSizeConverter;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.gui.PropertyEntry;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import penny.download.Downloads;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.gui.PropertyEntry;
+import penny.downloadmanager.view.converter.NumberToSizeConverter;
 
 /**
  *
