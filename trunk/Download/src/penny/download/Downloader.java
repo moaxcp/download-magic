@@ -65,28 +65,54 @@ public class Downloader {
     void runInput(InputStream in, AbstractDownload d) throws IOException {
         Logger.getLogger(Downloader.class.getName()).entering(Downloader.class.getName(), "runInput");
         if (d.getStatus() == DownloadStatus.DOWNLOADING) {
-            int read = -1;
+            int read;
             StopWatch bufferWatch = new StopWatch();
-            ByteArrayList timeBuffer = new ByteArrayList(128);
-            byte buffer[] = new byte[128];
+            ByteArrayList chunk = new ByteArrayList();
+            byte inputBuffer[] = new byte[128];
+            byte outputBuffer[] = new byte[128];
+            int multiplier = 1;
+            int growCount = 0;
+            int shrinkCount = 0;
+            int changeOn = 5;
+            int accelerateOn = 10;
             bufferWatch.start();
-            read = in.read(buffer);
+            read = in.read(inputBuffer);
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
-                timeBuffer.addElements(timeBuffer.size(), buffer, 0, read);
-                bufferWatch.add();
-                if (bufferWatch.getTimeMillis() >= getdSettings().getBufferTime()) {
-                    d.updateDownloadTime();
-                    processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
-                    d.setDownloaded(d.getDownloaded() + timeBuffer.size());
-                    bufferWatch.restart();
-                    timeBuffer.clear();
+                assert(multiplier > 0);
+                for (int i = 0; i < multiplier && read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING; i++) {
+                    chunk.addElements(chunk.size(), inputBuffer, 0, read);
+                    read = in.read(inputBuffer);
                 }
-                read = in.read(buffer);
-            }
-            if (timeBuffer.size() > 0) {
                 d.updateDownloadTime();
-                d.setDownloaded(d.getDownloaded() + timeBuffer.size());
-                processor.doChunck(timeBuffer.size(), timeBuffer.toByteArray(buffer));
+                if(chunk.size() > outputBuffer.length) {
+                    outputBuffer = new byte[chunk.size()];
+                }
+                processor.doChunck(chunk.size(), chunk.toByteArray(outputBuffer));
+                d.setDownloaded(d.getDownloaded() + chunk.size());
+                chunk.clear();
+                bufferWatch.add();
+                //System.out.print(bufferWatch);
+                long maxTime = getdSettings().getBufferTime() * 1000000;
+                if (bufferWatch.getTime() < maxTime) {
+                    growCount++;
+                    shrinkCount = 0;
+                    if (growCount >= accelerateOn) {
+                        multiplier += growCount;
+                    } else if (growCount >= changeOn) {
+                        multiplier++;
+                    }
+                    //System.out.println(" grow " + multiplier);
+                } else if (multiplier > 1) {
+                    shrinkCount++;
+                    growCount = 0;
+                    if (shrinkCount >= accelerateOn && multiplier - shrinkCount > 1) {
+                        multiplier -= shrinkCount;
+                    } else if (shrinkCount >= changeOn) {
+                        multiplier--;
+                    }
+                    //System.out.println(" shrink " + multiplier);
+                }
+                bufferWatch.restart();
             }
         }
         Logger.getLogger(Downloader.class.getName()).exiting(Downloader.class.getName(), "runInput");
@@ -205,7 +231,7 @@ public class Downloader {
                     }
                 }
             }
-            
+
             if (download.getStatus() != DownloadStatus.DOWNLOADING && download.getStatus() != DownloadStatus.INITIALIZING) {
                 if (download.getStatus() == DownloadStatus.STOPPING) {
                     download.setStatus(DownloadStatus.STOPPED);
