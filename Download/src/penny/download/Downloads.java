@@ -66,7 +66,7 @@ public class Downloads {
      * @return the rate in seconds
      */
     public static String getRate(AbstractDownload d) {
-        return formatByteSize((d.getDownloadTime() / 1000000000 == 0 ? 0 : d.getDownloaded() / (d.getDownloadTime() / 1000000000))) + "/s";
+        return formatByteSize((long)(d.getDownloadTime() / (double)1000000000 == 0 ? 0 : d.getDownloaded() / (d.getDownloadTime() / (double)1000000000))) + "/s";
     }
 
     /**
