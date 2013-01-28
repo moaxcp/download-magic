@@ -367,7 +367,7 @@ public abstract class AbstractDownload {
     }
 
     public boolean isCanQueue() {
-        return status == DownloadStatus.STOPPED || status == DownloadStatus.ERROR;
+        return status == DownloadStatus.STOPPED || status == DownloadStatus.ERROR || status == DownloadStatus.COMPLETE;
     }
     public void queue() {
         setStatus(DownloadStatus.QUEUED);
