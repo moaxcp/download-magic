@@ -81,17 +81,12 @@ public class Util {
         }
     }
 
-    public static Map<String, Object> getImageInfo(File file) {
+    public static Map<String, Object> getImageInfo(File file) throws IOException {
         Map<String, Object> map = new HashMap<String, Object>();
-        try {
-            BufferedImage image = ImageIO.read(file);
-            if (image != null) {
-                map.put(Model.getApplicationSettings().getImageModel().getHeightName(), image.getHeight());
-                map.put(Model.getApplicationSettings().getImageModel().getWidthName(), image.getWidth());
-            }
-            image = null;
-        } catch (IOException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        BufferedImage image = ImageIO.read(file);
+        if (image != null) {
+            map.put(Model.getApplicationSettings().getImageModel().getHeightName(), image.getHeight());
+            map.put(Model.getApplicationSettings().getImageModel().getWidthName(), image.getWidth());
         }
         return map;
     }
