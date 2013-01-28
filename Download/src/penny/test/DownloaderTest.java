@@ -115,7 +115,7 @@ public class DownloaderTest implements DownloadProcessor, PropertyChangeListener
     }
 
     public void doChunck(int read, byte[] buffer) {
-        System.out.println("doChunck " + d.getStatus() + " " + Downloads.getProgress(d) + "%");
+        //System.out.println("doChunck " + d.getStatus() + " " + Downloads.getProgress(d) + "%");
     }
 
     public void onFinalize() {

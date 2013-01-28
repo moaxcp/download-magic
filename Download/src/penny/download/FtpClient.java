@@ -80,8 +80,7 @@ class FtpClient extends ProtocolClient {
                 return;
             }
             Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "download()", "Login successful " + client.getReplyString());
-            client.setFileType(FTP.BINARY_FILE_TYPE, FTP.BINARY_FILE_TYPE);
-            client.setFileTransferMode(FTP.BINARY_FILE_TYPE);
+
             FTPFile file = client.mlistFile(download.getUrl().getPath());
             download.setResponseCode(client.getReplyCode());
 
@@ -97,6 +96,9 @@ class FtpClient extends ProtocolClient {
             if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
                 restart = true;
             }
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            download.setResponseCode(client.getReplyCode());
+            download.setMessage(client.getReplyString());
             content = client.retrieveFileStream(download.getUrl().getPath());
             download.setResponseCode(client.getReplyCode());
             if (content == null) {
