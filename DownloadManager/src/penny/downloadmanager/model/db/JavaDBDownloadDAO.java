@@ -231,7 +231,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             throw new IllegalArgumentException(download + "  exists in db");
         }
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = Download.propertyNames;
+        List<String> propertyNames = JavaDBDataSource.saveProps;
         query.append("insert into DOWNLOAD\n(");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {
@@ -322,7 +322,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     @Override
     public void updateDownload(Download download) {
         StringBuilder query = new StringBuilder();
-        List<String> propertyNames = Download.propertyNames;
+        List<String> propertyNames = JavaDBDataSource.saveProps;
         query.append("update DOWNLOAD\n set ");
         query.append(propertyNames.get(0));
         for (int i = 1; i < propertyNames.size(); i++) {

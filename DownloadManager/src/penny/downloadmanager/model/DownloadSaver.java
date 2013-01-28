@@ -132,7 +132,6 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
     public void listChanged(ListEvent listChanges) {
 
         EventList changeList = listChanges.getSourceList();
-
         while (listChanges.next()) {
             int sourceIndex = listChanges.getIndex();
             int changeType = listChanges.getType();
