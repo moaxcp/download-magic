@@ -263,14 +263,17 @@ public abstract class AbstractDownload {
         }
         setHost(url.getHost());
         setPath(Downloads.getPath(url.getPath()));
-        setProtocol(url.getProtocol());
-        setQuery(url.getQuery());
-        if (this.query == null) {
+        
+        if (url.getQuery() == null) {
             setQuery("");
+        } else {
+            setQuery(url.getQuery());
         }
 
-        if (this.protocol == null) {
+        if (url.getProtocol() == null) {
             setProtocol("");
+        } else {
+            setProtocol(url.getProtocol());
         }
     }
 
