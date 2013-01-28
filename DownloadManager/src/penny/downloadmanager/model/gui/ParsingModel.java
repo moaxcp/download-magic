@@ -33,9 +33,9 @@ public class ParsingModel implements Serializable {
 
     public ParsingModel() {
         parseLinks = true;
-        parseUnknownLinks = true;
+        parseUnknownLinks = false;
         parseLinksTypes = new BasicEventList<String>();
-        parseLinksTypes.add("text");
+        parseLinksTypes.add("html");
         parseWords = true;
         parseUnknownWords = false;
         parseWordsTypes = new BasicEventList<String>();
