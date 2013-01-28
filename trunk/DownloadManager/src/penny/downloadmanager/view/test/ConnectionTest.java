@@ -5,32 +5,29 @@ package penny.downloadmanager.view.test;
  *
  * Created on May 8, 2008, 7:51 PM
  */
-import penny.download.AbstractDownload;
-import penny.download.DownloadStatus;
-import penny.download.Downloader;
+import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.beans.IndexedPropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import penny.download.AbstractDownload;
 import penny.download.DownloadSettings;
+import penny.download.DownloadStatus;
+import penny.download.Downloader;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.view.DownloadDataView;
 
 /**
  *
  * @author  John J Mercier
  */
 public class ConnectionTest extends javax.swing.JFrame implements PropertyChangeListener, ListDataListener {
-    
-    class Download extends AbstractDownload {
-        Download(URL url) {
-            setUrl(url);
-        }
-    }
+
 
     DefaultListModel eventList = new DefaultListModel();
     Download download = null;
@@ -59,6 +56,7 @@ public class ConnectionTest extends javax.swing.JFrame implements PropertyChange
         output = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Downloader Test"); // NOI18N
@@ -88,8 +86,8 @@ public class ConnectionTest extends javax.swing.JFrame implements PropertyChange
         jSplitPane1.setDividerLocation(300);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
-        output.setColumns(20);
         output.setEditable(false);
+        output.setColumns(20);
         output.setRows(5);
         jScrollPane1.setViewportView(output);
 
@@ -101,6 +99,13 @@ public class ConnectionTest extends javax.swing.JFrame implements PropertyChange
 
         jSplitPane1.setRightComponent(jScrollPane2);
 
+        jButton1.setText("View");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,22 +113,25 @@ public class ConnectionTest extends javax.swing.JFrame implements PropertyChange
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
+                    .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 610, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(addressBox, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
+                        .addComponent(addressBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(goButton)))
+                        .addComponent(goButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(goButton, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(addressBox, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(addressBox, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(goButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE))
         );
 
         pack();
@@ -139,7 +147,8 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 goButton.setText("Stop");
                 download = null;
                 try {
-                    download = new Download(new URL(addressBox.getText()));
+                    download = new Download();
+                    download.setUrl(new URL(addressBox.getText()));
                     download.addPropertyChangeListener(ConnectionTest.this);
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(ConnectionTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -169,6 +178,11 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     }
 }//GEN-LAST:event_formWindowClosing
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        DownloadDataView view = new DownloadDataView(download);
+        view.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -183,6 +197,7 @@ private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:even
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField addressBox;
     private javax.swing.JButton goButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
