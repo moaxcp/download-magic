@@ -9,7 +9,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.UUID;
@@ -28,6 +31,35 @@ public class JavaDBDataSource {
     private String user = "downloaduser";
     private String password = "downloadpassword";
     private String dbName = "downloads";
+    public static final List<String> saveProps;
+    static {
+        List<String> l = new ArrayList<String>();
+        l.add(Download.PROP_ID);
+        l.add(Download.PROP_URL);
+        l.add(Download.PROP_SIZE);
+        l.add(Download.PROP_DOWNLOADED);
+        l.add(Download.PROP_STATUS);
+        l.add(Download.PROP_DOWNLOADTIME);
+        l.add(Download.PROP_ATTEMPTS);
+        l.add(Download.PROP_HOPS);
+        l.add(Download.PROP_CONTENTTYPE);
+        l.add(Download.PROP_HOST);
+        l.add(Download.PROP_PROTOCOL);
+        l.add(Download.PROP_QUERY);
+        l.add(Download.PROP_PATH);
+        l.add(Download.PROP_FILE);
+        l.add(Download.PROP_PROTOCOLFILENAME);
+        l.add(Download.PROP_FILEEXTENTION);
+        l.add(Download.PROP_MESSAGE);
+        l.add(Download.PROP_RESPONSECODE);
+        l.add(Download.PROP_LOCATIONS);
+        l.add(Download.PROP_MD5);
+        l.add(Download.PROP_LINKSTATE);
+        l.add(Download.PROP_WORDBUFFER);
+        l.add(Download.PROP_SAVEPATH);
+        l.add(Download.PROP_TEMPPATH);
+        saveProps = Collections.unmodifiableList(l);
+    }
     private String strCreateDownloadTable =
             "create table DOWNLOAD (\n"
             + "    " + Download.PROP_ID + "             CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL PRIMARY KEY, \n"
@@ -37,6 +69,7 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_STATUS +           " DownloadStatus, \n"
             + "    " + Download.PROP_DOWNLOADTIME +     " BIGINT, \n"
             + "    " + Download.PROP_ATTEMPTS +         " SMALLINT, \n"
+            + "    " + Download.PROP_HOPS +             " SMALLINT, \n"
             + "    " + Download.PROP_CONTENTTYPE +      " VARCHAR(32672), \n"
             + "    " + Download.PROP_HOST +             " VARCHAR(32672), \n"
             + "    " + Download.PROP_PROTOCOL +         " VARCHAR(32672), \n"
@@ -46,7 +79,6 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_PROTOCOLFILENAME + " VARCHAR(32672), \n"
             + "    " + Download.PROP_FILEEXTENTION +    " VARCHAR(32672), \n"
             + "    " + Download.PROP_MESSAGE +          " VARCHAR(32672), \n"
-            + "    " + Download.PROP_RETRYTIME +        " BIGINT, \n"
             + "    " + Download.PROP_RESPONSECODE +     " SMALLINT, \n"
             + "    " + Download.PROP_LOCATIONS +        " List, \n"
             + "    " + Download.PROP_MD5 +              " MD5State, \n"

@@ -44,7 +44,7 @@ public class DownloadTableFormatCM implements AdvancedTableFormat<Download>, Lis
     }
 
     public void getColumns(Download d) {
-        for (String s : d.getPropertyNames()) {
+        for (String s : Download.propertyNames) {
             boolean add = true;
             //required lock for read/write transaction
             columns.getReadWriteLock().writeLock().lock();

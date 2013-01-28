@@ -57,6 +57,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         List<String> l = new ArrayList<String>();
 
         l.add(Download.PROP_ATTEMPTS);
+        l.add(Download.PROP_HOPS);
         l.add(Download.PROP_CONTENTTYPE);
         l.add(Download.PROP_DOWNLOADED);
         l.add(Download.PROP_DOWNLOADTIME);
@@ -74,13 +75,17 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         l.add(Download.PROP_SIZE);
         l.add(Download.PROP_STATUS);
         l.add(Download.PROP_URL);
-        
         l.add(Download.PROP_ID);
         l.add(Download.PROP_MD5);
         l.add(Download.PROP_LINKSTATE);
         l.add(Download.PROP_WORDBUFFER);
         l.add(Download.PROP_SAVEPATH);
         l.add(Download.PROP_TEMPPATH);
+        l.add(Download.PROP_CANSTOP);
+        l.add(Download.PROP_CANQUEUE);
+        l.add(Download.PROP_HREFLINKS);
+        l.add(Download.PROP_SRCLINKS);
+        l.add(Download.PROP_WORDS);
         
         propertyNames = Collections.unmodifiableList(l);
     }
@@ -264,14 +269,12 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         propertySupport.fireIndexedPropertyChange(PROP_WORDS, i, null, word);
     }
 
-    public List<String> getPropertyNames() {
-        return Collections.unmodifiableList(propertyNames);
-    }
-
     public Object getProperty(String key) {
 
         if (key.equals(Download.PROP_ATTEMPTS)) {
             return Integer.valueOf(this.getAttempts());
+        } else if(key.equals(Download.PROP_HOPS)) {
+            return Integer.valueOf(this.getHops());
         } else if (key.equals(Download.PROP_CONTENTTYPE)) {
             return this.getContentType();
         } else if (key.equals(Download.PROP_DOWNLOADED)) {
@@ -318,9 +321,19 @@ public class Download extends AbstractDownload implements Comparable<Download> {
             return this.getTempPath();
         } else if(key.equals(Download.PROP_WORDBUFFER)) {
             return this.getWordBuffer();
+        } else if(key.equals(Download.PROP_CANSTOP)) {
+            return this.isCanStop();
+        } else if(key.equals(Download.PROP_CANQUEUE)) {
+            return this.isCanQueue();
+        } else if(key.equals(Download.PROP_HREFLINKS)) {
+            return this.getHrefLinks();
+        } else if(key.equals(Download.PROP_SRCLINKS)) {
+            return this.getSrcLinks();
+        } else if(key.equals(Download.PROP_WORDS)) {
+            return this.getWords();
         }
-
-        return "";
+        
+        throw new IllegalArgumentException(key + " is not a property");
     }
 
     public void setExtraProperty(String key, Object value) {

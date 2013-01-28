@@ -40,7 +40,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<Download> {
 
     public boolean getColumns(Download d) {
         boolean r = false;
-        for (String s : d.getPropertyNames()) {
+        for (String s : Download.propertyNames) {
             if (!columns.containsKey(s)) {
                 Object o = d.getProperty(s);
                 if (o != null) {
