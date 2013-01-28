@@ -10,19 +10,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import penny.download.DownloadStatus;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.ParsingModel;
 import penny.parser.LinkEater;
 import penny.parser.LinkExtractor;
-import penny.parser.WordEater;
-import penny.parser.WordExtractor;
 
 /**
  *
  * @author john
  */
-public class LinkParser implements LinkEater, WordEater {
+public class LinkParser implements LinkEater {
 
     private LinkExtractor linkExtractor;
     private ParsingModel parsingModel;
@@ -45,14 +44,13 @@ public class LinkParser implements LinkEater, WordEater {
     public void resetParseFromFile(File file) throws URISyntaxException, FileNotFoundException, IOException {
         if (Model.parseLinks(download)) {
             linkExtractor = new LinkExtractor(download.getUrl().toURI(), this);
-            download.setWordBuffer("");
             download.setLinkState(linkExtractor.getLinkState());
             InputStream in = null;
             try {
                 in = new FileInputStream(file);
                 byte[] buffer = new byte[10240];
                 int read = in.read(buffer);
-                while (read != -1) {
+                while (read != -1 && download.getStatus() != DownloadStatus.STOPPING) {
                     parse(read, buffer);
                     read = in.read(buffer);
                 }
@@ -75,10 +73,5 @@ public class LinkParser implements LinkEater, WordEater {
         } else {
             download.addHrefLink(url);
         }
-    }
-
-    @Override
-    public void eatWord(String word) {
-        download.addWord(word);
     }
 }

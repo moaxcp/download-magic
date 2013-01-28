@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import penny.download.DownloadStatus;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.MD5ingModel;
@@ -42,7 +43,7 @@ public class MD5er {
                 in = new FileInputStream(file);
                 byte[] buffer = new byte[10240];
                 int read = in.read(buffer);
-                while (read != -1) {
+                while (read != -1 && download.getStatus() != DownloadStatus.STOPPING) {
                     update(read, buffer);
                     read = in.read(buffer);
                 }

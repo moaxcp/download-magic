@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import penny.download.DownloadStatus;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.ParsingModel;
@@ -51,7 +52,7 @@ public class WordParser implements LinkEater, WordEater {
                 in = new FileInputStream(file);
                 byte[] buffer = new byte[10240];
                 int read = in.read(buffer);
-                while (read != -1) {
+                while (read != -1 && download.getStatus() != DownloadStatus.STOPPING) {
                     parse(read, buffer);
                     read = in.read(buffer);
                 }
