@@ -20,10 +20,16 @@ public class WordExtractor {
     }
 
     public void put(char c) {
-        if (Character.isLetter(c)) {
+        if (Character.isLetter(c) || c == '\'') {
             word.append(c);
         } else {
             if(word.length() > 0) {
+                if(word.charAt(0) == '\'') {
+                    word.deleteCharAt(0);
+                }
+                if(word.charAt(word.length() - 1) == '\'') {
+                    word.deleteCharAt(word.length() - 1);
+                }
                 eater.eatWord(word.toString());
                 word.setLength(0);
             }
