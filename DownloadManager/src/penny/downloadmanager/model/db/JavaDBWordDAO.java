@@ -36,7 +36,7 @@ public class JavaDBWordDAO implements WordDAO {
             }
             PreparedStatement insert = connection.prepareStatement("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n(?, ?, ?)");
             insert.setString(1, uuid.toString());
-            insert.setString(2, word);
+            insert.setString(2, word.replace("'", "''"));
             insert.setLong(3, wordIndex);
             executeUpdate = insert.executeUpdate();
             Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.FINE, "returned {0} on insert into word (" + Download.PROP_ID + ", word, wordindex) values ({1}, {2}, {3})", new Object[]{executeUpdate, uuid, word, wordIndex});
@@ -69,9 +69,9 @@ public class JavaDBWordDAO implements WordDAO {
             }
             StringBuilder insert = new StringBuilder();
             if(words.size() > 0) {
-                insert.append("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n('").append(uuid.toString()).append("', '").append(words.get(0)).append("', ").append(wordIndex++).append(")");
+                insert.append("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n('").append(uuid.toString()).append("', '").append(words.get(0).replace("'", "''")).append("', ").append(wordIndex++).append(")");
             for (int i = 1; i < words.size(); i++) {
-                insert.append(",\n('").append(uuid.toString()).append("', '").append(words.get(i)).append("', ").append(wordIndex++).append(")");
+                insert.append(",\n('").append(uuid.toString()).append("', '").append(words.get(i).replace("'", "''")).append("', ").append(wordIndex++).append(")");
             }
                 executeUpdate = statement.executeUpdate(insert.toString());
                 Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, insert.toString()});
@@ -112,7 +112,7 @@ public class JavaDBWordDAO implements WordDAO {
             for (String word : words) {
                 int executeUpdate = 0;
                 Statement statement = connection.createStatement();
-                String query = "delete from word where " + Download.PROP_ID + " = '" + uuid + "' and word = '" + word + "'";
+                String query = "delete from word where " + Download.PROP_ID + " = '" + uuid + "' and word = '" + word.replace("'", "''") + "'";
                 executeUpdate = statement.executeUpdate(query);
                 Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
             }
