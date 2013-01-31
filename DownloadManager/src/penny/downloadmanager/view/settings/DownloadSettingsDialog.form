@@ -508,10 +508,10 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="1" attributes="0">
-                                          <Component id="jScrollPane2" pref="422" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane2" pref="423" max="32767" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="1" attributes="0">
-                                              <Component id="removeSaveType" pref="68" max="32767" attributes="1"/>
+                                              <Component id="removeSaveType" pref="69" max="32767" attributes="1"/>
                                               <Component id="addSaveType" alignment="0" pref="68" max="32767" attributes="1"/>
                                           </Group>
                                       </Group>
@@ -534,7 +534,7 @@
                                       </Group>
                                       <Component id="jScrollPane2" alignment="0" min="-2" pref="138" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace pref="42" max="32767" attributes="0"/>
+                                  <EmptySpace pref="51" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                         </DimensionLayout>
@@ -707,7 +707,7 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel17" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="216" max="32767" attributes="0"/>
+                              <EmptySpace pref="223" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -732,7 +732,7 @@
                                           <Component id="jScrollPane3" min="-2" pref="399" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="1" attributes="0">
-                                              <Component id="removeDownloadType" pref="91" max="32767" attributes="1"/>
+                                              <Component id="removeDownloadType" pref="93" max="32767" attributes="1"/>
                                               <Component id="addDownloadType" alignment="0" pref="91" max="32767" attributes="1"/>
                                           </Group>
                                       </Group>
@@ -896,7 +896,7 @@
                               </Group>
                               <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jTextField30" alignment="0" pref="394" max="32767" attributes="2"/>
+                                  <Component id="jTextField30" alignment="0" pref="396" max="32767" attributes="2"/>
                                   <Component id="jTextField9" alignment="0" pref="369" max="32767" attributes="2"/>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
@@ -916,7 +916,7 @@
                                   <Component id="jLabel34" alignment="3" min="-2" max="-2" attributes="0"/>
                                   <Component id="jTextField30" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace pref="519" max="32767" attributes="0"/>
+                              <EmptySpace pref="528" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -993,7 +993,7 @@
                               <Component id="jPanel27" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel28" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="68" max="32767" attributes="0"/>
+                              <EmptySpace pref="87" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1247,7 +1247,7 @@
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel43" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="jTextField39" pref="271" max="32767" attributes="0"/>
+                                          <Component id="jTextField39" pref="273" max="32767" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel45" min="-2" max="-2" attributes="0"/>
@@ -1629,8 +1629,18 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="parseLinks" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jPanel18" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="jPanel18" alignment="1" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="parseLinks" min="-2" max="-2" attributes="0"/>
+                                          <Group type="102" attributes="0">
+                                              <Component id="jTextField8" min="-2" pref="53" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="jLabel12" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -1642,8 +1652,13 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="parseLinks" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jTextField8" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel12" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel18" min="-2" pref="171" max="-2" attributes="0"/>
-                              <EmptySpace pref="381" max="32767" attributes="0"/>
+                              <EmptySpace pref="356" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1665,10 +1680,10 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="1" attributes="0">
-                                          <Component id="jScrollPane4" pref="410" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane4" pref="411" max="32767" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="1" attributes="0">
-                                              <Component id="removeLinkType" pref="80" max="32767" attributes="1"/>
+                                              <Component id="removeLinkType" pref="81" max="32767" attributes="1"/>
                                               <Component id="addLinkType" alignment="0" pref="80" max="32767" attributes="1"/>
                                           </Group>
                                       </Group>
@@ -1753,6 +1768,19 @@
                         <BindingProperty name="selected" source="applicationSettings1" sourcePath="${parsingModel.parseLinks}" target="parseLinks" targetPath="selected" updateStrategy="0" immediately="false"/>
                       </BindingProperties>
                     </Component>
+                    <Component class="javax.swing.JTextField" name="jTextField8">
+                      <BindingProperties>
+                        <BindingProperty name="text" source="applicationSettings1" sourcePath="${parsingModel.linkQueueSize}" target="jTextField8" targetPath="text" updateStrategy="0" immediately="false">
+                          <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
+                        </BindingProperty>
+                        <BindingProperty name="enabled" source="applicationSettings1" sourcePath="${parsingModel.parseLinks}" target="jTextField8" targetPath="enabled" updateStrategy="0" immediately="false"/>
+                      </BindingProperties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel12">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Link Queue Size"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
                 <Container class="javax.swing.JPanel" name="jPanel20">
@@ -1770,8 +1798,18 @@
                           <Group type="102" attributes="0">
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="parseWords" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jPanel21" alignment="1" max="32767" attributes="0"/>
+                                  <Component id="jPanel21" alignment="0" max="32767" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="parseWords" min="-2" max="-2" attributes="0"/>
+                                          <Group type="102" attributes="0">
+                                              <Component id="jTextField10" min="-2" pref="49" max="-2" attributes="0"/>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                      </Group>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
@@ -1783,8 +1821,13 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="parseWords" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="3" attributes="0">
+                                  <Component id="jTextField10" alignment="3" min="-2" max="-2" attributes="0"/>
+                                  <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel21" min="-2" pref="171" max="-2" attributes="0"/>
-                              <EmptySpace pref="381" max="32767" attributes="0"/>
+                              <EmptySpace pref="356" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                     </DimensionLayout>
@@ -1814,10 +1857,10 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="1" attributes="0">
-                                          <Component id="jScrollPane5" pref="410" max="32767" attributes="0"/>
+                                          <Component id="jScrollPane5" pref="411" max="32767" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="1" attributes="0">
-                                              <Component id="removeWordType" alignment="1" pref="80" max="32767" attributes="1"/>
+                                              <Component id="removeWordType" alignment="1" pref="81" max="32767" attributes="1"/>
                                               <Component id="addWordType" alignment="0" pref="80" max="32767" attributes="1"/>
                                           </Group>
                                       </Group>
@@ -1894,6 +1937,19 @@
                         </Component>
                       </SubComponents>
                     </Container>
+                    <Component class="javax.swing.JTextField" name="jTextField10">
+                      <BindingProperties>
+                        <BindingProperty name="text" source="applicationSettings1" sourcePath="${parsingModel.wordQueueSize}" target="jTextField10" targetPath="text" updateStrategy="0" immediately="false">
+                          <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
+                        </BindingProperty>
+                        <BindingProperty name="enabled" source="applicationSettings1" sourcePath="${parsingModel.parseWords}" target="jTextField10" targetPath="enabled" updateStrategy="0" immediately="false"/>
+                      </BindingProperties>
+                    </Component>
+                    <Component class="javax.swing.JLabel" name="jLabel14">
+                      <Properties>
+                        <Property name="text" type="java.lang.String" value="Word Queue Size"/>
+                      </Properties>
+                    </Component>
                   </SubComponents>
                 </Container>
               </SubComponents>
@@ -1932,7 +1988,7 @@
                       <Component id="jCheckBox9" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel29" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="384" max="32767" attributes="0"/>
+                      <EmptySpace pref="398" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -1974,7 +2030,7 @@
                                   <Component id="jScrollPane6" min="-2" pref="399" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="1" attributes="0">
-                                      <Component id="removeMD5Type" alignment="1" pref="123" max="32767" attributes="1"/>
+                                      <Component id="removeMD5Type" alignment="1" pref="129" max="32767" attributes="1"/>
                                       <Component id="addMD5Type" alignment="0" pref="123" max="32767" attributes="1"/>
                                   </Group>
                               </Group>
@@ -2080,7 +2136,7 @@
                               <Component id="jTextField7" min="-2" pref="170" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="309" max="32767" attributes="0"/>
+                      <EmptySpace pref="315" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -2099,7 +2155,7 @@
                           <Component id="jLabel11" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jTextField7" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="553" max="32767" attributes="0"/>
+                      <EmptySpace pref="567" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

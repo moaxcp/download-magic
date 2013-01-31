@@ -29,6 +29,13 @@ public class ParsingModel implements Serializable {
     private boolean parseUnknownWords;
     public static final String PROP_PARSEWORDSTYPES = "parseWordsTypes";
     private EventList<String> parseWordsTypes;
+    
+    public static final String PROP_WORDQUEUESIZE = "wordQueueSize";
+    private int wordQueueSize;
+    
+    public static final String PROP_LINKQUEUESIZE = "linkQueueSize";
+    private int linkQueueSize;
+    
     private transient PropertyChangeSupport propertySupport;
 
     public ParsingModel() {
@@ -40,6 +47,8 @@ public class ParsingModel implements Serializable {
         parseUnknownWords = false;
         parseWordsTypes = new BasicEventList<String>();
         parseWordsTypes.add("text");
+        wordQueueSize = 500;
+        linkQueueSize = 10;
         propertySupport = new SwingPropertyChangeSupport(this, true);
     }
 
@@ -56,6 +65,7 @@ public class ParsingModel implements Serializable {
         setParseUnknownWords(parsingModel.isParseUnknownWords());
         parseWordsTypes.clear();
         parseWordsTypes.addAll(parsingModel.getParseWordsTypes());
+        setWordQueueSize(parsingModel.getWordQueueSize());
     }
 
     /**
@@ -134,6 +144,26 @@ public class ParsingModel implements Serializable {
      */
     public EventList<String> getParseWordsTypes() {
         return parseWordsTypes;
+    }
+    
+    public int getWordQueueSize() {
+        return wordQueueSize;
+    }
+    
+    public void setWordQueueSize(int wordQueueSize) {
+        int oldValue = this.wordQueueSize;
+        this.wordQueueSize = wordQueueSize;
+        propertySupport.firePropertyChange(PROP_WORDQUEUESIZE, oldValue, wordQueueSize);
+    }
+    
+    public int getLinkQueueSize() {
+        return linkQueueSize;
+    }
+    
+    public void setLinkQueueSize(int linkQueueSize) {
+        int oldValue = this.linkQueueSize;
+        this.linkQueueSize = linkQueueSize;
+        propertySupport.firePropertyChange(PROP_LINKQUEUESIZE, oldValue, linkQueueSize);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
