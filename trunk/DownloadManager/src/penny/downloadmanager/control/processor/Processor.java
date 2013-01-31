@@ -149,6 +149,8 @@ public class Processor implements DownloadProcessor {
                 download.setMessage("finished getting image info");
                 download.addExtraProperties(imageInfo);
             }
+            wordParser.complete();
+            linkParser.complete();
             md5er.complete();
             saver.complete();
         } catch (URISyntaxException ex) {

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import penny.download.DownloadStatus;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.db.DownloadDAO;
@@ -28,38 +27,163 @@ import penny.recmd5.MD5State;
  */
 public class DownloadSaver implements ListEventListener<Download>, PropertyChangeListener {
 
+    class HrefLinkSaver implements ListEventListener<String> {
+
+        private Download download;
+
+        public HrefLinkSaver(Download download) {
+            this.download = download;
+            download.addHrefLinksListener(this);
+        }
+
+        @Override
+        public void listChanged(ListEvent<String> listChanges) {
+
+            List<String> addLinks = new ArrayList<String>();
+            List<String> removeLinks = new ArrayList<String>();
+            while (listChanges.next()) {
+                int sourceIndex = listChanges.getIndex();
+                int changeType = listChanges.getType();
+
+                switch (changeType) {
+                    case ListEvent.DELETE:
+                        removeLinks.add(listChanges.getOldValue());
+                        break;
+                    case ListEvent.INSERT:
+                        addLinks.add(download.getHrefLinks().get(sourceIndex));
+                    case ListEvent.UPDATE:
+
+                        break;
+                }
+            }
+            
+            if(addLinks.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLinks, Download.HREF);
+            }
+            
+            if(removeLinks.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks, Download.HREF);
+            }
+        }
+    }
+
+    class SrcLinkSaver implements ListEventListener<String> {
+
+        private Download download;
+
+        public SrcLinkSaver(Download download) {
+            this.download = download;
+            download.addSrcLinksListener(this);
+        }
+
+        @Override
+        public void listChanged(ListEvent<String> listChanges) {
+
+            List<String> addLinks = new ArrayList<String>();
+            List<String> removeLinks = new ArrayList<String>();
+
+            EventList changeList = listChanges.getSourceList();
+            while (listChanges.next()) {
+                int sourceIndex = listChanges.getIndex();
+                int changeType = listChanges.getType();
+
+                switch (changeType) {
+                    case ListEvent.DELETE:
+                        removeLinks.add(listChanges.getOldValue());
+                        break;
+                    case ListEvent.INSERT:
+                        addLinks.add(download.getSrcLinks().get(sourceIndex));
+                        break;
+                    case ListEvent.UPDATE:
+
+                        break;
+                }
+            }
+            
+            if(addLinks.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLinks, Download.SRC);
+            }
+            
+            if(removeLinks.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks, Download.SRC);
+            }
+        }
+    }
+
+    class WordSaver implements ListEventListener<String> {
+
+        private Download download;
+
+        public WordSaver(Download download) {
+            this.download = download;
+            download.addWordsListener(this);
+        }
+
+        @Override
+        public void listChanged(ListEvent<String> listChanges) {
+
+            List<String> addWords = new ArrayList<String>();
+            List<String> removeWords = new ArrayList<String>();
+            
+            while (listChanges.next()) {
+                int sourceIndex = listChanges.getIndex();
+                int changeType = listChanges.getType();
+
+                switch (changeType) {
+                    case ListEvent.DELETE:
+                        removeWords.add(listChanges.getOldValue());
+                        break;
+                    case ListEvent.INSERT:
+                        addWords.add(download.getWords().get(sourceIndex));
+                        break;
+                    case ListEvent.UPDATE:
+
+                        break;
+                }
+            }
+            if (addWords.size() > 0) {
+                DAOFactory.getInstance().getWordDAO().addWords(download.getId(), addWords);
+            }
+            if (removeWords.size() > 0) {
+                DAOFactory.getInstance().getWordDAO().deleteWords(download.getId(), removeWords);
+            }
+        }
+    }
     private ObservableElementList<Download> downloads;
     private DownloadDAO dao;
     private List<String> saveProps;
     private boolean saveDelete;
     private Map<Download, MD5State> md5ValuesMap;
     private Map<Download, LinkState> linkStateValuesMap;
-    private Map<Download, String> wordStateValuesMap;
-    private Map<Download, Long> lastSaveTime;
+    private Map<Download, WordSaver> wordSavers;
+    private Map<Download, HrefLinkSaver> hrefSavers;
+    private Map<Download, SrcLinkSaver> srcSavers;
 
     public DownloadSaver(ObservableElementList<Download> downloads) {
         saveProps = new ArrayList<String>();
-        saveProps.add(Download.PROP_CONTENTTYPE);
-        saveProps.add(Download.PROP_DOWNLOADTIME);
+        saveProps.add(Download.PROP_URL);
+        saveProps.add(Download.PROP_SIZE);
         saveProps.add(Download.PROP_DOWNLOADED);
-        saveProps.add(Download.PROP_FILE);
-        saveProps.add(Download.PROP_FILEEXTENTION);
+        saveProps.add(Download.PROP_STATUS);
+        saveProps.add(Download.PROP_DOWNLOADTIME);
+        saveProps.add(Download.PROP_ATTEMPTS);
+        saveProps.add(Download.PROP_HOPS);
+        saveProps.add(Download.PROP_CONTENTTYPE);
         saveProps.add(Download.PROP_HOST);
+        saveProps.add(Download.PROP_PROTOCOL);
+        saveProps.add(Download.PROP_QUERY);
+        saveProps.add(Download.PROP_PATH);
+        saveProps.add(Download.PROP_FILE);
+        saveProps.add(Download.PROP_PROTOCOLFILENAME);
+        saveProps.add(Download.PROP_FILEEXTENTION);
+        saveProps.add(Download.PROP_MESSAGE);
+        saveProps.add(Download.PROP_RESPONSECODE);
         saveProps.add(Download.PROP_LOCATIONS);
         //saveProps.add(Download.PROP_MD5);
         //saveProps.add(Download.PROP_LINKSTATE);
         saveProps.add(Download.PROP_WORDBUFFER);
-        saveProps.add(Download.PROP_MESSAGE);
-        saveProps.add(Download.PROP_PATH);
-        saveProps.add(Download.PROP_PROTOCOL);
-        saveProps.add(Download.PROP_PROTOCOLFILENAME);
-        saveProps.add(Download.PROP_QUERY);
-        saveProps.add(Download.PROP_RESPONSECODE);
         saveProps.add(Download.PROP_SAVEPATH);
-        saveProps.add(Download.PROP_SIZE);
-        saveProps.add(Download.PROP_STATUS);
         saveProps.add(Download.PROP_TEMPPATH);
-        saveProps.add(Download.PROP_URL);
         this.downloads = downloads;
         dao = DAOFactory.getInstance().getDownloadDAO();
         saveDelete = true;
@@ -72,8 +196,10 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
         md5ValuesMap = new HashMap<Download, MD5State>();
         linkStateValuesMap = new HashMap<Download, LinkState>();
-        wordStateValuesMap = new HashMap<Download, String>();
-        lastSaveTime = new HashMap<Download, Long>();
+        
+        wordSavers = new HashMap<Download, WordSaver>();
+        hrefSavers = new HashMap<Download, HrefLinkSaver>();
+        srcSavers = new HashMap<Download, SrcLinkSaver>();
     }
 
     public boolean isSaveDelete() {
@@ -145,11 +271,23 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     d1.removePropertyChangeListener(this);
                     md5ValuesMap.remove(d1);
                     linkStateValuesMap.remove(d1);
-                    wordStateValuesMap.remove(d1);
 
                     if (saveDelete) {
                         dao.deleteDownload(d1.getId());
                     }
+
+
+                    WordSaver wordSaver = wordSavers.get(d1);
+                    d1.removeWordsListener(wordSaver);
+                    wordSavers.remove(d1);
+
+                    HrefLinkSaver hrefSaver = hrefSavers.get(d1);
+                    d1.removeWordsListener(hrefSaver);
+                    hrefSavers.remove(d1);
+
+                    SrcLinkSaver srcSaver = srcSavers.get(d1);
+                    d1.removeWordsListener(srcSaver);
+                    srcSavers.remove(d1);
                     break;
                 case ListEvent.INSERT:
                     changeList.getReadWriteLock().readLock().lock();
@@ -158,6 +296,10 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
                     d2.addPropertyChangeListener(this);
                     dao.insertDownload(d2);
+
+                    wordSavers.put(d2, new WordSaver(d2));
+                    hrefSavers.put(d2, new HrefLinkSaver(d2));
+                    srcSavers.put(d2, new SrcLinkSaver(d2));
                     break;
                 case ListEvent.UPDATE:
 
@@ -178,12 +320,13 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
         if (saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
-        } else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
-            dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.SRC);
-        } else if (evt.getPropertyName().equals(Download.PROP_HREFLINKS)) {
-            dao.saveLink(d.getId(), (String) evt.getNewValue(), Download.HREF);
-        } else if (evt.getPropertyName().equals(Download.PROP_WORDS)) {
-            dao.saveWord(d.getId(), (String) evt.getNewValue());
-        }
+        } 
+//        else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
+//            DAOFactory.getInstance().getLinkDAO().addLink(d.getId(), (String) evt.getNewValue(), Download.SRC);
+//        } else if (evt.getPropertyName().equals(Download.PROP_HREFLINKS)) {
+//            DAOFactory.getInstance().getLinkDAO().addLink(d.getId(), (String) evt.getNewValue(), Download.HREF);
+//        } else if (evt.getPropertyName().equals(Download.PROP_WORDS)) {
+//            DAOFactory.getInstance().getWordDAO().addWord(d.getId(), (String) evt.getNewValue());
+//        }
     }
 }
