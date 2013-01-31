@@ -31,7 +31,7 @@ public class JavaDBDataSource {
     private String user = "downloaduser";
     private String password = "downloadpassword";
     private String dbName = "downloads";
-    public static final List<String> saveProps;
+    static final List<String> saveProps;
     static {
         List<String> l = new ArrayList<String>();
         l.add(Download.PROP_ID);
