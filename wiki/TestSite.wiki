@@ -1,3 +1,15 @@
-The DownloadManagerTestSite is a webapp that can be used to test the DownloadManager with http.
+The DownloadManagerTestSite is a webapp that can be used to test the DownloadManager with http and generate urls for http and ftp.
 
-It also generates urls for anonymous ftp on the same server.
+To setup the project put downloads into the download folder and and run the webapp. Open index.jsp. This will list both http and ftp urls in two sections.
+
+The first section is urls whose file is smaller than 500k. The second section is urls that are larger than 500k.
+
+To setup ftp install an ftp server. I used proftpd. Anonymous access must be allowed. Add the same files that are in the downloads folder in the webapp to DownloadManagerTestSite/downloads in the ftp server.
+
+You can edit the index.jsp to match your setup.
+
+Example urls:
+http://localhost:8084/DownloadManagerTestSite/downloads/OldJohnMercier/LOG.TXT
+ftp://anonymous@localhost/DownloadManagerTestSite/downloads/OldJohnMercier/LOG.TXT
+
+Now you can save the two lists into a file and add them to DownloadManager through the add button.
