@@ -1,0 +1,3 @@
+The DownloadManagerTestSite is a webapp that can be used to test the DownloadManager with http.
+
+It also generates urls for anonymous ftp on the same server.
