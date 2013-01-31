@@ -233,6 +233,8 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
 
         jScrollPane4.setBorder(javax.swing.BorderFactory.createTitledBorder("Locations"));
 
+        jList4.setModel(downloadData.getLocationsModel());
+
         org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create("${locations}");
         org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, downloadData, eLProperty, jList4);
         bindingGroup.addBinding(jListBinding);
@@ -352,13 +354,13 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jList1.setBorder(javax.swing.BorderFactory.createTitledBorder("src links"));
-        jList1.setModel(new EventListModel<String>(downloadData.getSrcLinks()));
+        jList1.setModel(downloadData.getSrcLinksModel());
         jScrollPane1.setViewportView(jList1);
 
         jSplitPane1.setTopComponent(jScrollPane1);
 
         jList2.setBorder(javax.swing.BorderFactory.createTitledBorder("href links"));
-        jList2.setModel(new EventListModel<String>(downloadData.getHrefLinks()));
+        jList2.setModel(downloadData.getHrefLinksModel());
         jScrollPane2.setViewportView(jList2);
 
         jSplitPane1.setRightComponent(jScrollPane2);
@@ -384,7 +386,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
 
         jScrollPane3.setBorder(javax.swing.BorderFactory.createTitledBorder("words"));
 
-        jList3.setModel(new EventListModel<String>(d.getWords()));
+        jList3.setModel(d.getWordsModel());
         jScrollPane3.setViewportView(jList3);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);

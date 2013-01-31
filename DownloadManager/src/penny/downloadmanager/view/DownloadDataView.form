@@ -413,6 +413,11 @@
               <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
               <SubComponents>
                 <Component class="javax.swing.JList" name="jList4">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="downloadData.getLocationsModel()" type="code"/>
+                    </Property>
+                  </Properties>
                   <BindingProperties>
                     <BindingProperty name="elements" source="downloadData" sourcePath="${locations}" target="jList4" targetPath="elements" updateStrategy="0" immediately="false"/>
                   </BindingProperties>
@@ -478,7 +483,7 @@
                           </Border>
                         </Property>
                         <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="new EventListModel&lt;String&gt;(downloadData.getSrcLinks())" type="code"/>
+                          <Connection code="downloadData.getSrcLinksModel()" type="code"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -504,7 +509,7 @@
                           </Border>
                         </Property>
                         <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="new EventListModel&lt;String&gt;(downloadData.getHrefLinks())" type="code"/>
+                          <Connection code="downloadData.getHrefLinksModel()" type="code"/>
                         </Property>
                       </Properties>
                     </Component>
@@ -561,7 +566,7 @@
                 <Component class="javax.swing.JList" name="jList3">
                   <Properties>
                     <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                      <Connection code="new EventListModel&lt;String&gt;(d.getWords())" type="code"/>
+                      <Connection code="d.getWordsModel()" type="code"/>
                     </Property>
                   </Properties>
                 </Component>
