@@ -69,6 +69,9 @@ public class WordParser implements WordEater {
     }
     
     public void complete() {
+        //Push last word with -1. Issue 90!
+        wordExtractor.put(new byte[1], 0, -1);
+        download.setWordBuffer("");
         pushWordsToDownload();
     }
     
