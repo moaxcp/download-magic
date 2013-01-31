@@ -31,7 +31,11 @@ public class WordExtractor {
     }
 
     public void put(byte[] b, int off, int len) {
-        for (int i = off; i < off + len; i++) {
+        if(len == -1) {
+            eater.eatWord(word.toString());
+            word.setLength(0);
+        }
+        for (int i = off; i < len; i++) {
             put((char) b[i]);
         }
     }
