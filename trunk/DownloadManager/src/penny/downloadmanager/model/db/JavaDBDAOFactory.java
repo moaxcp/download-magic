@@ -9,15 +9,6 @@
 
 package penny.downloadmanager.model.db;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author John
@@ -26,5 +17,20 @@ public class JavaDBDAOFactory extends DAOFactory {
     @Override
     public DownloadDAO getDownloadDAO() {
         return new JavaDBDownloadDAO();
+    }
+
+    @Override
+    public WordDAO getWordDAO() {
+        return new JavaDBWordDAO();
+    }
+
+    @Override
+    public LinkDAO getLinkDAO() {
+        return new JavaDBLinkDAO();
+    }
+
+    @Override
+    public PropertyDAO getPropertyDAO() {
+        return new JavaDBPropertyDAO();
     }
 }

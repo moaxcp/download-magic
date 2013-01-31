@@ -23,6 +23,9 @@ public abstract class DAOFactory {
     private static JavaDBDAOFactory javaFactory;
     
     public abstract DownloadDAO getDownloadDAO();
+    public abstract WordDAO getWordDAO();
+    public abstract LinkDAO getLinkDAO();
+    public abstract PropertyDAO getPropertyDAO();
     
     public static DAOFactory getInstance() {
         switch(db) {

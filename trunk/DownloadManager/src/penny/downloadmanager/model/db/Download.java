@@ -7,6 +7,10 @@ package penny.downloadmanager.model.db;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.GlazedLists;
+import ca.odell.glazedlists.event.ListEvent;
+import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.swing.EventListModel;
 import java.net.URL;
 import java.util.*;
 import penny.download.AbstractDownload;
@@ -97,16 +101,56 @@ public class Download extends AbstractDownload implements Comparable<Download> {
     public Download(UUID id) {
         super();
         this.id = id;
-        hrefLinks = new BasicEventList<String>();
-        srcLinks = new BasicEventList<String>();
-        words = new BasicEventList<String>();
-        locations = new BasicEventList<URL>();
+        hrefLinks = GlazedLists.threadSafeList(new BasicEventList<String>());
+        srcLinks = GlazedLists.threadSafeList(new BasicEventList<String>());
+        words = GlazedLists.threadSafeList(new BasicEventList<String>());
+        locations = GlazedLists.threadSafeList(new BasicEventList<URL>());
         md5 = new MD5State();
         linkState = new LinkState();
         wordBuffer = "";
         savePath = "";
         tempPath = "";
         extraProps = new HashMap<String, Object>();
+        
+        hrefLinks.addListEventListener(new ListEventListener<String>() {
+
+            @Override
+            public void listChanged(ListEvent<String> listChanges) {
+                while(listChanges.next()) {
+                    propertySupport.fireIndexedPropertyChange(PROP_HREFLINKS, listChanges.getIndex(), listChanges.getOldValue(), listChanges.getNewValue());
+                }
+            }
+        });
+        
+        srcLinks.addListEventListener(new ListEventListener<String>() {
+
+            @Override
+            public void listChanged(ListEvent<String> listChanges) {
+                while(listChanges.next()) {
+                    propertySupport.fireIndexedPropertyChange(PROP_SRCLINKS, listChanges.getIndex(), listChanges.getOldValue(), listChanges.getNewValue());
+                }
+            }
+        });
+        
+        words.addListEventListener(new ListEventListener<String>() {
+
+            @Override
+            public void listChanged(ListEvent<String> listChanges) {
+                while(listChanges.next()) {
+                    propertySupport.fireIndexedPropertyChange(PROP_WORDS, listChanges.getIndex(), listChanges.getOldValue(), listChanges.getNewValue());
+                }
+            }
+        });
+        
+        ((EventList<URL>)locations).addListEventListener(new ListEventListener<URL>() {
+
+            @Override
+            public void listChanged(ListEvent<URL> listChanges) {
+                while(listChanges.next()) {
+                    propertySupport.fireIndexedPropertyChange(PROP_LOCATIONS, listChanges.getIndex(), listChanges.getOldValue(), listChanges.getNewValue());
+                }
+            }
+        });
     }
     
     public UUID getId() {
@@ -196,77 +240,156 @@ public class Download extends AbstractDownload implements Comparable<Download> {
     /**
      * @return the hrefLinks
      */
-    public EventList<String> getHrefLinks() {
-        return hrefLinks;
+    public List<String> getHrefLinks() {
+        return Collections.unmodifiableList(hrefLinks);
+    }
+    
+    public EventListModel<String> getHrefLinksModel() {
+        return new EventListModel(hrefLinks);
+    }
+    
+    public void clearHrefLinks() {
+        hrefLinks.clear();
+    }
+    
+    public void addHrefLinksListener(ListEventListener<String> listener) {
+        hrefLinks.addListEventListener(listener);
+    }
+    
+    public void removeHrefLinksListener(ListEventListener<String> listener) {
+        hrefLinks.removeListEventListener(listener);
     }
 
-    public void setHrefLinks(EventList<String> list) {
-        //TODO may need to fire property change event for clearing list
+    public void setHrefLinks(List<String> list) {
+        hrefLinks.getReadWriteLock().writeLock().lock();
         hrefLinks.clear();
-        for(String s : list) {
-            addHrefLink(s);
-        }
+        hrefLinks.addAll(list);
+        hrefLinks.getReadWriteLock().writeLock().unlock();
     }
 
     /**
      * @param hrefLinks the hrefLinks to set
      */
     public void addHrefLink(String hrefLink) {
-        int i = hrefLinks.size();
         hrefLinks.add(hrefLink);
-        propertySupport.fireIndexedPropertyChange(PROP_HREFLINKS, i, null, hrefLink);
+    }
+
+    public void addHrefLinks(List<String> list) {
+        hrefLinks.addAll(list);
     }
 
     /**
      * @return the srcLinks
      */
-    public EventList<String> getSrcLinks() {
-        return srcLinks;
+    public List<String> getSrcLinks() {
+        return Collections.unmodifiableList(srcLinks);
+    }
+    
+    public EventListModel<String> getSrcLinksModel() {
+        return new EventListModel<String>(srcLinks);
+    }
+    
+    public void clearSrcLinks() {
+        srcLinks.clear();
+    }
+    
+    public void addSrcLinksListener(ListEventListener<String> listener) {
+        srcLinks.addListEventListener(listener);
+    }
+    
+    public void removeSrcLinksListener(ListEventListener<String> listener) {
+        srcLinks.removeListEventListener(listener);
     }
 
-    public void setSrcLinks(EventList<String> list) {
-        //TODO may need to fire property change event for clearing list
+    public void setSrcLinks(List<String> list) {
+        srcLinks.getReadWriteLock().writeLock().lock();
         srcLinks.clear();
-        for(String s : list) {
-            addSrcLink(s);
-        }
+        srcLinks.addAll(list);
+        srcLinks.getReadWriteLock().writeLock().unlock();
     }
 
     /**
      * @param srcLinks the srcLinks to set
      */
     public void addSrcLink(String srcLink) {
-        int i = srcLinks.size();
         srcLinks.add(srcLink);
-        propertySupport.fireIndexedPropertyChange(PROP_SRCLINKS, i, null, srcLink);
     }
 
-    /**
-     * @return the srcLinks
-     */
-    public EventList<String> getWords() {
-        return words;
+    public void addSrcLinks(List<String> list) {
+        srcLinks.addAll(list);
+    }
+    
+    public List<String> getWords() {
+        return Collections.unmodifiableList(words);
+    }
+    
+    public EventListModel<String> getWordsModel() {
+        return new EventListModel<String>(words);
+    }
+    
+    public void clearWords() {
+        words.clear();
+    }
+    
+    public void addWordsListener(ListEventListener<String> listener) {
+        words.addListEventListener(listener);
+    }
+    
+    public void removeWordsListener(ListEventListener<String> listener) {
+        words.removeListEventListener(listener);
     }
 
-    public void setWords(EventList<String> list) {
-        //TODO may need to fire property change event for clearing list
+    public void setWords(List<String> list) {
         words.getReadWriteLock().writeLock().lock();
         words.clear();
-        for(String s : list) {
-            addWord(s);
-        }
+        words.addAll(list);
         words.getReadWriteLock().writeLock().unlock();
     }
-
-    /**
-     * @param srcLinks the srcLinks to set
-     */
+    
     public void addWord(String word) {
-        int i = words.size();
-        words.getReadWriteLock().writeLock().lock();
         words.add(word);
-        words.getReadWriteLock().writeLock().unlock();
-        propertySupport.fireIndexedPropertyChange(PROP_WORDS, i, null, word);
+    }
+    
+    public void addWords(List<String> list) {
+        words.addAll(list);
+    }
+    
+    @Override
+    public List<URL> getLocations() {
+        return Collections.unmodifiableList(locations);
+    }
+    
+    public EventListModel<URL> getLocationsModel() {
+        return new EventListModel<URL>((EventList<URL>)locations);
+    }
+    
+    public void clearLocations() {
+        locations.clear();
+    }
+    
+    public void addLocationsListener(ListEventListener<URL> listener) {
+        ((EventList<URL>) locations).addListEventListener(listener);
+    }
+    
+    public void removeLocationsListener(ListEventListener<URL> listener) {
+        ((EventList<URL>) locations).removeListEventListener(listener);
+    }
+
+    public void setLocations(List<URL> list) {
+        ((EventList<URL>)locations).getReadWriteLock().writeLock().lock();
+        ((EventList<URL>)locations).clear();
+        ((EventList<URL>)locations).addAll(list);
+        ((EventList<URL>)locations).getReadWriteLock().writeLock().unlock();
+    }
+    
+    @Override
+    public void addLocation(URL location) {
+        System.out.println("addLocation " + location);
+        locations.add(location);
+    }
+    
+    public void addLocations(List<URL> list) {
+        locations.addAll(list);
     }
 
     public Object getProperty(String key) {
