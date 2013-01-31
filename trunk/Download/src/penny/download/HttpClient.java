@@ -1,4 +1,4 @@
-/*
+ /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -98,8 +98,8 @@ class HttpClient extends ProtocolClient {
             if (response.getStatusLine().getStatusCode() / 100 == 3) {
                 Header[] headers = response.getHeaders("Location");
                 if (headers.length > 0 && headers[0] != null) {
+                    download.addLocation(download.getUrl());
                     download.setUrl(new URL(headers[0].getValue()));
-                    download.getLocations().add(download.getUrl());
                     download.setStatus(DownloadStatus.REDIRECTING);
                     httpget.abort();
                 } else {
