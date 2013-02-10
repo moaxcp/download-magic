@@ -5,7 +5,6 @@
 package penny.download;
 
 import it.unimi.dsi.fastutil.bytes.ByteArrayList;
-import it.unimi.dsi.fastutil.bytes.ByteList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -193,6 +192,7 @@ public class Downloader {
                         client.connect();
                         if (client.isDataRestarting()) {
                             processor.onReset();
+                            download.setDownloaded(0);
                         }
 
                         if (download.getStatus() == DownloadStatus.REDIRECTING) {

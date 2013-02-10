@@ -119,7 +119,7 @@ class HttpClient extends ProtocolClient {
                 if (h.getName().equals("Content-Type") && h.getValue() != null) {
                     download.setContentType(h.getValue());
                 }
-                if (h.getName().equals("Content-Length") && h.getValue() != null) {
+                if (h.getName().equals("Content-Length") && h.getValue() != null && !(download.getSize() > 0)) {
                     download.setSize(Long.valueOf(h.getValue()));
                 }
                 if (h.getName().equals("Content-Range")) {

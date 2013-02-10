@@ -47,7 +47,7 @@ class FtpClient extends ProtocolClient {
 
             if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
                 client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
                 download.setStatus(DownloadStatus.ERROR, "failed to connect " + client.getReplyString());
                 return;
             }
@@ -67,7 +67,7 @@ class FtpClient extends ProtocolClient {
             if (!client.login(user, password)) {
                 client.logout();
                 client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
                 download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
                 return;
             }
@@ -75,30 +75,36 @@ class FtpClient extends ProtocolClient {
 
             if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
                 client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "download()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
                 download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
                 return;
             }
-            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "download()", "Login successful " + client.getReplyString());
+            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Login successful " + client.getReplyString());
+            
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            download.setResponseCode(client.getReplyCode());
+            download.setMessage(client.getReplyString());
+            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Binary Mode response: " + download.getMessage());
 
             FTPFile file = client.mlistFile(download.getUrl().getPath());
             download.setResponseCode(client.getReplyCode());
 
-            if (file != null) {
+            if (file != null && download.getSize() < 0) {
                 download.setSize(file.getSize());
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "download()", "File size reply " + client.getReplyString());
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "File size reply " + client.getReplyString());
             }
 
-            client.doCommand("REST", Long.toString(download.getDownloaded()));
-            download.setResponseCode(client.getReplyCode());
-            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "download()", "FTP Offset is " + client.getRestartOffset() + " " + client.getReplyString());
-
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
-                restart = true;
+            if (download.getDownloaded() > 0) {
+                client.doCommand("REST", Long.toString(download.getDownloaded()));
+                download.setResponseCode(client.getReplyCode());
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "FTP Offset: " + " " + client.getReplyString());
+                if (client.getReplyCode() != 350) {
+                    restart = true;
+                    Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Restarting download from 0");
+                }
             }
-            client.setFileType(FTP.BINARY_FILE_TYPE);
-            download.setResponseCode(client.getReplyCode());
-            download.setMessage(client.getReplyString());
+
+            //client.doCommand("bin", null);
             content = client.retrieveFileStream(download.getUrl().getPath());
             download.setResponseCode(client.getReplyCode());
             if (content == null) {
