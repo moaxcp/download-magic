@@ -57,7 +57,7 @@ public class Application {
                     System.out.println("saved tasks");
                 } catch (Exception ex) {
                     System.out.println("could not save tasks");
-                    System.out.println(ex);
+                    ex.printStackTrace();
                 }
 
                 try {
@@ -65,7 +65,7 @@ public class Application {
                     System.out.println("saved downloads");
                 } catch (Exception ex) {
                     System.out.println("could not save downloads");
-                    System.out.println(ex);
+                    ex.printStackTrace();
                 }
                 
                 try {
