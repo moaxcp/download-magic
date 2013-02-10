@@ -23,13 +23,13 @@ public class WordExtractor {
         if (Character.isLetter(c) || c == '\'') {
             word.append(c);
         } else {
-            if(word.length() > 0) {
-                if(word.charAt(0) == '\'') {
-                    word.deleteCharAt(0);
-                }
-                if(word.charAt(word.length() - 1) == '\'') {
-                    word.deleteCharAt(word.length() - 1);
-                }
+            if (word.length() > 0 && word.charAt(0) == '\'') {
+                word.deleteCharAt(0);
+            }
+            if (word.length() > 0 && word.charAt(word.length() - 1) == '\'') {
+                word.deleteCharAt(word.length() - 1);
+            }
+            if (word.length() > 0) {
                 eater.eatWord(word.toString());
                 word.setLength(0);
             }
@@ -37,7 +37,7 @@ public class WordExtractor {
     }
 
     public void put(byte[] b, int off, int len) {
-        if(len == -1) {
+        if (len == -1) {
             eater.eatWord(word.toString());
             word.setLength(0);
         }
