@@ -455,8 +455,8 @@ public abstract class AbstractDownload {
                 }
                 break;
             case ERROR:
-                if (!(oldValue == DownloadStatus.INITIALIZING || oldValue == DownloadStatus.CONNECTING || oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.FINALIZING)) {
-                    throw new IllegalStateException("Download status must be INITIALIZING, CONNECTING, DOWNLOADING, or FINALIZING before setting to ERROR. status=" + oldValue);
+                if (!(oldValue == DownloadStatus.INITIALIZING || oldValue == DownloadStatus.CONNECTING || oldValue == DownloadStatus.DOWNLOADING || oldValue == DownloadStatus.FINALIZING || oldValue == DownloadStatus.STOPPING)) {
+                    throw new IllegalStateException("Download status must be STOPPING, INITIALIZING, CONNECTING, DOWNLOADING, or FINALIZING before setting to ERROR. status=" + oldValue);
                 }
                 break;
             case RETRYING:
