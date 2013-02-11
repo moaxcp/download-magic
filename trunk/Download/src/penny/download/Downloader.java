@@ -76,14 +76,15 @@ public class Downloader {
             int accelerateOn = 10;
             bufferWatch.start();
             read = in.read(inputBuffer);
+            d.initDownloadTime();
             while (read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING) {
-                assert(multiplier > 0);
+                assert (multiplier > 0);
                 for (int i = 0; i < multiplier && read != -1 && d.getStatus() == DownloadStatus.DOWNLOADING; i++) {
                     chunk.addElements(chunk.size(), inputBuffer, 0, read);
                     read = in.read(inputBuffer);
                 }
                 d.updateDownloadTime();
-                if(chunk.size() > outputBuffer.length) {
+                if (chunk.size() > outputBuffer.length) {
                     outputBuffer = new byte[chunk.size()];
                 }
                 processor.doChunck(chunk.size(), chunk.toByteArray(outputBuffer));
@@ -169,23 +170,23 @@ public class Downloader {
 
             download.setStatus(DownloadStatus.INITIALIZING);
             download.setAttempts(a);
-            download.initDownloadTime();
 
             processor.onInit(download);
 
             if (download.getSize() > 0 ? download.getDownloaded() < download.getSize() : true) {
-                ProtocolClient client = getClient(download);
-                client.setDownload(download);
 
                 for (int h = 0; h < dSettings.getMaxHops(); h++) {
-                    try {
-                        if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
-                            if (download.getStatus() == DownloadStatus.STOPPING) {
-                                download.setStatus(DownloadStatus.STOPPED);
-                                return;
-                            }
-                            break;
+                    if (download.getStatus() != DownloadStatus.INITIALIZING && download.getStatus() != DownloadStatus.REDIRECTING) {
+                        if (download.getStatus() == DownloadStatus.STOPPING) {
+                            download.setStatus(DownloadStatus.STOPPED);
+                            return;
                         }
+                        break;
+                    }
+                    ProtocolClient client = getClient(download);
+                    client.setDownload(download);
+
+                    try {
                         download.setStatus(DownloadStatus.CONNECTING);
 
                         download.setHops(h);
@@ -193,6 +194,7 @@ public class Downloader {
                         if (client.isDataRestarting()) {
                             processor.onReset();
                             download.setDownloaded(0);
+                            download.setDownloadTime(0);
                         }
 
                         if (download.getStatus() == DownloadStatus.REDIRECTING) {
