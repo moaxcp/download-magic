@@ -71,10 +71,12 @@ public class Util {
         if (f != null) {
             if (f.isFile()) {
                 f.delete();
+                Logger.getLogger(Util.class.getName()).finer("deleted file " + f.getName());
                 remove(f.getParentFile());
             } else if (f.isDirectory()) {
                 if (f.listFiles().length == 0) {
                     f.delete();
+                    Logger.getLogger(Util.class.getName()).finer("deleted directory " + f.getName());
                     remove(f.getParentFile());
                 }
             }

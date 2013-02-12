@@ -46,6 +46,11 @@ public class Processor implements DownloadProcessor {
             linksParsed = Model.parseLinks(download);
             wordsParsed = Model.parseWords(download);
             saver = new FileSaver(download);
+            if(!saver.getTempFile().exists()) {
+                onReset();
+                download.setDownloaded(0);
+                download.setDownloadTime(0);
+            }
         } catch (URISyntaxException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(Processor.class.getName()).log(Level.SEVERE, null, ex);
