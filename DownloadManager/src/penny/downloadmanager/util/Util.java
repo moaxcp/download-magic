@@ -74,7 +74,7 @@ public class Util {
                 Logger.getLogger(Util.class.getName()).finer("deleted file " + f.getName());
                 remove(f.getParentFile());
             } else if (f.isDirectory()) {
-                if (f.listFiles().length == 0) {
+                if (f.listFiles().length == 0 && !f.equals(new File(Model.getApplicationSettings().getSavingModel().getSaveFolder())) && !f.equals(new File(Model.getApplicationSettings().getSavingModel().getTempFolder()))) {
                     f.delete();
                     Logger.getLogger(Util.class.getName()).finer("deleted directory " + f.getName());
                     remove(f.getParentFile());
