@@ -19,19 +19,23 @@ import java.util.regex.Pattern;
 public class Downloads {
 
     /**
-     * number of miliseconds in a second
+     * number of nanoseconds in a millisecond
      */
-    protected static final long second = 1000;
+    protected static final long millisecond = 1000000;
     /**
-     * number of miliseconds in a minute
+     * number of nanoseconds in a second
+     */
+    protected static final long second = 1000 * millisecond;
+    /**
+     * number of nanoseconds in a minute
      */
     protected static final long minute = 60 * second;
     /**
-     * number of miliseconds in a hour
+     * number of nanoseconds in a hour
      */
     protected static final long hour = 60 * minute;
     /**
-     * number of miliseconds in a day
+     * number of nanoseconds in a day
      */
     protected static final long day = 24 * hour;
 
@@ -66,7 +70,7 @@ public class Downloads {
      * @return the rate in seconds
      */
     public static String getRate(AbstractDownload d) {
-        return formatByteSize((long)(d.getDownloadTime() / (double)1000000000 == 0 ? 0 : d.getDownloaded() / (d.getDownloadTime() / (double)1000000000))) + "/s";
+        return formatByteSize((long)(d.getDownloadTime() == 0 ? 0 : (d.getDownloaded() / (double)d.getDownloadTime()) * (double)1000000000)) + "/s";
     }
 
     /**
@@ -77,30 +81,29 @@ public class Downloads {
      * @return String formatByteSize - A formatted size
      */
     public static String formatByteSize(long sz) {
-        float size = sz;
         String post = "B";
-        if (sz / 1024 > 0) {
+        if(sz < 10000) {
+            return String.format("%1$d %2$s", sz, post);
+        }
+        double size = sz;
+        if ((long)size / 1024 > 0) {
             size = size / 1024;
-            sz = (long) size;
             post = "KB";
         }
-        if (sz / 1024 > 0) {
+        if ((long)size / 1024 > 0) {
             size = size / 1024;
-            sz = (long) size;
             post = "MB";
         }
-        if (sz / 1024 > 0) {
+        if ((long)size / 1024 > 0) {
             size = size / 1024;
-            sz = (long) size;
             post = "GB";
         }
-        if (sz / 1024 > 0) {
+        if ((long)size / 1024 > 0) {
             size = size / 1024;
-            //sz = (long)size;
             post = "TB";
         }
-
-        return String.format("%1$.2f", size) + post;
+        int digits = Long.toString((long) size).length();
+        return String.format("%1$." + (4 - digits) + "f %2$s", size, post);
     }
 
     /**
@@ -183,95 +186,21 @@ public class Downloads {
      * @param time The time in milliseconds.
      * @return The formatted string.
      */
-    public static String formatMilliTime(long timeMilli) {
-        long days = (timeMilli / (1000 * 60 * 60 * 24));
-        long hours = (timeMilli / (1000 * 60 * 60)) % 24;
-        long minutes = (timeMilli / (1000 * 60)) % 60;
-        long seconds = (timeMilli / 1000) % 60;
-        String sdays = (days == 0 ? "00:" : ((days < 10 ? "0" + days : days) + ":"));
-        String shours = (hours == 0 || hours >= 24 ? "00:" : (hours < 10 ? "0" + hours : hours) + ":");
-        String sminutes = (minutes == 0 || minutes >= 60 ? "00:" : (minutes < 10 ? "0" + minutes : minutes) + ":");
-        String sseconds = seconds < 10 ? "0" + seconds : seconds + "";
-        String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : "";
-        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + sseconds + " " + postfix;
-    }
-
-    /**
-     * Formats a time in milliseconds to a 00:00:00:00:000 unit format.
-     * @param time The time in milliseconds.
-     * @return The formatted string.
-     */
-    public static String formatMilliTimeMilli(long timeMilli) {
-        long days = (timeMilli / (1000 * 60 * 60 * 24));
-        long hours = (timeMilli / (1000 * 60 * 60)) % 24;
-        long minutes = (timeMilli / (1000 * 60)) % 60;
-        long seconds = (timeMilli / 1000) % 60;
-        long milli = timeMilli % 1000;
-        String sdays = (days == 0 ? "00:" : ((days < 10 ? "0" + days : days) + ":"));
-        String shours = (hours == 0 || hours >= 24 ? "00:" : (hours < 10 ? "0" + hours : hours) + ":");
-        String sminutes = (minutes == 0 || minutes >= 60 ? "00:" : (minutes < 10 ? "0" + minutes : minutes) + ":");
-        String sseconds = (seconds == 0 || seconds >= 60 ? "00:" : (seconds < 10 ? "0" + seconds : seconds) + ":");
-        String smilli = milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli;
-        String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
-        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
-    }
-
-    /**
-     * Formats a time in nanoseconds to a 00:00:00:00 unit format.
-     * @param time The time in nanoseconds.
-     * @return The formatted string.
-     */
-    public static String formatNanoTime(long timeNano) {
-        long days = (timeNano / (1000 * 60 * 60 * 24));
-        long hours = (timeNano / (1000 * 60 * 60)) % 24;
-        long minutes = (timeNano / (1000 * 60)) % 60;
-        long seconds = (timeNano / 1000) % 60;
-        String sdays = (days == 0 ? "00:" : ((days < 10 ? "0" + days : days) + ":"));
-        String shours = (hours == 0 || hours >= 24 ? "00:" : (hours < 10 ? "0" + hours : hours) + ":");
-        String sminutes = (minutes == 0 || minutes >= 60 ? "00:" : (minutes < 10 ? "0" + minutes : minutes) + ":");
-        String sseconds = seconds < 10 ? "0" + seconds : seconds + "";
-        String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : "";
-        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + sseconds + " " + postfix;
-    }
-
-    /**
-     * Formats a time in nanoseconds to a 00:00:00:00:000 unit format.
-     * @param time The time in nanoseconds.
-     * @return The formatted string.
-     */
-    public static String formatNanoTimeMilli(long timeNano) {
-        long days = (timeNano / (1000 * 60 * 60 * 24));
-        long hours = (timeNano / (1000 * 60 * 60)) % 24;
-        long minutes = (timeNano / (1000 * 60)) % 60;
-        long seconds = (timeNano / 1000) % 60;
-        long milli = timeNano % 1000;
-        String sdays = (days == 0 ? "00:" : ((days < 10 ? "0" + days : days) + ":"));
-        String shours = (hours == 0 || hours >= 24 ? "00:" : (hours < 10 ? "0" + hours : hours) + ":");
-        String sminutes = (minutes == 0 || minutes >= 60 ? "00:" : (minutes < 10 ? "0" + minutes : minutes) + ":");
-        String sseconds = (seconds == 0 || seconds >= 60 ? "00:" : (seconds < 10 ? "0" + seconds : seconds) + ":");
-        String smilli = milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli;
-        String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
-        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
-    }
-
-    /**
-     * Formats a time in nanoseconds to a 00:00:00:00:000000000 unit format.
-     * @param time The time in nanoseconds.
-     * @return The formatted string.
-     */
-    public static String formatNanoTimeNano(long timeNano) {
-        long days = (timeNano / (1000 * 60 * 60 * 24));
-        long hours = (timeNano / (1000 * 60 * 60)) % 24;
-        long minutes = (timeNano / (1000 * 60)) % 60;
-        long seconds = (timeNano / 1000) % 60;
-        long milli = timeNano % 1000;
-        String sdays = (days == 0 ? "00:" : ((days < 10 ? "0" + days : days) + ":"));
-        String shours = (hours == 0 || hours >= 24 ? "00:" : (hours < 10 ? "0" + hours : hours) + ":");
-        String sminutes = (minutes == 0 || minutes >= 60 ? "00:" : (minutes < 10 ? "0" + minutes : minutes) + ":");
-        String sseconds = (seconds == 0 || seconds >= 60 ? "00:" : (seconds < 10 ? "0" + seconds : seconds) + ":");
-        String smilli = milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli;
-        String postfix = days >= 1 ? "day" : hours >= 1 ? "hour" : minutes >= 1 ? "min" : seconds >= 1 ? "sec" : milli >= 1 ? "milli" : "";
-        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + smilli + " " + postfix;
+    public static String formatNanoTime(long nanoseconds) {
+        long days = (nanoseconds / day);
+        long hours = (nanoseconds / hour) % 24;
+        long minutes = (nanoseconds / minute) % 60;
+        long seconds = (nanoseconds / second) % 60;
+        long milli = (nanoseconds / millisecond) % 1000;
+        long nano = nanoseconds % 1000000;
+        String sdays = (days < 10 ? "0" + days : ("" + days)) + ":";
+        String shours = (hours < 10 ? "0" + hours : ("" + hours)) + ":";
+        String sminutes = (minutes < 10 ? "0" + minutes : "" + minutes) + ":";
+        String sseconds = (seconds < 10 ? "0" + seconds : "" + seconds) + ":";
+        String smilli = (milli < 100 ? milli < 10 ? "00" + milli : "0" + milli : "" + milli);
+        String snano = nano < 100000 ? nano < 10000 ? nano < 1000 ? nano < 100 ? nano < 10 ? "00000" + nano : "0000" + nano : "000" + nano : "00" + nano : "0" + nano : "" + nano;
+        String postfix = days >= 1 ? "day" : hours >= 1 ? "hr" : minutes >= 1 ? "mn" : seconds >= 1 ? "s" : milli >= 1 ? "ms" : nano >= 1 ? "ns" : "";
+        return (days == 0 ? "" : sdays) + (days == 0 && hours == 0 ? "" : shours) + (days == 0 && hours == 0 && minutes == 0 ? "" : sminutes) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 ? "" : sseconds) + (days == 0 && hours == 0 && minutes == 0 && seconds == 0 && milli == 0 ? "" : smilli) + (milli == 0 ? snano : "") + " " + postfix;
     }
     
     public static void setStatus(AbstractDownload d, DownloadStatus s) {
