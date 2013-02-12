@@ -4,14 +4,13 @@
  */
 package penny.downloadmanager.model;
 
-import penny.downloadmanager.model.db.Download;
 import ca.odell.glazedlists.gui.AdvancedTableFormat;
-import penny.download.DownloadStatus;
-import penny.download.Downloads;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.swing.JProgressBar;
+import penny.download.Downloads;
+import penny.downloadmanager.model.db.Download;
 
 /**
  *
@@ -73,9 +72,9 @@ public class DownloadTableFormat implements AdvancedTableFormat<Download> {
     public Object getColumnValue(Download download, int column) {
         String name = getColumnName(column);
         if(name.equals(PROP_TIMELEFT)) {
-            long rate = (download.getDownloadTime() / 1000000 == 0 ? 0 : download.getDownloaded() / (download.getDownloadTime() / 1000000));
-            long time = rate == 0 ? 0 : (download.getSize() - download.getDownloaded()) / rate;
-            return Downloads.formatMilliTimeMilli(time);
+            double rate = (download.getDownloadTime() == 0 ? 0 : download.getDownloaded() / (double) download.getDownloadTime());
+            long time = (long) (rate == 0 ? 0 : (download.getSize() - download.getDownloaded()) / rate);
+            return Downloads.formatNanoTime(time);
         }
         if (name.equals(PROP_PROGRESS)) {
             if (download.getSize() >= 0) {
@@ -94,10 +93,10 @@ public class DownloadTableFormat implements AdvancedTableFormat<Download> {
             return Downloads.formatByteSize(download.getSize());
         }
         if (name.equals(Download.PROP_DOWNLOADTIME)) {
-            return Downloads.formatMilliTimeMilli(download.getDownloadTime() / 1000000);
+            return Downloads.formatNanoTime(download.getDownloadTime());
         }
         if (name.equals(Download.PROP_RETRYTIME)) {
-            return Downloads.formatMilliTimeMilli(download.getRetryTime() / 1000000);
+            return Downloads.formatNanoTime(download.getRetryTime());
         }
         if(name.equals(Download.PROP_HREFLINKS)) {
             return download.getHrefLinks().size();

@@ -15,7 +15,6 @@ import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.ObservableElementList;
 import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -535,9 +534,9 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
         } else if (key.equals(Download.PROP_SIZE)) {
             return Downloads.formatByteSize(d.getSize());
         } else if (key.equals(Download.PROP_DOWNLOADTIME)) {
-            return Downloads.formatMilliTimeMilli(d.getDownloadTime() / 1000000);
+            return Downloads.formatNanoTime(d.getDownloadTime());
         } else if (key.equals(Download.PROP_RETRYTIME)) {
-            return Downloads.formatMilliTimeMilli(d.getRetryTime() / 1000000);
+            return Downloads.formatNanoTime(d.getRetryTime());
         }
 
         return d.getProperty(key).toString();

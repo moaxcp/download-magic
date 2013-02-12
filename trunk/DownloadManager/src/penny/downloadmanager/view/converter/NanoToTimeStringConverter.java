@@ -18,7 +18,7 @@ public class NanoToTimeStringConverter extends Converter<Long, String> {
 
     @Override
     public String convertForward(Long s) {
-            return Downloads.formatMilliTimeMilli(s / 1000000);
+            return Downloads.formatNanoTime(s);
     }
 
     @Override
