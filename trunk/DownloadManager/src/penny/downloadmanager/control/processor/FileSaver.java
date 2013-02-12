@@ -31,6 +31,13 @@ public class FileSaver {
     private File temp;
     private Download download;
 
+    public FileSaver(Download download) {
+        this.download = download;
+        this.savingModel = Model.getApplicationSettings().getSavingModel();
+        initFiles();
+        download.setDownloaded(temp.length());
+    }
+
     public File getSaveFile() {
         return save;
     }
@@ -48,6 +55,9 @@ public class FileSaver {
             File delete = new File(file.getPath());
             file.renameTo(newFile);
             Util.remove(delete.getParentFile());
+        } else if(file.getParentFile() != null && file.getParentFile().exists() && !file.equals(newFile)) {
+            Util.remove(file.getParentFile());
+            newFile.getParentFile().mkdirs();
         } else {
             newFile.getParentFile().mkdirs();
         }
@@ -69,9 +79,8 @@ public class FileSaver {
                     break;
                 case COMPLETE:
                     //move save to temp and resume download from there.
-                    Util.remove(temp);
+                    temp.delete();
                     File file = new File(save.getPath());
-                    temp.getParentFile().mkdirs();
                     file.renameTo(temp);
                     Util.remove(save.getParentFile());
                     Logger.getLogger(Processor.class.getName()).log(Level.FINE, "Continuing with save file {0}", save);
@@ -89,13 +98,10 @@ public class FileSaver {
                     break;
             }
         }
-    }
-
-    public FileSaver(Download download) {
-        this.download = download;
-        this.savingModel = Model.getApplicationSettings().getSavingModel();
-        initFiles();
-        download.setDownloaded(temp.length());
+        
+        if(save.getParentFile().exists()) {
+            Util.remove(save.getParentFile());
+        }
     }
 
     private void closeFile() throws IOException {
@@ -120,6 +126,9 @@ public class FileSaver {
         download.setTempPath(Util.getTempFile(download));
         save = setupCorrectFile(download.getSavePath(), Util.getSaveFile(download));
         download.setSavePath(Util.getSaveFile(download));
+        if(save.getParentFile().exists()) {
+            Util.remove(save.getParentFile());
+        }
         out = new FileOutputStream(temp, true);
     }
 
@@ -151,7 +160,6 @@ public class FileSaver {
         download.setSavePath(Util.getSaveFile(download));
         
         if (Model.save(download)) {
-            save.getParentFile().mkdirs();
             temp.renameTo(save);
             Util.remove(temp.getParentFile());
             if (temp.exists()) {
