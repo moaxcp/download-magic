@@ -29,7 +29,7 @@ public class DownloadTask extends Task {
 
     @Override
     public void run() {
-        
+        data.init();
         data.setStatus(Status.RUNNING);
         Downloader downloader = new Downloader(settings.getDownloadingModel().getDownloadSettings());
         downloader.setProcessor(processor);

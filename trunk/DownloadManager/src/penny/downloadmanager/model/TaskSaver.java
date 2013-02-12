@@ -11,8 +11,14 @@ import ca.odell.glazedlists.event.ListEventListener;
 import penny.downloadmanager.model.task.TaskData;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +41,7 @@ public class TaskSaver implements ListEventListener<TaskData>, PropertyChangeLis
         }
     }
 
-    public void saveList() {
+    public void saveList() throws IOException {
         ArrayList<TaskData> saveList = new ArrayList<TaskData>();
         try {
             tasks.getReadWriteLock().readLock().lock();
@@ -46,7 +52,20 @@ public class TaskSaver implements ListEventListener<TaskData>, PropertyChangeLis
             tasks.getReadWriteLock().readLock().unlock();
         }
 
-        ObjectOutputStream out;
+        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("data/tasks.dat"));
+        //out.writeObject(saveList);
+        out.close();
+    }
+    
+    public void loadList() throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream("data/tasks.dat"));
+        //ArrayList<TaskData> list = (ArrayList<TaskData>) in.readObject();
+        in.close();
+//        tasks.getReadWriteLock().writeLock().lock();
+//        for(TaskData t : list) {
+//            tasks.add(t);
+//        }
+//        tasks.getReadWriteLock().writeLock().unlock();
     }
 
     @Override
@@ -55,33 +74,41 @@ public class TaskSaver implements ListEventListener<TaskData>, PropertyChangeLis
         EventList changeList = listChanges.getSourceList();
 
         while (listChanges.next()) {
-            int sourceIndex = listChanges.getIndex();
-            int changeType = listChanges.getType();
+            try {
+                int sourceIndex = listChanges.getIndex();
+                int changeType = listChanges.getType();
 
-            switch (changeType) {
-                case ListEvent.DELETE:
-                    changeList.getReadWriteLock().readLock().lock();
-                    TaskData t1 = (TaskData) listChanges.getOldValue();
-                    changeList.getReadWriteLock().readLock().unlock();
-                    t1.removePropertyChangeListener(this);
-                    saveList();
-                    break;
-                case ListEvent.INSERT:
-                    changeList.getReadWriteLock().readLock().lock();
-                    TaskData t2 = (TaskData) changeList.get(sourceIndex);
-                    changeList.getReadWriteLock().readLock().unlock();
-                    t2.addPropertyChangeListener(this);
-                    saveList();
-                    break;
-                case ListEvent.UPDATE:
+                switch (changeType) {
+                    case ListEvent.DELETE:
+                        changeList.getReadWriteLock().readLock().lock();
+                        TaskData t1 = (TaskData) listChanges.getOldValue();
+                        changeList.getReadWriteLock().readLock().unlock();
+                        t1.removePropertyChangeListener(this);
+                        saveList();
+                        break;
+                    case ListEvent.INSERT:
+                        changeList.getReadWriteLock().readLock().lock();
+                        TaskData t2 = (TaskData) changeList.get(sourceIndex);
+                        changeList.getReadWriteLock().readLock().unlock();
+                        t2.addPropertyChangeListener(this);
+                        saveList();
+                        break;
+                    case ListEvent.UPDATE:
 
-                    break;
+                        break;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(TaskSaver.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        saveList();
+        try {
+            saveList();
+        } catch (IOException ex) {
+            Logger.getLogger(TaskSaver.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

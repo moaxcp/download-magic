@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import penny.downloadmanager.model.Model;
 
 /**
  *
@@ -20,24 +21,32 @@ import java.util.List;
 public class DTaskData extends TaskData {
 
     public static final String PROP_DOWNLOAD = "download";
-    private Download download;
-
-
-    private EventList<Download> downloads;
+    private transient Download download;
     
     public static final String PROP_COMPLETE = "complete";
-    private List<Download> complete;
+    private transient int complete;
 
-    public DTaskData(EventList<Download> downloads) {
-        this.downloads = downloads;
+    public DTaskData() {
         this.name = "Download Task";
         this.status = Status.QUEUED;
-        complete = new ArrayList<Download>();
-        for(Download d : downloads) {
+        complete = 0;
+        for(Download d : Model.getDownloads()) {
             if(d.getStatus() != DownloadStatus.QUEUED) {
-                addComplete(d);
+                complete++;
             }
         }
+    }
+    
+    public void init() {
+        this.status = Status.QUEUED;
+        int oldValue = complete;
+        complete = 0;
+        for(Download d : Model.getDownloads()) {
+            if(d.getStatus() != DownloadStatus.QUEUED) {
+                complete++;
+            }
+        }
+        propertySupport.firePropertyChange(PROP_COMPLETE, oldValue, complete);
     }
 
     /**
@@ -45,9 +54,9 @@ public class DTaskData extends TaskData {
      */
     public void setStatus(Status status) {
         if(download != null && status == Status.STOPPED) {
-            downloads.getReadWriteLock().writeLock().lock();
+            Model.getDownloads().getReadWriteLock().writeLock().lock();
             download.stop();
-            downloads.getReadWriteLock().writeLock().unlock();
+            Model.getDownloads().getReadWriteLock().writeLock().unlock();
         }
         Status oldValue = getStatus();
         this.status = status;
@@ -55,14 +64,14 @@ public class DTaskData extends TaskData {
     }
 
     public Download getNextDownload() {
-        downloads.getReadWriteLock().writeLock().lock();
-        for (Download i : downloads) {
+        Model.getDownloads().getReadWriteLock().writeLock().lock();
+        for (Download i : Model.getDownloads()) {
             if (i.getStatus().equals(DownloadStatus.QUEUED)) {
-                downloads.getReadWriteLock().writeLock().unlock();
+                Model.getDownloads().getReadWriteLock().writeLock().unlock();
                 return i;
             }
         }
-        downloads.getReadWriteLock().writeLock().unlock();
+        Model.getDownloads().getReadWriteLock().writeLock().unlock();
         return null;
     }
 
@@ -86,20 +95,13 @@ public class DTaskData extends TaskData {
         return download.getSize() > 0 ? ((int) (download.getDownloaded() / (float) download.getSize() * 10000)) : 0;
     }
 
-    /**
-     * @return the downloads
-     */
-    public EventList<Download> getDownloads() {
-        return downloads;
-    }
-
     public void addComplete(Download data) {
-        int oldValue = complete.size();
-        complete.add(data);
-        propertySupport.firePropertyChange(PROP_COMPLETE, oldValue, complete.size());
+        int oldValue = complete;
+        complete++;
+        propertySupport.firePropertyChange(PROP_COMPLETE, oldValue, complete);
     }
 
     public int getComplete() {
-        return complete.size();
+        return complete;
     }
 }

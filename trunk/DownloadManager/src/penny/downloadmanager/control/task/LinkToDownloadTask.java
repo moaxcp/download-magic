@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.control.task;
 
+import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.task.LinkToDownloadTaskData;
 import penny.downloadmanager.model.task.Status;
@@ -23,7 +24,7 @@ public class LinkToDownloadTask extends Task {
     @Override
     public void run() {
         data.setStatus(Status.RUNNING);
-        for (Download d : data.getDownloads()) {
+        for (Download d : Model.getDownloads()) {
             if (data.getStatus() == Status.STOPPED) {
                 return;
             }

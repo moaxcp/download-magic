@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.downloadmanager.model.Model;
 
 /**
  *
@@ -25,13 +26,11 @@ public class LinkToDownloadTaskData extends TaskData {
     public static final String PROP_PROGRESS = "progress";
     private int progress;
     private LinkedList<String> links;
-    private List<Download> downloads;
 
-    public LinkToDownloadTaskData(List<Download> downloads) {
+    public LinkToDownloadTaskData() {
         name = "Link To Download Task";
         this.status = Status.QUEUED;
         links = new LinkedList<String>();
-        this.downloads = downloads;
     }
 
     public int getSize() {
@@ -42,13 +41,10 @@ public class LinkToDownloadTaskData extends TaskData {
         return progress;
     }
 
-    public List<Download> getDownloads() {
-        return downloads;
-    }
-
     public void addLink(String link) {
         int oldValue = links.size();
         links.add(link);
+        size++;
         propertySupport.firePropertyChange(PROP_SIZE, oldValue, links.size());
     }
 
@@ -56,7 +52,7 @@ public class LinkToDownloadTaskData extends TaskData {
         try {
             Download download = new Download(UUID.randomUUID());
             download.setUrl(new URL(links.pop()));
-            downloads.add(download);
+            Model.getDownloads().add(download);
             int oldValue = progress;
             progress++;
             propertySupport.firePropertyChange(PROP_PROGRESS, oldValue, progress);

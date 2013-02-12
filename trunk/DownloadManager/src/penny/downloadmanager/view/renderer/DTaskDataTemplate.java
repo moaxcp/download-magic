@@ -14,6 +14,7 @@ package penny.downloadmanager.view.renderer;
 import penny.downloadmanager.model.task.DTaskData;
 import penny.downloadmanager.model.task.Status;
 import java.awt.Color;
+import penny.downloadmanager.model.Model;
 
 /**
  *
@@ -58,7 +59,7 @@ public class DTaskDataTemplate extends javax.swing.JPanel {
 
     void setTaskData(DTaskData dTaskData, Color background, Color forground) {
         if(dTaskData.getStatus() == Status.RUNNING) {
-            name.setText(dTaskData.getName() + " " + dTaskData.getStatus().toString() + " " + dTaskData.getComplete() + "/" + dTaskData.getDownloads().size());
+            name.setText(dTaskData.getName() + " " + dTaskData.getStatus().toString() + " " + dTaskData.getComplete() + "/" + Model.getDownloads().size());
         } else {
             name.setText(dTaskData.getName() + " " + dTaskData.getStatus().toString());
         }
