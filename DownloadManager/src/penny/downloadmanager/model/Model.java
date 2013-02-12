@@ -6,6 +6,7 @@ package penny.downloadmanager.model;
 
 import ca.odell.glazedlists.ObservableElementList;
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -286,8 +287,14 @@ public class Model {
                     }
                 }
             }
-
-            mainWindowModel.getTasks().add(new DTaskData(mainWindowModel.getDownloads()));
+            try {
+                taskSaver.loadList();
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (Model.getTasks().size() == 0) {
+                Model.getTasks().add(new DTaskData());
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.toString(),
                     "SQLException",

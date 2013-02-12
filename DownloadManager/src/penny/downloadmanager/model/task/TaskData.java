@@ -7,13 +7,14 @@ package penny.downloadmanager.model.task;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
 import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  *
  * @author john
  */
-public abstract class TaskData {
+public abstract class TaskData implements Serializable {
     
     public static final String PROP_NAME = "name";
     protected String name;
@@ -23,7 +24,7 @@ public abstract class TaskData {
     protected PropertyChangeSupport propertySupport;
 
     public TaskData() {
-        propertySupport = new SwingPropertyChangeSupport(this, true);
+        propertySupport = new PropertyChangeSupport(this);
     }
     /**
      * @return the name

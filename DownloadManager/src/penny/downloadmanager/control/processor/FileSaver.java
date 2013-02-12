@@ -112,6 +112,7 @@ public class FileSaver {
         }
         Util.remove(save);
         Util.remove(temp);
+        Logger.getLogger(Processor.class.getName()).log(Level.FINE, "Download has been restarted. Removed files.");
     }
 
     public void prepare() throws FileNotFoundException {

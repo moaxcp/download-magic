@@ -33,9 +33,9 @@ public class AddTaskControl implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getActionCommand().equals(COM_OK)) {
             if(addTaskModel.getSelectedTask().equals(AddTaskModel.TaskList.DOWNLOAD)) {
-                mainModel.getTasks().add(new DTaskData(mainModel.getDownloads()));
+                mainModel.getTasks().add(new DTaskData());
             } else if(addTaskModel.getSelectedTask().equals(AddTaskModel.TaskList.LinkToDownload)) {
-                mainModel.getTasks().add(new LinkToDownloadTaskData(mainModel.getDownloads()));
+                mainModel.getTasks().add(new LinkToDownloadTaskData());
             }
             addTaskModel.setVisible(false);
         } else if(e.getActionCommand().equals(COM_CANCEL)) {

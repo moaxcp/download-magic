@@ -294,7 +294,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 Object o = download.getProperty(property);
                 setObjectParam(statement, 1, o);
                 executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update download set {1} = {2} where url = ''{3}''", new Object[]{executeUpdate, property, o, download.getUrl().toString()});
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.FINE, "returned {0} on update download set {1} = {2} where " + Download.PROP_ID + " = ''{3}''", new Object[]{executeUpdate, property, o, download.getId()});
                 statement.close();
 
                 if (executeUpdate != 1) {
