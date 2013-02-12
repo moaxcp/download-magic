@@ -51,6 +51,17 @@ class FtpClient extends ProtocolClient {
                 download.setStatus(DownloadStatus.ERROR, "failed to connect " + client.getReplyString());
                 return;
             }
+            
+            client.enterLocalPassiveMode();
+            
+            download.setResponseCode(client.getReplyCode());
+
+            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
+                client.disconnect();
+                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+                download.setStatus(DownloadStatus.ERROR, "failed to enter passive mode " + client.getReplyString());
+                return;
+            }
 
             client.setSoTimeout(settings.getFtpReadTimeout());
             String user = "anonymous";
@@ -89,7 +100,7 @@ class FtpClient extends ProtocolClient {
             FTPFile file = client.mlistFile(download.getUrl().getPath());
             download.setResponseCode(client.getReplyCode());
 
-            if (file != null && download.getSize() < 0) {
+            if (file != null && download.getSize() <= 0) {
                 download.setSize(file.getSize());
                 Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "File size reply " + client.getReplyString());
             }
