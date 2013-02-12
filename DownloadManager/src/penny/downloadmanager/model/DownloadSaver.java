@@ -282,11 +282,11 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     wordSavers.remove(d1);
 
                     HrefLinkSaver hrefSaver = hrefSavers.get(d1);
-                    d1.removeWordsListener(hrefSaver);
+                    d1.removeHrefLinksListener(hrefSaver);
                     hrefSavers.remove(d1);
 
                     SrcLinkSaver srcSaver = srcSavers.get(d1);
-                    d1.removeWordsListener(srcSaver);
+                    d1.removeSrcLinksListener(srcSaver);
                     srcSavers.remove(d1);
                     break;
                 case ListEvent.INSERT:
