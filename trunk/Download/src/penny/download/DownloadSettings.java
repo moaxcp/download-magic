@@ -124,12 +124,12 @@ public class DownloadSettings implements Serializable {
         httpProxyPort = -1;
         httpConnectTimeout = 10000;
         httpReadTimeout = 10000;
-        httpUserAgent = null;
+        httpUserAgent = "project-penny Download Manager (http://code.google.com/p/project-penny/)";
         httpsProxyServer = null;
         httpsProxyPort = -1;
         httpsConnectTimeout = 10000;
         httpsReadTimeout = 10000;
-        httpsUserAgent = null;
+        httpsUserAgent = httpUserAgent;
         httpsTrustManagers = new TrustManager[]{
                         new X509TrustManager() {
 

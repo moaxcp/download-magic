@@ -44,10 +44,13 @@ class HttpClient extends ProtocolClient {
                 final HttpContext context) throws HttpException, IOException {
             if (!request.containsHeader("Range") && download.getDownloaded() > 0) {
                 request.addHeader("Range", "bytes " + download.getDownloaded() + "-");
+                Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Added Range: {0}", request.getHeaders("Range"));
             }
-            if (!request.containsHeader("User-Agent")) {
-                request.addHeader("User-Agent", settings.getHttpUserAgent());
-            }
+            
+            request.addHeader("User-Agent", settings.getHttpUserAgent());
+            Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Added User-Agent: {0}", request.getHeaders("User-Agent"));
+
+            Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Headers: {0}", request.getAllHeaders());
         }
     }
     private DownloadSettings settings;
@@ -56,6 +59,7 @@ class HttpClient extends ProtocolClient {
     private DownloaderInterceptor interceptor;
     private InputStream content;
     private boolean restart;
+    private HttpGet request;
 
     HttpClient(DownloadSettings settings) {
         this.settings = settings;
@@ -91,8 +95,8 @@ class HttpClient extends ProtocolClient {
     @Override
     void connect() {
         try {
-            HttpGet httpget = new HttpGet(download.getUrl().toURI());
-            HttpResponse response = httpClient.execute(httpget);
+            request = new HttpGet(download.getUrl().toURI());
+            HttpResponse response = httpClient.execute(request);
             download.setResponseCode(response.getStatusLine().getStatusCode());
 
             if (response.getStatusLine().getStatusCode() / 100 == 3) {
@@ -101,16 +105,18 @@ class HttpClient extends ProtocolClient {
                     download.addLocation(download.getUrl());
                     download.setUrl(new URL(headers[0].getValue()));
                     download.setStatus(DownloadStatus.REDIRECTING);
-                    httpget.abort();
+                    request.abort();
                 } else {
                     download.setStatus(DownloadStatus.ERROR, "Could not find location for redirection");
+                    Logger.getLogger(HttpClient.class.getName()).fine(download.getMessage());
                 }
                 return;
             }
-            
-            if(download.getResponseCode() / 100 != 2) {
+
+            if (download.getResponseCode() / 100 != 2) {
                 download.setStatus(DownloadStatus.ERROR, "response code is " + download.getResponseCode() + " could not download");
-                httpget.abort();
+                Logger.getLogger(HttpClient.class.getName()).fine(download.getMessage());
+                request.abort();
                 return;
             }
 
@@ -124,6 +130,7 @@ class HttpClient extends ProtocolClient {
                 }
                 if (h.getName().equals("Content-Range")) {
                     String value = h.getValue();
+                    Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Content-Range exists value is {0}", value);
                     if (value.contains("bytes") && value.contains(Long.toString(download.getDownloaded()))) {
                         byteExists = true;
                     }
@@ -140,10 +147,11 @@ class HttpClient extends ProtocolClient {
             //should restart
             if (!byteExists && download.getDownloaded() > 0) {
                 restart = true;
+                Logger.getLogger(HttpClient.class.getName()).fine("Restarting download from 0");
             }
-            
+
             content = response.getEntity().getContent();
-            
+
         } catch (ClientProtocolException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,14 +176,17 @@ class HttpClient extends ProtocolClient {
 
     @Override
     void close() {
-        try {
-            if(content != null) {
-                content.close();
-            }
-        } catch (IOException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
-        }
+//        try {
+//            if (request != null) {
+                request.abort();
+//            }
+//            if (content != null) {
+//                content.close();
+//            }
+//        } catch (IOException ex) {
+//            download.setStatus(DownloadStatus.ERROR, ex.toString());
+//            Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
 
     void shutdown() {
