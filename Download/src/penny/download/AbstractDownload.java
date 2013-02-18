@@ -15,7 +15,7 @@ import java.util.*;
  * This class represents a AbstractDownload. It is the base class for all other
  * downloads. This class and all classes that extend it should be used to track
  * information on a download only. All other logic such as getting connections
- * and save files should be implementend elseware. ex.
+ * and save files should be implemented elsewhere. ex.
  * DownloadConnectionFactory.
  *
  * AbstractDownload can be used to update a table model with property change
@@ -80,9 +80,9 @@ public abstract class AbstractDownload {
      */
     public static final String PROP_PROTOCOLFILENAME = "protocolFileName";
     /**
-     * Property string for fileExtention.
+     * Property string for fileExtension.
      */
-    public static final String PROP_FILEEXTENTION = "fileExtention";
+    public static final String PROP_FILEEXSENTION = "fileExtension";
     /**
      * Property string for host.
      */
@@ -121,6 +121,9 @@ public abstract class AbstractDownload {
      * Property string for url.
      */
     public static final String PROP_URL = "url";
+    public static final String PROP_PROGRESS = "progress";
+    public static final String PROP_BYTESPERSECOND = "rate";
+    public static final String PROP_TIMELEFT = "timeLeft";
     /**
      * The URL of this AbstractDownload.
      */
@@ -196,7 +199,7 @@ public abstract class AbstractDownload {
     /**
      * The file extention of the URL for this AbstractDownload.
      */
-    protected String fileExtention;
+    protected String fileExtension;
     /**
      * The set of URLs the AbstractDownload has been redirected from. In HTTP
      * when a connection is supposed to be redirected the AbstractDownload url
@@ -223,7 +226,7 @@ public abstract class AbstractDownload {
         file = "";
         protocol = "";
         protocolFileName = "";
-        fileExtention = "";
+        fileExtension = "";
         host = "";
         path = "";
         protocol = "";
@@ -259,11 +262,11 @@ public abstract class AbstractDownload {
         propertySupport.firePropertyChange(PROP_URL, oldValue, getUrl());
         setFile(Downloads.getFileName(url.getPath()));
         if (getFile() != null) {
-            setFileExtention(Downloads.getFileExtention(getFile()));
+            setFileExtension(Downloads.getFileExtension(getFile()));
         }
         setHost(url.getHost());
         setPath(Downloads.getPath(url.getPath()));
-        
+
         if (url.getQuery() == null) {
             setQuery("");
         } else {
@@ -369,6 +372,7 @@ public abstract class AbstractDownload {
     public boolean isCanQueue() {
         return status == DownloadStatus.STOPPED || status == DownloadStatus.ERROR || status == DownloadStatus.COMPLETE;
     }
+
     public void queue() {
         setStatus(DownloadStatus.QUEUED);
     }
@@ -376,6 +380,7 @@ public abstract class AbstractDownload {
     public boolean isCanStop() {
         return status == DownloadStatus.PREPARING || status == DownloadStatus.RETRYING || status == DownloadStatus.CONNECTING || status == DownloadStatus.DOWNLOADING || status == DownloadStatus.FINALIZING;
     }
+
     public void stop() {
         setStatus(DownloadStatus.STOPPING);
     }
@@ -478,13 +483,13 @@ public abstract class AbstractDownload {
         this.setMessage("");
         this.status = status;
         propertySupport.firePropertyChange(PROP_STATUS, oldValue, getStatus());
-        
-        if(isCanStop()) {
+
+        if (isCanStop()) {
             propertySupport.firePropertyChange(PROP_CANSTOP, false, true);
         } else {
             propertySupport.firePropertyChange(PROP_CANSTOP, true, false);
         }
-        if(isCanQueue()) {
+        if (isCanQueue()) {
             propertySupport.firePropertyChange(PROP_CANQUEUE, false, true);
         } else {
             propertySupport.firePropertyChange(PROP_CANQUEUE, true, false);
@@ -746,19 +751,19 @@ public abstract class AbstractDownload {
      *
      * @return
      */
-    public String getFileExtention() {
-        return fileExtention;
+    public String getFileExtension() {
+        return fileExtension;
     }
 
     /**
      * Sets the file Extention for this AbstractDownload.
      *
-     * @param fileExtention
+     * @param fileExtension
      */
-    protected void setFileExtention(String fileExtention) {
-        String oldValue = getFileExtention();
-        this.fileExtention = fileExtention;
-        propertySupport.firePropertyChange(PROP_FILEEXTENTION, oldValue, getFileExtention());
+    protected void setFileExtension(String fileExtension) {
+        String oldValue = getFileExtension();
+        this.fileExtension = fileExtension;
+        propertySupport.firePropertyChange(PROP_FILEEXSENTION, oldValue, getFileExtension());
     }
 
     /**
@@ -853,7 +858,24 @@ public abstract class AbstractDownload {
         this.setRetryStartTime(System.nanoTime());
         propertySupport.firePropertyChange(PROP_RETRYTIME, oldValue, getRetryTime());
     }
-    
+
+    public long getTimeLeft() {
+        double rate = (getDownloadTime() == 0 ? 0 : getDownloaded() / (double) getDownloadTime());
+        return (long) (rate == 0 ? 0 : (getSize() - getDownloaded()) / rate);
+    }
+
+    public double getProgress() {
+        if (getSize() >= 0) {
+            return ((double) getDownloaded()) / (double) getSize();
+        } else {
+            return 0;
+        }
+    }
+
+    public long getBytesPerSecond() {
+        return (long)(getDownloadTime() == 0 ? 0 : (getDownloaded() / (double)getDownloadTime()) * (double)1000000000);
+    }
+
     @Override
     public String toString() {
         return url.toString();
