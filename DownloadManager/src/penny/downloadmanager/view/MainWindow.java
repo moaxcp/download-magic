@@ -10,26 +10,25 @@
  */
 package penny.downloadmanager.view;
 
-import penny.downloadmanager.view.renderer.ProgressRenderer;
-import penny.downloadmanager.view.renderer.TaskDataRenderer;
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
-import ca.odell.glazedlists.swing.TableComparatorChooser;
-import penny.download.DownloadStatus;
-import penny.downloadmanager.control.MainWindowControl;
-import penny.downloadmanager.model.db.Download;
-import penny.downloadmanager.model.gui.MainWindowModel;
-import penny.downloadmanager.model.task.Status;
-import penny.downloadmanager.model.task.TaskData;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JProgressBar;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import penny.download.DownloadStatus;
+import penny.downloadmanager.control.MainWindowControl;
 import penny.downloadmanager.model.TaskManagerModel;
+import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.model.gui.MainWindowModel;
+import penny.downloadmanager.model.task.Status;
+import penny.downloadmanager.model.task.TaskData;
+import penny.downloadmanager.view.renderer.ProgressRenderer;
+import penny.downloadmanager.view.renderer.TaskDataRenderer;
 
 /**
  *

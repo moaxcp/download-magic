@@ -67,7 +67,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         l.add(Download.PROP_DOWNLOADTIME);
         l.add(Download.PROP_FILE);
         l.add(Download.PROP_PROTOCOLFILENAME);
-        l.add(Download.PROP_FILEEXTENTION);
+        l.add(Download.PROP_FILEEXSENTION);
         l.add(Download.PROP_HOST);
         l.add(Download.PROP_LOCATIONS);
         l.add(Download.PROP_MESSAGE);
@@ -90,6 +90,9 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         l.add(Download.PROP_HREFLINKS);
         l.add(Download.PROP_SRCLINKS);
         l.add(Download.PROP_WORDS);
+        l.add(Download.PROP_BYTESPERSECOND);
+        l.add(Download.PROP_PROGRESS);
+        l.add(Download.PROP_TIMELEFT);
         
         propertyNames = Collections.unmodifiableList(l);
     }
@@ -408,8 +411,8 @@ public class Download extends AbstractDownload implements Comparable<Download> {
             return this.getFile();
         } else if (key.equals(Download.PROP_PROTOCOLFILENAME)) {
             return this.getProtocolFileName();
-        } else if (key.equals(Download.PROP_FILEEXTENTION)) {
-            return this.getFileExtention();
+        } else if (key.equals(Download.PROP_FILEEXSENTION)) {
+            return this.getFileExtension();
         } else if (key.equals(Download.PROP_HOST)) {
             return this.getHost();
         } else if (key.equals(Download.PROP_LOCATIONS)) {
@@ -454,6 +457,12 @@ public class Download extends AbstractDownload implements Comparable<Download> {
             return this.getSrcLinks();
         } else if(key.equals(Download.PROP_WORDS)) {
             return this.getWords();
+        } else if(key.equals(Download.PROP_BYTESPERSECOND)) {
+            return this.getBytesPerSecond();
+        } else if(key.equals(Download.PROP_PROGRESS)) {
+            return this.getProgress();
+        } else if(key.equals(Download.PROP_TIMELEFT)) {
+            return this.getTimeLeft();
         }
         
         throw new IllegalArgumentException(key + " is not a property");
