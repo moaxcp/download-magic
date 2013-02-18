@@ -49,7 +49,7 @@ public class JavaDBDataSource {
         l.add(Download.PROP_PATH);
         l.add(Download.PROP_FILE);
         l.add(Download.PROP_PROTOCOLFILENAME);
-        l.add(Download.PROP_FILEEXTENTION);
+        l.add(Download.PROP_FILEEXSENTION);
         l.add(Download.PROP_MESSAGE);
         l.add(Download.PROP_RESPONSECODE);
         l.add(Download.PROP_LOCATIONS);
@@ -77,7 +77,7 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_PATH +             " VARCHAR(32672), \n"
             + "    " + Download.PROP_FILE +             " VARCHAR(32672), \n"
             + "    " + Download.PROP_PROTOCOLFILENAME + " VARCHAR(32672), \n"
-            + "    " + Download.PROP_FILEEXTENTION +    " VARCHAR(32672), \n"
+            + "    " + Download.PROP_FILEEXSENTION +    " VARCHAR(32672), \n"
             + "    " + Download.PROP_MESSAGE +          " VARCHAR(32672), \n"
             + "    " + Download.PROP_RESPONSECODE +     " SMALLINT, \n"
             + "    " + Download.PROP_LOCATIONS +        " List, \n"

@@ -8,9 +8,8 @@ import ca.odell.glazedlists.gui.AdvancedTableFormat;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.swing.JProgressBar;
-import penny.download.Downloads;
 import penny.downloadmanager.model.db.Download;
+import penny.downloadmanager.util.Util;
 
 /**
  *
@@ -19,9 +18,6 @@ import penny.downloadmanager.model.db.Download;
 public class DownloadTableFormat implements AdvancedTableFormat<Download> {
 
     private Map<String, Class> columns;
-    public static final String PROP_PROGRESS = "progress";
-    public static final String PROP_RATE = "rate";
-    public static final String PROP_TIMELEFT = "timeLeft";
     private Comparator comparator = new Comparator() {
 
         @Override
@@ -32,20 +28,14 @@ public class DownloadTableFormat implements AdvancedTableFormat<Download> {
 
     public DownloadTableFormat() {
         columns = new TreeMap<String, Class>();
-        columns.put(PROP_PROGRESS, JProgressBar.class);
-        columns.put(PROP_RATE, String.class);
-        columns.put(PROP_TIMELEFT, String.class);
     }
 
     public boolean getColumns(Download d) {
         boolean r = false;
         for (String s : Download.propertyNames) {
             if (!columns.containsKey(s)) {
-                Object o = d.getProperty(s);
-                if (o != null) {
-                    columns.put(s, o.getClass());
+                    columns.put(s, String.class);
                     r = true;
-                }
             }
         }
         return r;
@@ -71,46 +61,7 @@ public class DownloadTableFormat implements AdvancedTableFormat<Download> {
     @Override
     public Object getColumnValue(Download download, int column) {
         String name = getColumnName(column);
-        if(name.equals(PROP_TIMELEFT)) {
-            double rate = (download.getDownloadTime() == 0 ? 0 : download.getDownloaded() / (double) download.getDownloadTime());
-            long time = (long) (rate == 0 ? 0 : (download.getSize() - download.getDownloaded()) / rate);
-            return Downloads.formatNanoTime(time);
-        }
-        if (name.equals(PROP_PROGRESS)) {
-            if (download.getSize() >= 0) {
-                return (((float) download.getDownloaded()) / (float) download.getSize()) * 100;
-            } else {
-                return (float) -1;
-            }
-        }
-        if (name.equals(PROP_RATE)) {
-            return Downloads.getRate(download);
-        }
-        if (name.equals(Download.PROP_DOWNLOADED)) {
-            return Downloads.formatByteSize(download.getDownloaded());
-        }
-        if (name.equals(Download.PROP_SIZE)) {
-            return Downloads.formatByteSize(download.getSize());
-        }
-        if (name.equals(Download.PROP_DOWNLOADTIME)) {
-            return Downloads.formatNanoTime(download.getDownloadTime());
-        }
-        if (name.equals(Download.PROP_RETRYTIME)) {
-            return Downloads.formatNanoTime(download.getRetryTime());
-        }
-        if(name.equals(Download.PROP_HREFLINKS)) {
-            return download.getHrefLinks().size();
-        }
-        if(name.equals(Download.PROP_SRCLINKS)) {
-            return download.getSrcLinks().size();
-        }
-        if(name.equals(Download.PROP_WORDS)) {
-            return download.getWords().size();
-        }
-        if(name.equals(Download.PROP_LOCATIONS)) {
-            return download.getLocations().size();
-        }
-        return download.getProperty(name);
+        return Util.toFormattedString(download, name);
     }
 
     @Override

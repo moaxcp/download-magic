@@ -24,6 +24,7 @@ import java.util.Comparator;
 import penny.download.Downloads;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.PropertyEntry;
+import penny.downloadmanager.util.Util;
 import penny.downloadmanager.view.converter.NumberToSizeConverter;
 
 /**
@@ -520,26 +521,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
     // End of variables declaration//GEN-END:variables
 
     private String getPropValue(String key) {
-
-        if (key.equals(Download.PROP_HREFLINKS)) {
-            return Integer.toString(d.getHrefLinks().size());
-        } else if (key.equals(Download.PROP_SRCLINKS)) {
-            return Integer.toString(d.getSrcLinks().size());
-        } else if (key.equals(Download.PROP_LOCATIONS)) {
-            return Integer.toString(d.getLocations().size());
-        } else if (key.equals(Download.PROP_WORDS)) {
-            return Integer.toString(d.getWords().size());
-        } else if (key.equals(Download.PROP_DOWNLOADED)) {
-            return Downloads.formatByteSize(d.getDownloaded());
-        } else if (key.equals(Download.PROP_SIZE)) {
-            return Downloads.formatByteSize(d.getSize());
-        } else if (key.equals(Download.PROP_DOWNLOADTIME)) {
-            return Downloads.formatNanoTime(d.getDownloadTime());
-        } else if (key.equals(Download.PROP_RETRYTIME)) {
-            return Downloads.formatNanoTime(d.getRetryTime());
-        }
-
-        return d.getProperty(key).toString();
+        return Util.toFormattedString(d, key);
     }
 
     @Override

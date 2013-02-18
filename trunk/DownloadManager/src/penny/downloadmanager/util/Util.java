@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 import penny.download.AbstractDownload;
+import penny.download.Downloads;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.recmd5.MD5MessageDigest;
@@ -118,5 +119,40 @@ public class Util {
             }
         }
         return null;
+    }
+    
+    public static String toFormattedString(Download download, String property) {
+        String r = Downloads.toFormattedString(download, property);
+        if(r != null) {
+            return r;
+        }
+        if(property.equals(Download.PROP_HREFLINKS)) {
+            return String.valueOf(download.getHrefLinks().size());
+        }
+        if(property.equals(Download.PROP_ID)) {
+            return download.getId().toString();
+        }
+        if(property.equals(Download.PROP_LINKSTATE)) {
+            return download.getLinkState().toString();
+        }
+        if(property.equals(Download.PROP_MD5)) {
+            return download.getMD5().toString();
+        }
+        if(property.equals(Download.PROP_SAVEPATH)) {
+            return download.getSavePath();
+        }
+        if(property.equals(Download.PROP_SRCLINKS)) {
+            return String.valueOf(download.getSrcLinks().size());
+        }
+        if(property.equals(Download.PROP_TEMPPATH)) {
+            return download.getTempPath();
+        }
+        if(property.equals(Download.PROP_WORDBUFFER)) {
+            return download.getWordBuffer();
+        }
+        if(property.equals(Download.PROP_WORDS)) {
+            return String.valueOf(download.getWords().size());
+        }
+        throw new IllegalArgumentException(property + " is not a Download property");
     }
 }

@@ -175,7 +175,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
         saveProps.add(Download.PROP_PATH);
         saveProps.add(Download.PROP_FILE);
         saveProps.add(Download.PROP_PROTOCOLFILENAME);
-        saveProps.add(Download.PROP_FILEEXTENTION);
+        saveProps.add(Download.PROP_FILEEXSENTION);
         saveProps.add(Download.PROP_MESSAGE);
         saveProps.add(Download.PROP_RESPONSECODE);
         saveProps.add(Download.PROP_LOCATIONS);
