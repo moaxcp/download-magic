@@ -38,18 +38,9 @@ public class Downloads {
      * number of nanoseconds in a day
      */
     protected static final long day = 24 * hour;
-
-    /**
-     * Gets the percentage of download completed for a AbstractDownload.
-     * @param d
-     * @return percentage complete
-     */
-    public static float getProgress(AbstractDownload d) {
-        if(d.getSize() > 0) {
-            return ((float) d.getDownloaded() / d.getSize()) * 100;
-        } else {
-            return 0;
-        }
+    
+    public static String formatProgress(double prog) {
+        return String.format("%1$.2f", prog * 100);
     }
 
     /**
@@ -147,7 +138,7 @@ public class Downloads {
      * @param file
      * @return the file extention or null if there is no extention
      */
-    public static String getFileExtention(String file) {
+    public static String getFileExtension(String file) {
         if (file == null || !file.contains(".")) {
             return "";
         }
@@ -213,5 +204,81 @@ public class Downloads {
         } else {
             throw new IllegalArgumentException("DownloadStatus invalid " + s);
         }
+    }
+    
+    public static String toFormattedString(AbstractDownload download, String property) {
+        if(property.equals(AbstractDownload.PROP_ATTEMPTS)) {
+            return String.format("%1$d", download.getAttempts());
+        }
+        if(property.equals(AbstractDownload.PROP_CANQUEUE)) {
+            return String.valueOf(download.isCanQueue());
+        }
+        if(property.equals(AbstractDownload.PROP_CANSTOP)) {
+            return String.valueOf(download.isCanStop());
+        }
+        if(property.equals(AbstractDownload.PROP_CONTENTTYPE)) {
+            return download.getContentType();
+        }
+        if(property.equals(AbstractDownload.PROP_DOWNLOADED)) {
+            return Downloads.formatByteSize(download.getDownloaded());
+        }
+        if(property.equals(AbstractDownload.PROP_DOWNLOADTIME)) {
+            return Downloads.formatNanoTime(download.getDownloadTime());
+        }
+        if(property.equals(AbstractDownload.PROP_FILE)) {
+            return download.getFile();
+        }
+        if(property.equals(AbstractDownload.PROP_FILEEXSENTION)) {
+            return download.getFileExtension();
+        }
+        if(property.equals(AbstractDownload.PROP_HOPS)) {
+            return String.valueOf(download.getHops());
+        }
+        if(property.equals(AbstractDownload.PROP_HOST)) {
+            return download.getHost();
+        }
+        if(property.equals(AbstractDownload.PROP_LOCATIONS)) {
+            return String.format("%1$d", download.getLocations().size());
+        }
+        if(property.equals(AbstractDownload.PROP_MESSAGE)) {
+            return download.getMessage();
+        }
+        if(property.equals(AbstractDownload.PROP_PATH)) {
+            return download.getPath();
+        }
+        if(property.equals(AbstractDownload.PROP_PROGRESS)) {
+            return Downloads.formatProgress(download.getProgress());
+        }
+        if(property.equals(AbstractDownload.PROP_PROTOCOL)) {
+            return download.getProtocol();
+        }
+        if(property.equals(AbstractDownload.PROP_PROTOCOLFILENAME)) {
+            return download.getProtocolFileName();
+        }
+        if(property.equals(AbstractDownload.PROP_QUERY)) {
+            return download.getQuery();
+        }
+        if(property.equals(AbstractDownload.PROP_BYTESPERSECOND)) {
+            return String.format("%1$s/s", Downloads.formatByteSize(download.getBytesPerSecond()));
+        }
+        if(property.equals(AbstractDownload.PROP_RESPONSECODE)) {
+            return String.valueOf(download.getResponseCode());
+        }
+        if(property.equals(AbstractDownload.PROP_RETRYTIME)) {
+            return Downloads.formatNanoTime(download.getRetryTime());
+        }
+        if(property.equals(AbstractDownload.PROP_SIZE)) {
+            return Downloads.formatByteSize(download.getSize());
+        }
+        if(property.equals(AbstractDownload.PROP_STATUS)) {
+            return download.getStatus().toString();
+        }
+        if(property.equals(AbstractDownload.PROP_TIMELEFT)) {
+            return Downloads.formatNanoTime(download.getTimeLeft());
+        }
+        if(property.equals(AbstractDownload.PROP_URL)) {
+            return download.getUrl().toString();
+        }
+        return null;
     }
 }
