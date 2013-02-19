@@ -46,7 +46,7 @@ class HttpClient extends ProtocolClient {
                 request.addHeader("Range", "bytes " + download.getDownloaded() + "-");
                 Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Added Range: {0}", request.getHeaders("Range"));
             }
-            
+
             request.addHeader("User-Agent", settings.getHttpUserAgent());
             Logger.getLogger(HttpClient.class.getName()).log(Level.FINE, "Added User-Agent: {0}", request.getHeaders("User-Agent"));
 
@@ -152,15 +152,13 @@ class HttpClient extends ProtocolClient {
 
             content = response.getEntity().getContent();
 
-        } catch (ClientProtocolException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (URISyntaxException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            if (download.getStatus() != DownloadStatus.STOPPING) {
+                download.setStatus(DownloadStatus.ERROR, ex.toString());
+                Logger.getLogger(HttpClient.class.getName()).log(Level.SEVERE, null, ex);
+            } else {
+                download.setMessage(ex.toString());
+            }
         }
     }
 
@@ -178,7 +176,7 @@ class HttpClient extends ProtocolClient {
     void close() {
 //        try {
 //            if (request != null) {
-                request.abort();
+        request.abort();
 //            }
 //            if (content != null) {
 //                content.close();
