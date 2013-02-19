@@ -37,29 +37,33 @@ class FtpClient extends ProtocolClient {
         content = null;
     }
 
+    private boolean statusCheck() throws IOException {
+        download.setResponseCode(client.getReplyCode());
+        if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
+            client.disconnect();
+            Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "statusCheck()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
+            download.setStatus(DownloadStatus.ERROR, "command failed " + client.getReplyString());
+            return false;
+        } else if(download.getStatus() == DownloadStatus.STOPPING) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     void connect() {
         try {
             client.setDefaultTimeout(settings.getFtpConnectTimeout());
             client.setConnectTimeout(settings.getFtpConnectTimeout());
             client.connect(download.getUrl().getHost(), download.getUrl().getPort() < 0 ? 21 : download.getUrl().getPort());
-            download.setResponseCode(client.getReplyCode());
 
-            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
-                client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
-                download.setStatus(DownloadStatus.ERROR, "failed to connect " + client.getReplyString());
+            if(!statusCheck()) {
                 return;
             }
-            
-            client.enterLocalPassiveMode();
-            
-            download.setResponseCode(client.getReplyCode());
 
-            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
-                client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
-                download.setStatus(DownloadStatus.ERROR, "failed to enter passive mode " + client.getReplyString());
+            client.enterLocalPassiveMode();
+
+            if(!statusCheck()) {
                 return;
             }
 
@@ -75,30 +79,19 @@ class FtpClient extends ProtocolClient {
                         user = s[0];
                 }
             }
-            if (!client.login(user, password)) {
-                client.logout();
-                client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
-                download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
-                return;
-            }
-            download.setResponseCode(client.getReplyCode());
-
-            if (!FTPReply.isPositiveCompletion(download.getResponseCode())) {
-                client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "connect()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
-                download.setStatus(DownloadStatus.ERROR, "failed to login username: " + user + ", password: " + password + " " + client.getReplyString());
-                return;
-            }
-            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Login successful " + client.getReplyString());
             
-            client.setFileType(FTP.BINARY_FILE_TYPE);
-            download.setResponseCode(client.getReplyCode());
-            download.setMessage(client.getReplyString());
-            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Binary Mode response: " + download.getMessage());
+            client.login(user, password);
+            
+            if(!statusCheck()) {
+                return;
+            }
+            
+            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Login successful " + client.getReplyString());
 
             FTPFile file = client.mlistFile(download.getUrl().getPath());
-            download.setResponseCode(client.getReplyCode());
+            if(!statusCheck()) {
+                return;
+            }
 
             if (file != null && download.getSize() <= 0) {
                 download.setSize(file.getSize());
@@ -115,12 +108,14 @@ class FtpClient extends ProtocolClient {
                 }
             }
 
-            //client.doCommand("bin", null);
-            content = client.retrieveFileStream(download.getUrl().getPath());
-            download.setResponseCode(client.getReplyCode());
-            if (content == null) {
-                download.setStatus(DownloadStatus.ERROR, client.getReplyString());
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            
+            if(!statusCheck()) {
+                return;
             }
+            Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Binary Mode response: " + client.getReplyString());
+
+            content = client.retrieveFileStream(download.getUrl().getPath());
         } catch (SocketException ex) {
             download.setStatus(DownloadStatus.ERROR, ex.toString());
             Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -164,7 +159,6 @@ class FtpClient extends ProtocolClient {
                 }
                 client.logout();
                 client.disconnect();
-                Logger.getLogger(FtpClient.class.getName()).severe("client.completePendingCommand() failed");
             } catch (IOException ex) {
                 Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
             }
