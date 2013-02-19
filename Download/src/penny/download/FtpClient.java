@@ -44,7 +44,7 @@ class FtpClient extends ProtocolClient {
             Logger.getLogger(FtpClient.class.getName()).logp(Level.SEVERE, FtpClient.class.getName(), "statusCheck()", "String " + client.getReplyString() + " Code " + client.getReplyCode());
             download.setStatus(DownloadStatus.ERROR, "command failed " + client.getReplyString());
             return false;
-        } else if(download.getStatus() == DownloadStatus.STOPPING) {
+        } else if (download.getStatus() == DownloadStatus.STOPPING) {
             return false;
         }
         return true;
@@ -57,13 +57,13 @@ class FtpClient extends ProtocolClient {
             client.setConnectTimeout(settings.getFtpConnectTimeout());
             client.connect(download.getUrl().getHost(), download.getUrl().getPort() < 0 ? 21 : download.getUrl().getPort());
 
-            if(!statusCheck()) {
+            if (!statusCheck()) {
                 return;
             }
 
             client.enterLocalPassiveMode();
 
-            if(!statusCheck()) {
+            if (!statusCheck()) {
                 return;
             }
 
@@ -79,17 +79,17 @@ class FtpClient extends ProtocolClient {
                         user = s[0];
                 }
             }
-            
+
             client.login(user, password);
-            
-            if(!statusCheck()) {
+
+            if (!statusCheck()) {
                 return;
             }
-            
+
             Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Login successful " + client.getReplyString());
 
             FTPFile file = client.mlistFile(download.getUrl().getPath());
-            if(!statusCheck()) {
+            if (!statusCheck()) {
                 return;
             }
 
@@ -109,19 +109,20 @@ class FtpClient extends ProtocolClient {
             }
 
             client.setFileType(FTP.BINARY_FILE_TYPE);
-            
-            if(!statusCheck()) {
+
+            if (!statusCheck()) {
                 return;
             }
             Logger.getLogger(FtpClient.class.getName()).logp(Level.FINE, FtpClient.class.getName(), "connect()", "Binary Mode response: " + client.getReplyString());
 
             content = client.retrieveFileStream(download.getUrl().getPath());
-        } catch (SocketException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            download.setStatus(DownloadStatus.ERROR, ex.toString());
-            Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            if (download.getStatus() != DownloadStatus.STOPPING) {
+                download.setStatus(DownloadStatus.ERROR, ex.toString());
+                Logger.getLogger(FtpClient.class.getName()).log(Level.SEVERE, null, ex);
+            } else {
+                download.setMessage(ex.toString());
+            }
         }
     }
 
