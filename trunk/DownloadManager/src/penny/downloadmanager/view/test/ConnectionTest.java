@@ -19,6 +19,7 @@ import penny.download.AbstractDownload;
 import penny.download.DownloadSettings;
 import penny.download.DownloadStatus;
 import penny.download.Downloader;
+import penny.downloadmanager.control.Application;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.view.DownloadDataView;
 
@@ -161,7 +162,7 @@ private void goButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
                 goButton.setEnabled(true);
             }
         };
-        new Thread(updater).start();
+        Application.getThread(updater).start();
     } else {
         download.stop();
         goButton.setEnabled(false);

@@ -59,7 +59,7 @@ public class TaskManager {
 
     public boolean start() {
         if (!model.isRunning()) {
-            thread = new Thread(runnable);
+            thread = Application.getThread(runnable);
             thread.setName("TaskManager");
             thread.start();
         }

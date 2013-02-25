@@ -39,6 +39,12 @@ public class Application {
             }
         });
     }
+    
+    public static Thread getThread(Runnable runnable) {
+        Thread t = new Thread(runnable);
+        t.setUncaughtExceptionHandler(new SwingExceptionHandler());
+        return t;
+    }
 
     /**
      * @param args the command line arguments

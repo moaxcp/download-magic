@@ -9,6 +9,7 @@ import java.awt.*;
 import java.io.*;
 
 import java.lang.reflect.*;
+import penny.downloadmanager.view.ExceptionMessageView;
 
 public class SwingExceptionHandler implements
         Thread.UncaughtExceptionHandler {
@@ -47,10 +48,9 @@ public class SwingExceptionHandler implements
     private void showMessage(Thread t, Throwable e) {
         String stackTrace = generateStackTrace(e);
         // show an error dialog
+        ExceptionMessageView message = new ExceptionMessageView(findActiveOrVisibleFrame(), true, new ExceptionMessage(t.toString(), stackTrace));
 
-        JOptionPane.showMessageDialog(findActiveOrVisibleFrame(),
-                stackTrace, "Exception Occurred in " + t,
-                JOptionPane.ERROR_MESSAGE);
+        message.setVisible(true);
     }
 
     /**
