@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -19,6 +20,28 @@ import java.util.logging.Logger;
  * @author john
  */
 public class JavaDBWordDAO implements WordDAO {
+
+    @Override
+    public List<String> getWords(UUID uuid) {
+        List<String> words = new ArrayList<String>();
+        Connection connection = JavaDBDataSource.getInstance().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "select * from word where " + Download.PROP_ID + " = '" + uuid + "' order by wordindex";
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                words.add(rs.getString("WORD"));
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException("There was an SQL Exception", ex);
+        } finally {
+            JavaDBDataSource.getInstance().returnConnection(connection);
+        }
+        return words;
+    }
 
     @Override
     public void addWord(UUID uuid, String word) {
@@ -34,6 +57,7 @@ public class JavaDBWordDAO implements WordDAO {
             if (rs.next()) {
                 wordIndex = rs.getLong(1) + 1;
             }
+            statement.close();
             PreparedStatement insert = connection.prepareStatement("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n(?, ?, ?)");
             insert.setString(1, uuid.toString());
             insert.setString(2, word.replace("'", "''"));
@@ -55,36 +79,8 @@ public class JavaDBWordDAO implements WordDAO {
 
     @Override
     public void addWords(UUID uuid, List<String> words) {
-
-        Connection connection = JavaDBDataSource.getInstance().getConnection();
-        int executeUpdate = 0;
-        long wordIndex = 0;
-        try {
-            Statement statement = connection.createStatement();
-            String query = "select max(wordindex) from word where " + Download.PROP_ID + " = '" + uuid + "'";
-            Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.FINE, query);
-            ResultSet rs = statement.executeQuery(query);
-            if (rs.next()) {
-                wordIndex = rs.getLong(1) + 1;
-            }
-            StringBuilder insert = new StringBuilder();
-            if(words.size() > 0) {
-                insert.append("insert into word\n(" + Download.PROP_ID + ", word, wordindex)\nvalues\n('").append(uuid.toString()).append("', '").append(words.get(0).replace("'", "''")).append("', ").append(wordIndex++).append(")");
-            for (int i = 1; i < words.size(); i++) {
-                insert.append(",\n('").append(uuid.toString()).append("', '").append(words.get(i).replace("'", "''")).append("', ").append(wordIndex++).append(")");
-            }
-                executeUpdate = statement.executeUpdate(insert.toString());
-                Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, insert.toString()});
-
-                if (executeUpdate != words.size()) {
-                    throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 insert");
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JavaDBWordDAO.class.getName()).log(Level.SEVERE, "Exception saving words " + uuid + " " + words, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
-        } finally {
-            JavaDBDataSource.getInstance().returnConnection(connection);
+        for(String word : words) {
+            addWord(uuid, word);
         }
     }
 

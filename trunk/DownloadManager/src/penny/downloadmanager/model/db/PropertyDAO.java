@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.model.db;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -11,6 +12,8 @@ import java.util.UUID;
  * @author john
  */
 public interface PropertyDAO {
+    
+    public HashMap<String, Object> getProperties(UUID uuid);
 
     public void saveProperty(UUID uuid, String name, Object property);
 

@@ -54,6 +54,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
 
     public static final String HREF = "href";
     public static final String SRC = "src";
+    public static final String REDIRECT = "redirect";
     
     public static final List<String> propertyNames;    
     
@@ -107,7 +108,7 @@ public class Download extends AbstractDownload implements Comparable<Download> {
         hrefLinks = GlazedLists.threadSafeList(new BasicEventList<String>());
         srcLinks = GlazedLists.threadSafeList(new BasicEventList<String>());
         words = GlazedLists.threadSafeList(new BasicEventList<String>());
-        locations = GlazedLists.threadSafeList(new BasicEventList<URL>());
+        locations = GlazedLists.threadSafeList(new BasicEventList<String>());
         md5 = new MD5State();
         linkState = new LinkState();
         wordBuffer = "";
@@ -145,10 +146,10 @@ public class Download extends AbstractDownload implements Comparable<Download> {
             }
         });
         
-        ((EventList<URL>)locations).addListEventListener(new ListEventListener<URL>() {
+        ((EventList<String>)locations).addListEventListener(new ListEventListener<String>() {
 
             @Override
-            public void listChanged(ListEvent<URL> listChanges) {
+            public void listChanged(ListEvent<String> listChanges) {
                 while(listChanges.next()) {
                     propertySupport.fireIndexedPropertyChange(PROP_LOCATIONS, listChanges.getIndex(), listChanges.getOldValue(), listChanges.getNewValue());
                 }
@@ -358,40 +359,38 @@ public class Download extends AbstractDownload implements Comparable<Download> {
     }
     
     @Override
-    public List<URL> getLocations() {
+    public List<String> getLocations() {
         return Collections.unmodifiableList(locations);
     }
     
-    public EventListModel<URL> getLocationsModel() {
-        return new EventListModel<URL>((EventList<URL>)locations);
+    public EventListModel<String> getLocationsModel() {
+        return new EventListModel<String>((EventList<String>)locations);
     }
     
     public void clearLocations() {
         locations.clear();
     }
     
-    public void addLocationsListener(ListEventListener<URL> listener) {
-        ((EventList<URL>) locations).addListEventListener(listener);
+    public void addLocationsListener(ListEventListener<String> listener) {
+        ((EventList<String>)locations).addListEventListener(listener);
     }
     
-    public void removeLocationsListener(ListEventListener<URL> listener) {
-        ((EventList<URL>) locations).removeListEventListener(listener);
+    public void removeLocationsListener(ListEventListener<String> listener) {
+        ((EventList<String>)locations).removeListEventListener(listener);
     }
 
-    public void setLocations(List<URL> list) {
-        ((EventList<URL>)locations).getReadWriteLock().writeLock().lock();
-        ((EventList<URL>)locations).clear();
-        ((EventList<URL>)locations).addAll(list);
-        ((EventList<URL>)locations).getReadWriteLock().writeLock().unlock();
+    public void setLocations(List<String> list) {
+        ((EventList<String>)locations).getReadWriteLock().writeLock().lock();
+        ((EventList<String>)locations).clear();
+        ((EventList<String>)locations).addAll(list);
+        ((EventList<String>)locations).getReadWriteLock().writeLock().unlock();
     }
     
-    @Override
-    public void addLocation(URL location) {
-        System.out.println("addLocation " + location);
+    public void addLocations(String location) {
         locations.add(location);
     }
     
-    public void addLocations(List<URL> list) {
+    public void addLocations(List<String> list) {
         locations.addAll(list);
     }
 

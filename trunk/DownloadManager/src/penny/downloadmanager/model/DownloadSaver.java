@@ -62,7 +62,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
             }
             
             if(removeLinks.size() > 0) {
-                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks, Download.HREF);
+                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks);
             }
         }
     }
@@ -105,7 +105,50 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
             }
             
             if(removeLinks.size() > 0) {
-                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks, Download.SRC);
+                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks);
+            }
+        }
+    }
+
+    class LocationSaver implements ListEventListener<String> {
+
+        private Download download;
+
+        public LocationSaver(Download download) {
+            this.download = download;
+            download.addLocationsListener(this);
+        }
+
+        @Override
+        public void listChanged(ListEvent<String> listChanges) {
+
+            List<String> addLocations = new ArrayList<>();
+            List<String> removeLocations = new ArrayList<>();
+
+            EventList changeList = listChanges.getSourceList();
+            while (listChanges.next()) {
+                int sourceIndex = listChanges.getIndex();
+                int changeType = listChanges.getType();
+
+                switch (changeType) {
+                    case ListEvent.DELETE:
+                        removeLocations.add(listChanges.getOldValue());
+                        break;
+                    case ListEvent.INSERT:
+                        addLocations.add(download.getSrcLinks().get(sourceIndex));
+                        break;
+                    case ListEvent.UPDATE:
+
+                        break;
+                }
+            }
+            
+            if(addLocations.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLocations, Download.REDIRECT);
+            }
+            
+            if(removeLocations.size() > 0) {
+                DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLocations);
             }
         }
     }
@@ -158,6 +201,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
     private Map<Download, WordSaver> wordSavers;
     private Map<Download, HrefLinkSaver> hrefSavers;
     private Map<Download, SrcLinkSaver> srcSavers;
+    private Map<Download, LocationSaver> locationSavers;
 
     public DownloadSaver(ObservableElementList<Download> downloads) {
         saveProps = new ArrayList<String>();
@@ -200,6 +244,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
         wordSavers = new HashMap<Download, WordSaver>();
         hrefSavers = new HashMap<Download, HrefLinkSaver>();
         srcSavers = new HashMap<Download, SrcLinkSaver>();
+        locationSavers = new HashMap<Download, LocationSaver>();
     }
 
     public boolean isSaveDelete() {
@@ -288,6 +333,10 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     SrcLinkSaver srcSaver = srcSavers.get(d1);
                     d1.removeSrcLinksListener(srcSaver);
                     srcSavers.remove(d1);
+
+                    LocationSaver locationSaver = locationSavers.get(d1);
+                    d1.removeSrcLinksListener(locationSaver);
+                    locationSavers.remove(d1);
                     break;
                 case ListEvent.INSERT:
                     changeList.getReadWriteLock().readLock().lock();
@@ -300,6 +349,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     wordSavers.put(d2, new WordSaver(d2));
                     hrefSavers.put(d2, new HrefLinkSaver(d2));
                     srcSavers.put(d2, new SrcLinkSaver(d2));
+                    locationSavers.put(d2, new LocationSaver(d2));
                     break;
                 case ListEvent.UPDATE:
 
