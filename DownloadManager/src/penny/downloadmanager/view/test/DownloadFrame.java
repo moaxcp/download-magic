@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import penny.downloadmanager.control.Application;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.util.RandomChanges;
 
@@ -135,7 +136,7 @@ public class DownloadFrame extends javax.swing.JFrame {
         });
 
         randomChanges = new RandomChanges(downloads);
-        Thread t = new Thread(randomChanges);
+        Thread t = Application.getThread(randomChanges);
         t.start();
     }
 

@@ -162,7 +162,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     private void randomChange() {
         if (mainModel.isRandomChange()) {
             randomChanges.on();
-            Thread t = new Thread(randomChanges);
+            Thread t = Application.getThread(randomChanges);
             t.start();
         } else {
             randomChanges.stop();
