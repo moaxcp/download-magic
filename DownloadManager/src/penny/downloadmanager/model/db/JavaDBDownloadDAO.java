@@ -8,7 +8,6 @@
  */
 package penny.downloadmanager.model.db;
 
-import ca.odell.glazedlists.EventList;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.*;
@@ -123,10 +122,10 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 d.setWordBuffer(rs.getString(Download.PROP_WORDBUFFER));
                 d.setSavePath(rs.getString(Download.PROP_SAVEPATH));
                 d.setTempPath(rs.getString(Download.PROP_TEMPPATH));
-                d.addExtraProperties((Map<String, Object>) getProperties(uuid));
-                d.addSrcLinks(getLinks(uuid, Download.SRC));
-                d.addHrefLinks(getLinks(uuid, Download.HREF));
-                d.addWords(getWords(uuid));
+                d.addExtraProperties((Map<String, Object>) DAOFactory.getInstance().getPropertyDAO().getProperties(uuid));
+                d.addSrcLinks(DAOFactory.getInstance().getLinkDAO().getLinks(uuid, Download.SRC));
+                d.addHrefLinks(DAOFactory.getInstance().getLinkDAO().getLinks(uuid, Download.HREF));
+                d.addWords(DAOFactory.getInstance().getWordDAO().getWords(uuid));
             } else {
                 d = null;
             }
@@ -138,78 +137,6 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             JavaDBDataSource.getInstance().returnConnection(connection);
         }
         return d;
-    }
-
-    private HashMap<String, Object> getProperties(UUID uuid) {
-        HashMap<String, Object> props = new HashMap<String, Object>();
-        Connection connection = JavaDBDataSource.getInstance().getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            String query = "select * from property where " + Download.PROP_ID + " = '" + uuid + "'";
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
-            ResultSet rs = statement.executeQuery(query);
-            while (rs.next()) {
-                String name = rs.getString("name");
-                Object prop = rs.getObject("property");
-                props.put(name, prop);
-            }
-            statement.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
-        } finally {
-            JavaDBDataSource.getInstance().returnConnection(connection);
-        }
-        return props;
-    }
-
-    private List<String> getLinks(UUID uuid, String type) {
-        List<String> urls = new ArrayList<String>();
-        Connection connection = JavaDBDataSource.getInstance().getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            String query = "select * from url where " + Download.PROP_ID + " = '" + uuid + "' and TYPE = '" + type + "'";
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
-            ResultSet rs = statement.executeQuery(query);
-            while (rs.next()) {
-                int count = rs.getInt("count");
-                for (int i = 0; i < count; i++) {
-                    if (type.equals(Download.HREF)) {
-                        urls.add(rs.getString("link"));
-                    } else if (type.equals(Download.SRC)) {
-                        urls.add(rs.getString("link"));
-                    }
-                }
-            }
-            statement.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
-        } finally {
-            JavaDBDataSource.getInstance().returnConnection(connection);
-        }
-        return urls;
-    }
-
-    private List<String> getWords(UUID uuid) {
-        List<String> words = new ArrayList<String>();
-        Connection connection = JavaDBDataSource.getInstance().getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            String query = "select * from word where " + Download.PROP_ID + " = '" + uuid + "' order by wordindex";
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
-            ResultSet rs = statement.executeQuery(query);
-            while (rs.next()) {
-                words.add(rs.getString("WORD"));
-            }
-            statement.close();
-        } catch (SQLException ex) {
-            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
-        } finally {
-            JavaDBDataSource.getInstance().returnConnection(connection);
-        }
-        return words;
     }
 
     @Override
@@ -236,15 +163,8 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             PreparedStatement statement = connection.prepareStatement(query.toString());
             int param = 1;
             for (String s : propertyNames) {
-                if (s.equals(Download.PROP_LOCATIONS)) {
-                    List<URL> locations = (List<URL>) download.getProperty(s);
-                    List<URL> list = new ArrayList<URL>();
-                    list.addAll(locations);
-                    setObjectParam(statement, param, list);
-                } else {
-                    Object o = download.getProperty(s);
-                    setObjectParam(statement, param, o);
-                }
+                Object o = download.getProperty(s);
+                setObjectParam(statement, param, o);
                 param++;
             }
 
@@ -257,17 +177,9 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 insert");
             }
 
-            Map<String, Integer> href = JavaDBLinkDAO.countUrls(download.getHrefLinks());
-            for (String s : href.keySet()) {
-                DAOFactory.getInstance().getLinkDAO().addLink(download.getId(), s, Download.HREF, href.get(s));
-            }
-
-            href = null;
-
-            Map<String, Integer> src = JavaDBLinkDAO.countUrls(download.getSrcLinks());
-            for (String s : src.keySet()) {
-                DAOFactory.getInstance().getLinkDAO().addLink(download.getId(), s, Download.SRC, src.get(s));
-            }
+            DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), download.getHrefLinks(), Download.HREF);
+            DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), download.getSrcLinks(), Download.SRC);
+            DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), download.getLocations(), Download.REDIRECT);
 
             for (String s : download.getWords()) {
                 DAOFactory.getInstance().getWordDAO().addWord(download.getId(), s);
@@ -341,22 +253,33 @@ public class JavaDBDownloadDAO implements DownloadDAO {
                 throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update");
             }
 
-            Map<String, Integer> href = JavaDBLinkDAO.countUrls(download.getHrefLinks());
-            for (String s : href.keySet()) {
-                DAOFactory.getInstance().getLinkDAO().addLink(download.getId(), s, Download.HREF, href.get(s));
-            }
+            LinkDAO linkDao = DAOFactory.getInstance().getLinkDAO();
 
-            href = null;
+            List<String> href = linkDao.getLinks(download.getId(), Download.HREF);
+            List<String> copy = new ArrayList<>();
+            Collections.copy(copy, download.getHrefLinks());
+            copy.removeAll(href);
+            linkDao.addLinks(download.getId(), copy, Download.HREF);
 
-            Map<String, Integer> src = JavaDBLinkDAO.countUrls(download.getSrcLinks());
-            for (String s : src.keySet()) {
-                DAOFactory.getInstance().getLinkDAO().addLink(download.getId(), s, Download.SRC, src.get(s));
-            }
+            List<String> src = linkDao.getLinks(download.getId(), Download.SRC);
+            copy.clear();
+            Collections.copy(copy, download.getSrcLinks());
+            copy.removeAll(src);
+            linkDao.addLinks(download.getId(), copy, Download.SRC);
 
-            DAOFactory.getInstance().getWordDAO().deleteWords(download.getId());
-            for (String s : download.getWords()) {
-                DAOFactory.getInstance().getWordDAO().addWord(download.getId(), s);
-            }
+            List<String> locations = linkDao.getLinks(download.getId(), Download.REDIRECT);
+            copy.clear();
+            Collections.copy(copy, download.getLocations());
+            copy.removeAll(locations);
+            linkDao.addLinks(download.getId(), copy, Download.REDIRECT);
+
+            WordDAO wordDao = DAOFactory.getInstance().getWordDAO();
+
+            List<String> words = wordDao.getWords(download.getId());
+            copy.clear();
+            Collections.copy(copy, download.getWords());
+            copy.removeAll(words);
+            wordDao.addWords(download.getId(), copy);
 
             for (String s : download.getExtraProperties().keySet()) {
                 DAOFactory.getInstance().getPropertyDAO().saveProperty(download.getId(), s, download.getExtraProperties().get(s));

@@ -12,6 +12,7 @@ import java.util.UUID;
  * @author john
  */
 public interface WordDAO {
+    public List<String> getWords(UUID uuid);
     public void addWord(UUID uuid, String word);
     public void addWords(UUID uuid, List<String> words);
     public void deleteWords(UUID uuid);

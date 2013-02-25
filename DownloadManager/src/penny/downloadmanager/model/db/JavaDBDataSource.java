@@ -18,7 +18,6 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import penny.download.AbstractDownload;
 
 /**
  *
@@ -52,7 +51,6 @@ public class JavaDBDataSource {
         l.add(Download.PROP_FILEEXSENTION);
         l.add(Download.PROP_MESSAGE);
         l.add(Download.PROP_RESPONSECODE);
-        l.add(Download.PROP_LOCATIONS);
         l.add(Download.PROP_MD5);
         l.add(Download.PROP_LINKSTATE);
         l.add(Download.PROP_WORDBUFFER);
@@ -80,7 +78,6 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_FILEEXSENTION +    " VARCHAR(32672), \n"
             + "    " + Download.PROP_MESSAGE +          " VARCHAR(32672), \n"
             + "    " + Download.PROP_RESPONSECODE +     " SMALLINT, \n"
-            + "    " + Download.PROP_LOCATIONS +        " List, \n"
             + "    " + Download.PROP_MD5 +              " MD5State, \n"
             + "    " + Download.PROP_LINKSTATE +        " LinkState, \n"
             + "    " + Download.PROP_WORDBUFFER +       " VARCHAR(32672), \n"
@@ -92,8 +89,8 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_ID + " CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL,\n"
             + "    " + "LINK" +           " VARCHAR(32672) NOT NULL,\n"
             + "    " + "TYPE" +           " VARCHAR(4),\n"
-            + "    " + "COUNT" +          " INTEGER,\n"
-            + "    PRIMARY KEY (" + Download.PROP_ID + ", LINK, TYPE),\n"
+            + "    " + "LINKINDEX" +      " BIGINT,\n"
+            + "    PRIMARY KEY (" + Download.PROP_ID + ", LINKINDEX),\n"
             + "    FOREIGN KEY (" + Download.PROP_ID + ") REFERENCES DOWNLOAD (" + Download.PROP_ID + ")\n"
             + ")";
     private String strCreateWordTable =
@@ -101,7 +98,7 @@ public class JavaDBDataSource {
             + "    " + Download.PROP_ID + " CHAR(" + UUID.randomUUID().toString().length() + ") NOT NULL,\n"
             + "    WORD                VARCHAR(32672) NOT NULL,\n"
             + "    WORDINDEX           BIGINT,\n"
-            + "    PRIMARY KEY        (" + Download.PROP_ID + ", WORD, WORDINDEX),\n"
+            + "    PRIMARY KEY        (" + Download.PROP_ID + ", WORDINDEX),\n"
             + "    FOREIGN KEY        (" + Download.PROP_ID + ") REFERENCES DOWNLOAD (" + Download.PROP_ID + ")\n"
             + ")";
     private String strCreatePropertyTable =
@@ -128,17 +125,13 @@ public class JavaDBDataSource {
             "create type DownloadStatus\n " +
             "EXTERNAL NAME 'penny.download.DownloadStatus'\n " +
             "LANGUAGE JAVA";
-    private String strCreateListType =
-            "create type List\n " +
-            "EXTERNAL NAME 'java.util.List'\n " +
-            "LANGUAGE JAVA";
     private static JavaDBDataSource dataSource;
     private Queue<Connection> conPool;
     private Queue<Connection> conOut;
 
     public JavaDBDataSource() {
-        conPool = new LinkedList<Connection>();
-        conOut = new LinkedList<Connection>();
+        conPool = new LinkedList<>();
+        conOut = new LinkedList<>();
     }
 
     public static JavaDBDataSource getInstance() {
@@ -231,7 +224,7 @@ public class JavaDBDataSource {
 
         Properties dbProperties = loadProperties();
 
-        Connection connection = null;
+        Connection connection;
         try {
             connection = DriverManager.getConnection(url, dbProperties);
         } catch (SQLException ex) {
@@ -263,7 +256,6 @@ public class JavaDBDataSource {
             statement.execute(strCreateLinkStateType);
             statement.execute(strCreateObjectType);
             statement.execute(strCreateDownloadStatusType);
-            statement.execute(strCreateListType);
             statement.execute(strCreateDownloadTable);
             statement.execute(strCreateUrlTable);
             statement.execute(strCreateWordTable);

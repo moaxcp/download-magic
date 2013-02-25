@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,103 +23,60 @@ import java.util.logging.Logger;
  */
 public class JavaDBLinkDAO implements LinkDAO {
 
-    static Map<String, Integer> countUrls(List<String> urls) {
-        Map<String, Integer> counts = new HashMap<String, Integer>();
-        for (String s : urls) {
-            int c = 0;
-            for (int i = 0; i < urls.size(); i++) {
-                if (urls.get(i).equals(s)) {
-                    c++;
+    @Override
+    public List<String> getLinks(UUID uuid, String type) {
+        List<String> urls = new ArrayList<String>();
+        Connection connection = JavaDBDataSource.getInstance().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "select * from url where " + Download.PROP_ID + " = '" + uuid + "' and TYPE = '" + type + "' order by LINKINDEX";
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                if (type.equals(Download.HREF)) {
+                    urls.add(rs.getString("link"));
+                } else if (type.equals(Download.SRC)) {
+                    urls.add(rs.getString("link"));
+                } else if (type.equals(Download.REDIRECT)) {
+                    urls.add(rs.getString("link"));
                 }
             }
-            counts.put(s, c);
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException("There was an SQL Exception", ex);
+        } finally {
+            JavaDBDataSource.getInstance().returnConnection(connection);
         }
-        return counts;
+        return urls;
     }
 
     @Override
     public void addLink(UUID uuid, String link, String type) {
 
         Connection connection = JavaDBDataSource.getInstance().getConnection();
+        int executeUpdate = 0;
+        long linkIndex = 0;
         try {
-            int count = 0;
-            Statement s = connection.createStatement();
-            String query = "select count from url where " + Download.PROP_ID + " = '" + uuid + "' and link = '" + link + "' and type = '" + type + "'";
+            Statement statement = connection.createStatement();
+            String query = "select max(linkindex) from url where " + Download.PROP_ID + " = '" + uuid + "'";
             Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, query);
-            ResultSet rs = s.executeQuery(query);
+            ResultSet rs = statement.executeQuery(query);
             if (rs.next()) {
-                count = rs.getInt("count");
+                linkIndex = rs.getLong(1) + 1;
             }
-            s.close();
-            int executeUpdate = 0;
-            if (count > 0) {
-                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where " + Download.PROP_ID + " = ? and link = ? and type = ?");
-                statement.setInt(1, count + 1);
-                statement.setString(2, uuid.toString());
-                statement.setString(3, link);
-                statement.setString(4, type);
-                executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where " + Download.PROP_ID + " = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, count, uuid, link, type});
-                statement.close();
-            } else {
-                PreparedStatement statement = connection.prepareStatement("insert into url\n(" + Download.PROP_ID + ", link, type, count)\nvalues\n(?, ?, ?, ?)");
-                statement.setString(1, uuid.toString());
-                statement.setString(2, link);
-                statement.setString(3, type);
-                statement.setInt(4, count + 1);
-                executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (" + Download.PROP_ID + ", link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, uuid, link, type, count});
-                statement.close();
-            }
+            statement.close();
+            PreparedStatement insert = connection.prepareStatement("insert into url\n(" + Download.PROP_ID + ", link, type, linkindex)\nvalues\n(?, ?, ?, ?)");
+            insert.setString(1, uuid.toString());
+            insert.setString(2, link);
+            insert.setString(3, type);
+            insert.setLong(4, linkIndex);
+            executeUpdate = insert.executeUpdate();
+            Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (" + Download.PROP_ID + ", link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, uuid, link, type, linkIndex});
+            insert.close();
 
             if (executeUpdate != 1) {
-                throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update/insert");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + uuid + " " + link + " " + type, ex);
-            throw new IllegalStateException("There was an SQL Exception", ex);
-        } finally {
-            JavaDBDataSource.getInstance().returnConnection(connection);
-        }
-    }
-
-    @Override
-    public void addLink(UUID uuid, String link, String type, int count) {
-
-        Connection connection = JavaDBDataSource.getInstance().getConnection();
-        try {
-            int dbCount = 0;
-            Statement s = connection.createStatement();
-            String query = "select count from url where " + Download.PROP_ID + " = '" + uuid + "' and link = '" + link + "' and type = '" + type + "'";
-            Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, query);
-            ResultSet rs = s.executeQuery(query);
-            if (rs.next()) {
-                dbCount = rs.getInt("count");
-            }
-            s.close();
-            int executeUpdate = 0;
-            if (dbCount > 0) {
-                PreparedStatement statement = connection.prepareStatement("update url\n set count = ?\n where " + Download.PROP_ID + " = ? and link = ? and type = ?");
-                statement.setInt(1, count + dbCount);
-                statement.setString(2, uuid.toString());
-                statement.setString(3, link);
-                statement.setString(4, type);
-                executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} on udate url set count = {1} where " + Download.PROP_ID + " = {2} and link = {3} and type = {4}", new Object[]{executeUpdate, dbCount, uuid, link, type});
-                statement.close();
-            } else {
-                PreparedStatement statement = connection.prepareStatement("insert into url\n(" + Download.PROP_ID + ", link, type, count)\nvalues\n(?, ?, ?, ?)");
-                statement.setString(1, uuid.toString());
-                statement.setString(2, link);
-                statement.setString(3, type);
-                statement.setInt(4, count);
-                executeUpdate = statement.executeUpdate();
-                Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} insert into url (" + Download.PROP_ID + ", link, type, count) values ({1}, {2}, {3}, {4})", new Object[]{executeUpdate, uuid, link, type, dbCount});
-                statement.close();
-            }
-
-            if (executeUpdate != 1) {
-                throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 update/insert");
+                throw new IllegalStateException("executeUpdate is " + executeUpdate + " there should be 1 insert");
             }
         } catch (SQLException ex) {
             Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.SEVERE, "Exception saving link " + uuid + " " + link + " " + type, ex);
@@ -130,9 +88,8 @@ public class JavaDBLinkDAO implements LinkDAO {
 
     @Override
     public void addLinks(UUID uuid, List<String> list, String type) {
-        Map<String, Integer> count = countUrls(list);
-        for(String url : count.keySet()) {
-            addLink(uuid, url, type, count.get(url));
+        for (String url : list) {
+            addLink(uuid, url, type);
         }
     }
 
@@ -154,8 +111,22 @@ public class JavaDBLinkDAO implements LinkDAO {
     }
 
     @Override
-    public void deleteLinks(UUID uuid, List<String> list, String type) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void deleteLinks(UUID uuid, List<String> list) {
+        Connection connection = JavaDBDataSource.getInstance().getConnection();
+        try {
+            for (String link : list) {
+                int executeUpdate = 0;
+                Statement statement = connection.createStatement();
+                String query = "delete from url where " + Download.PROP_ID + " = '" + uuid + "' and link = '" + link + "'";
+                executeUpdate = statement.executeUpdate(query);
+                Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.FINE, "returned {0} on {1}", new Object[]{executeUpdate, query});
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(JavaDBLinkDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException("There was an SQL Exception", ex);
+        } finally {
+            JavaDBDataSource.getInstance().returnConnection(connection);
+        }
     }
 
     @Override
@@ -181,5 +152,4 @@ public class JavaDBLinkDAO implements LinkDAO {
         }
         return count;
     }
-    
 }
