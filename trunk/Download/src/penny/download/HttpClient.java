@@ -6,7 +6,6 @@ package penny.download;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +16,6 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -102,7 +100,7 @@ class HttpClient extends ProtocolClient {
             if (response.getStatusLine().getStatusCode() / 100 == 3) {
                 Header[] headers = response.getHeaders("Location");
                 if (headers.length > 0 && headers[0] != null) {
-                    download.addLocation(download.getUrl());
+                    download.addLocation(download.getUrl().toString());
                     download.setUrl(new URL(headers[0].getValue()));
                     download.setStatus(DownloadStatus.REDIRECTING);
                     request.abort();

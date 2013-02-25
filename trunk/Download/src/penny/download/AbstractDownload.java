@@ -205,10 +205,10 @@ public abstract class AbstractDownload {
      * when a connection is supposed to be redirected the AbstractDownload url
      * will change and locations will store the previous urls.
      */
-    protected List<URL> locations;
+    protected List<String> locations;
     public static final String PROP_LOCATIONS = "locations";
     /**
-     * The HTTP response code recieved when connecting to the url in this
+     * The HTTP response code received when connecting to the url in this
      * AbstractDownload.
      */
     protected int responseCode;
@@ -242,7 +242,7 @@ public abstract class AbstractDownload {
         message = "";
         retryStartTime = 0;
         retryTime = 0;
-        locations = new ArrayList<URL>();
+        locations = new ArrayList<String>();
     }
 
     public AbstractDownload(URL url) {
@@ -772,7 +772,7 @@ public abstract class AbstractDownload {
      *
      * @return
      */
-    public List<URL> getLocations() {
+    public List<String> getLocations() {
         return locations;
     }
 
@@ -782,14 +782,14 @@ public abstract class AbstractDownload {
      *
      * @param location
      */
-    public void addLocation(URL location) {
+    public void addLocation(String location) {
         int index = locations.size();
         locations.add(location);
         propertySupport.fireIndexedPropertyChange(PROP_LOCATIONS, index, null, location);
     }
 
     /**
-     * Returns the response code recieved when connecting to this
+     * Returns the response code received when connecting to this
      * AbstractDownload.
      *
      * @return
@@ -799,7 +799,7 @@ public abstract class AbstractDownload {
     }
 
     /**
-     * Sets the response code recieved when connecting to this AbstractDownload.
+     * Sets the response code received when connecting to this AbstractDownload.
      *
      * @param responseCode
      */
