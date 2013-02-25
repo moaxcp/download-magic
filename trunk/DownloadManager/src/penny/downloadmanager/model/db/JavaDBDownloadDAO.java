@@ -254,32 +254,55 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             }
 
             LinkDAO linkDao = DAOFactory.getInstance().getLinkDAO();
-
-            List<String> href = linkDao.getLinks(download.getId(), Download.HREF);
-            List<String> copy = new ArrayList<>();
-            Collections.copy(copy, download.getHrefLinks());
-            copy.removeAll(href);
-            linkDao.addLinks(download.getId(), copy, Download.HREF);
-
-            List<String> src = linkDao.getLinks(download.getId(), Download.SRC);
-            copy.clear();
-            Collections.copy(copy, download.getSrcLinks());
-            copy.removeAll(src);
-            linkDao.addLinks(download.getId(), copy, Download.SRC);
-
-            List<String> locations = linkDao.getLinks(download.getId(), Download.REDIRECT);
-            copy.clear();
-            Collections.copy(copy, download.getLocations());
-            copy.removeAll(locations);
-            linkDao.addLinks(download.getId(), copy, Download.REDIRECT);
-
             WordDAO wordDao = DAOFactory.getInstance().getWordDAO();
 
-            List<String> words = wordDao.getWords(download.getId());
-            copy.clear();
-            Collections.copy(copy, download.getWords());
-            copy.removeAll(words);
-            wordDao.addWords(download.getId(), copy);
+            List<String> hrefDB = linkDao.getLinks(download.getId(), Download.HREF);
+            List<String> hrefDownload = download.getHrefLinks();
+            List<String> srcDB = linkDao.getLinks(download.getId(), Download.SRC);
+            List<String> srcDownload = download.getSrcLinks();
+            List<String> locationsDB = linkDao.getLinks(download.getId(), Download.REDIRECT);
+            List<String> locationsDownload = download.getLocations();
+            List<String> wordsDB = wordDao.getWords(download.getId());
+            List<String> wordsDownload = download.getWords();
+            List<String> remove = new ArrayList<>();
+            List<String> add = new ArrayList<>();
+            
+            Collections.copy(remove, hrefDB);
+            remove.removeAll(hrefDownload);
+            linkDao.deleteLinks(download.getId(), remove);
+            Collections.copy(add, hrefDownload);
+            add.removeAll(hrefDB);
+            linkDao.addLinks(download.getId(), add, Download.HREF);
+
+            remove.clear();
+            add.clear();
+            
+            Collections.copy(remove, srcDB);
+            remove.removeAll(srcDownload);
+            linkDao.deleteLinks(download.getId(), remove);
+            Collections.copy(add, srcDownload);
+            add.removeAll(srcDB);
+            linkDao.addLinks(download.getId(), add, Download.SRC);
+
+            remove.clear();
+            add.clear();
+            
+            Collections.copy(remove, locationsDB);
+            remove.removeAll(locationsDownload);
+            linkDao.deleteLinks(download.getId(), remove);
+            Collections.copy(add, locationsDownload);
+            add.removeAll(locationsDB);
+            linkDao.addLinks(download.getId(), add, Download.REDIRECT);
+
+            remove.clear();
+            add.clear();
+            
+            Collections.copy(remove, wordsDB);
+            remove.removeAll(wordsDownload);
+            linkDao.deleteLinks(download.getId(), remove);
+            Collections.copy(add, wordsDownload);
+            add.removeAll(wordsDB);
+            wordDao.addWords(download.getId(), add);
 
             for (String s : download.getExtraProperties().keySet()) {
                 DAOFactory.getInstance().getPropertyDAO().saveProperty(download.getId(), s, download.getExtraProperties().get(s));
