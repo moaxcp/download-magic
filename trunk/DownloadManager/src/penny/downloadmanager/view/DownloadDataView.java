@@ -43,6 +43,7 @@ public class DownloadDataView extends javax.swing.JDialog implements PropertyCha
      * Creates new form DownloadDataView
      */
     public DownloadDataView(Download d) {
+        this.setLocationByPlatform(true);
         this.d = d;
         d.addPropertyChangeListener(this);
         Comparator<PropertyEntry> comp = new Comparator<PropertyEntry>() {

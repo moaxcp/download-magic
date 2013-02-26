@@ -49,6 +49,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private JMenu lookMenu;
 
     public MainWindow(MainWindowModel mainWindowModel, TaskManagerModel taskModel) {
+        this.setLocationByPlatform(true);
         this.mainWindowModel = mainWindowModel;
         this.taskModel = taskModel;
         taskModel.addPropertyChangeListener(this);

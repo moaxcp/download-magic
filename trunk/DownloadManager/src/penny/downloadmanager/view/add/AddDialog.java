@@ -33,6 +33,7 @@ public class AddDialog extends JDialog implements PropertyChangeListener {
 
     /** Creates new form AddDialog */
     public AddDialog(AddDialogModel addModel) {
+        this.setLocationByPlatform(true);
         addUrl = new AddURL(addModel);
         addList = new AddList(addModel);
         addQuery = new AddQuery(addModel);
