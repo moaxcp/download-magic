@@ -92,6 +92,7 @@ public class Application {
         Control.build();
 
         Model.loadData();
+        View.initLookAndFeel();
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
