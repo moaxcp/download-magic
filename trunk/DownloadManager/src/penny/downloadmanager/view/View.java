@@ -5,6 +5,15 @@
 
 package penny.downloadmanager.view;
 
+import java.awt.Frame;
+import java.awt.Window;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import penny.downloadmanager.model.LookAndFeelModel;
 import penny.downloadmanager.view.settings.DownloadSettingsDialog;
 import penny.downloadmanager.view.settings.EditFileFormat;
 import penny.downloadmanager.view.add.AddTask;
@@ -59,8 +68,48 @@ public class View {
     public static StartupSettings getStartupSettings() {
         return startupSettings;
     }
+    
+    public static void initLookAndFeel() {
+        LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
+        try {
+            UIManager.setLookAndFeel(lookModel.getLookAndFeels().get(lookModel.getLookAndFeel()));
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        for(Window window : JFrame.getWindows()) {
+            SwingUtilities.updateComponentTreeUI(window);
+        }
+    }
 
     public static void build() {
+        LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
+        if(lookModel.getLookAndFeel() == null || lookModel.getLookAndFeel().equals("")) {
+            for(String name : lookModel.getLookAndFeels().keySet()) {
+                if(lookModel.getLookAndFeels().get(name).equals(UIManager.getSystemLookAndFeelClassName())) {
+                    lookModel.setLookAndFeel(name);
+                    break;
+                } else {
+                    lookModel.setLookAndFeel(name);
+                }
+            }
+        }
+        try {
+            UIManager.setLookAndFeel(lookModel.getLookAndFeels().get(lookModel.getLookAndFeel()));
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+        }
         settingsDialogView = new DownloadSettingsDialog(Model.getSettingsDialogModel());
         Model.getSettingsDialogModel().addPropertyChangeListener(settingsDialogView);
         addDialogView = new AddDialog(Model.getAddDialogModel());

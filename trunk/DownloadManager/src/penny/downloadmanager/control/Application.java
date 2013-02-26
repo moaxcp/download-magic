@@ -10,9 +10,11 @@ import penny.downloadmanager.model.db.JavaDBDataSource;
 import penny.downloadmanager.util.SwingExceptionHandler;
 import penny.downloadmanager.view.View;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import penny.downloadmanager.util.EventRateCounter;
 
 /**
@@ -50,6 +52,7 @@ public class Application {
      * @param args the command line arguments
      */
     public static void main(String args[]) throws Exception {
+        Thread.currentThread().setUncaughtExceptionHandler(new SwingExceptionHandler());
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new EventRateCounter());
         
         //System.setProperty("socksProxyHost", "localhost");

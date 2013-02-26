@@ -15,13 +15,19 @@ import ca.odell.glazedlists.event.ListEvent;
 import ca.odell.glazedlists.event.ListEventListener;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.ButtonGroup;
+import javax.swing.JMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.MainWindowControl;
+import penny.downloadmanager.model.LookAndFeelModel;
+import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.TaskManagerModel;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.MainWindowModel;
@@ -40,6 +46,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private EventListModel<TaskData> taskListModel;
     private MainWindowModel mainWindowModel;
     private TaskManagerModel taskModel;
+    private JMenu lookMenu;
 
     public MainWindow(MainWindowModel mainWindowModel, TaskManagerModel taskModel) {
         this.mainWindowModel = mainWindowModel;
@@ -56,6 +63,20 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         downloadTable.setDefaultRenderer(JProgressBar.class, prog);
         downloadTable.getSelectionModel().addListSelectionListener(this);
         taskList.getSelectionModel().addListSelectionListener(this);
+        
+        LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
+        lookMenu = new JMenu("Look And Feel", false);
+        ButtonGroup lookGroup = new ButtonGroup();
+        for(String name : lookModel.getLookAndFeels().keySet()) {
+            JRadioButtonMenuItem button = new JRadioButtonMenuItem(name);
+            lookMenu.add(button);
+            lookGroup.add(button);
+            if(name.equals(lookModel.getLookAndFeel())) {
+                button.setSelected(true);
+            }
+            button.setActionCommand(name);
+        }
+        viewMenu.add(lookMenu);
     }
 
     /** This method is called from within the constructor to
@@ -92,10 +113,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         clearDownloadsMenu = new javax.swing.JMenuItem();
         clearCompleteDownloadsMenu = new javax.swing.JMenuItem();
         clearErrorDownloadsMenu = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        jMenu6 = new javax.swing.JMenu();
-        systemLookMenu = new javax.swing.JMenuItem();
-        metalLookMenu = new javax.swing.JMenuItem();
+        viewMenu = new javax.swing.JMenu();
         downloadProperties = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         testConnectionMenu = new javax.swing.JMenuItem();
@@ -145,7 +163,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(removeDownloadButton)
                     .addComponent(queueDownloadButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Downloads", jPanel2);
@@ -179,7 +197,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(addTaskButton)
                     .addComponent(removeTaskButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Task Manager", jPanel3);
@@ -220,22 +238,12 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("View");
-
-        jMenu6.setText("Look");
-
-        systemLookMenu.setText("System");
-        jMenu6.add(systemLookMenu);
-
-        metalLookMenu.setText("Metal");
-        jMenu6.add(metalLookMenu);
-
-        jMenu3.add(jMenu6);
+        viewMenu.setText("View");
 
         downloadProperties.setText("Properties");
-        jMenu3.add(downloadProperties);
+        viewMenu.add(downloadProperties);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(viewMenu);
 
         jMenu4.setText("Tools");
 
@@ -302,10 +310,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JMenuItem exitMenu;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -315,7 +321,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JMenuItem metalLookMenu;
     private javax.swing.JButton queueDownloadButton;
     private javax.swing.JCheckBoxMenuItem randomChangesMenu;
     private javax.swing.JButton removeDownloadButton;
@@ -323,9 +328,9 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JMenuItem settingsMenu;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
-    private javax.swing.JMenuItem systemLookMenu;
     private javax.swing.JList taskList;
     private javax.swing.JMenuItem testConnectionMenu;
+    private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables
 
     public void registerController(MainWindowControl mainWindowControl) {
@@ -366,12 +371,12 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         testConnectionMenu.addActionListener(mainWindowControl);
         testConnectionMenu.setActionCommand(MainWindowControl.COM_ANALYZER);
-
-        systemLookMenu.addActionListener(mainWindowControl);
-        systemLookMenu.setActionCommand(MainWindowControl.COM_SYSTEM);
-
-        metalLookMenu.addActionListener(mainWindowControl);
-        metalLookMenu.setActionCommand(MainWindowControl.COM_METAL);
+        
+        for(Component c : lookMenu.getMenuComponents()) {
+            if(c instanceof JRadioButtonMenuItem) {
+                ((JRadioButtonMenuItem)c).addActionListener(mainWindowControl);
+            }
+        }
 
         aboutMenu.addActionListener(mainWindowControl);
         aboutMenu.setActionCommand(MainWindowControl.COM_ABOUT);
