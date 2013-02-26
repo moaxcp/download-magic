@@ -24,6 +24,7 @@ public class ApplicationSettingsModel implements Serializable {
     private MD5ingModel md5ingModel;
     private ImageModel imageModel;
     private StartupModel startupModel;
+    private LookAndFeelModel lookModel;
 
     public ApplicationSettingsModel() {
         savingModel = new SavingModel();
@@ -32,6 +33,7 @@ public class ApplicationSettingsModel implements Serializable {
         md5ingModel = new MD5ingModel();
         imageModel = new ImageModel();
         startupModel = new StartupModel();
+        lookModel = new LookAndFeelModel();
     }
 
     public ApplicationSettingsModel(ApplicationSettingsModel appSettings) {
@@ -45,6 +47,7 @@ public class ApplicationSettingsModel implements Serializable {
         this.md5ingModel.copy(appSettings.getMd5ingModel());
         this.imageModel.copy(appSettings.getImageModel());
         this.startupModel.copy(appSettings.getStartupModel());
+        this.lookModel.copy(appSettings.getLookModel());
     }
 
     /**
@@ -87,5 +90,9 @@ public class ApplicationSettingsModel implements Serializable {
      */
     public StartupModel getStartupModel() {
         return startupModel;
+    }
+    
+    public LookAndFeelModel getLookModel() {
+        return lookModel;
     }
 }

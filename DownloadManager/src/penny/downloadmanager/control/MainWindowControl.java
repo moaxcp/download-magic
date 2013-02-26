@@ -10,8 +10,10 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.task.TaskManager;
+import penny.downloadmanager.model.LookAndFeelModel;
 import penny.downloadmanager.model.Model;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.AddDialogModel;
@@ -52,7 +54,6 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     public static final String COM_CLEARCOMPLETEDOWNLOADS = "clearCompleteDownloads";
     public static final String COM_CLEARERRORDOWNLOADS = "clearErrorDownloads";
     public static final String COM_APPLICATIONSTARTUP = "applicationStartup";
-    
     private MainWindowModel mainModel;
     private SettingsDialogModel settingsModel;
     private AddDialogModel addModel;
@@ -90,22 +91,22 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     }
 
     public void openDownloadView(Download download) {
-            DownloadDataView view = null;
+        DownloadDataView view = null;
 
-            for(DownloadDataView v : downloadViews) {
-                if(v.getDownload().equals(mainModel.getSelectedDownload())) {
-                    view = v;
-                    break;
-                }
+        for (DownloadDataView v : downloadViews) {
+            if (v.getDownload().equals(mainModel.getSelectedDownload())) {
+                view = v;
+                break;
             }
+        }
 
-            if(view == null) {
-                view = new DownloadDataView(mainModel.getSelectedDownload());
-                downloadViews.add(view);
-            }
+        if (view == null) {
+            view = new DownloadDataView(mainModel.getSelectedDownload());
+            downloadViews.add(view);
+        }
 
-            view.setVisible(true);
-            view.addWindowListener(this);
+        view.setVisible(true);
+        view.addWindowListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -133,10 +134,6 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             mainModel.getSelectedDownload().queue();
         } else if (e.getActionCommand().equals(COM_EXIT)) {
             exit();
-        } else if (e.getActionCommand().equals(COM_SYSTEM)) {
-            System.out.println(e.getActionCommand());
-        } else if (e.getActionCommand().equals(COM_METAL)) {
-            System.out.println(e.getActionCommand());
         } else if (e.getActionCommand().equals(COM_ADDTASK)) {
             addTaskModel.setVisible(true);
         } else if (e.getActionCommand().equals(COM_REMOVETASK) && mainModel.getSelectedTask() != null) {
@@ -149,8 +146,14 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             mainModel.clearCompleteDownloads();
         } else if (e.getActionCommand().equals(COM_CLEARERRORDOWNLOADS)) {
             mainModel.clearErrorDownloads();
-        } else if(e.getActionCommand().equals(COM_APPLICATIONSTARTUP)) {
+        } else if (e.getActionCommand().equals(COM_APPLICATIONSTARTUP)) {
             Model.getStartupDialogModel().setVisible(true);
+        } else {
+            LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
+            if (lookModel.getLookAndFeels().containsKey(e.getActionCommand())) {
+                lookModel.setLookAndFeel(e.getActionCommand());
+                View.initLookAndFeel();
+            }
         }
     }
 
@@ -204,9 +207,9 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
 
     @Override
     public void windowClosing(WindowEvent e) {
-        if(e.getWindow().equals(View.getMainWindowView())) {
+        if (e.getWindow().equals(View.getMainWindowView())) {
             exit();
-        } else if(e.getWindow() instanceof DownloadDataView) {
+        } else if (e.getWindow() instanceof DownloadDataView) {
             DownloadDataView view = (DownloadDataView) e.getWindow();
             view.removeWindowListener(this);
             view.getDownload().removePropertyChangeListener(view);
