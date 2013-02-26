@@ -153,6 +153,7 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             if (lookModel.getLookAndFeels().containsKey(e.getActionCommand())) {
                 lookModel.setLookAndFeel(e.getActionCommand());
                 View.initLookAndFeel();
+                Model.getSettingsSaver().save();
             }
         }
     }

@@ -99,17 +99,7 @@ public class View {
                 }
             }
         }
-        try {
-            UIManager.setLookAndFeel(lookModel.getLookAndFeels().get(lookModel.getLookAndFeel()));
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedLookAndFeelException ex) {
-            Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        initLookAndFeel();
         settingsDialogView = new DownloadSettingsDialog(Model.getSettingsDialogModel());
         Model.getSettingsDialogModel().addPropertyChangeListener(settingsDialogView);
         addDialogView = new AddDialog(Model.getAddDialogModel());
