@@ -29,6 +29,7 @@ public class DownloadSettingsDialog extends javax.swing.JDialog implements Prope
 
     /** Creates new form DownloadSettingsDialog */
     public DownloadSettingsDialog(SettingsDialogModel settingsModel) {
+        this.setLocationByPlatform(true);
         this.settingsModel = settingsModel;
         initComponents();
     }

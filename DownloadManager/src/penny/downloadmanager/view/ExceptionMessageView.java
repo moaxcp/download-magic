@@ -19,6 +19,7 @@ public class ExceptionMessageView extends javax.swing.JDialog {
      */
     public ExceptionMessageView(java.awt.Frame parent, boolean modal, ExceptionMessage message) {
         super(parent, modal);
+        this.setLocationByPlatform(true);
         this.message = message;
         initComponents();
     }
