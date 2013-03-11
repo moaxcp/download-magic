@@ -5,7 +5,6 @@
 
 package penny.downloadmanager.view;
 
-import java.awt.Frame;
 import java.awt.Window;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,11 +13,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import penny.downloadmanager.model.LookAndFeelModel;
+import penny.downloadmanager.model.Model;
+import penny.downloadmanager.view.add.AddDialog;
+import penny.downloadmanager.view.add.AddTask;
 import penny.downloadmanager.view.settings.DownloadSettingsDialog;
 import penny.downloadmanager.view.settings.EditFileFormat;
-import penny.downloadmanager.view.add.AddTask;
-import penny.downloadmanager.view.add.AddDialog;
-import penny.downloadmanager.model.Model;
 import penny.downloadmanager.view.settings.StartupSettings;
 
 /**
