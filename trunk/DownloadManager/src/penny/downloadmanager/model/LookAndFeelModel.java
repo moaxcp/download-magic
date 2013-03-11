@@ -4,6 +4,7 @@
  */
 package penny.downloadmanager.model;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -59,5 +60,21 @@ public class LookAndFeelModel implements Serializable {
         String oldValue = this.lookAndFeel;
         this.lookAndFeel = lookAndFeel;
         propertySupport.firePropertyChange(PROP_LOOKANDFEEL, oldValue, this.lookAndFeel);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String prop, PropertyChangeListener listener) {
+        propertySupport.addPropertyChangeListener(prop, listener);
+    }
+
+    public void removePropertyChangeListener(String prop, PropertyChangeListener listener) {
+        propertySupport.removePropertyChangeListener(prop, listener);
     }
 }

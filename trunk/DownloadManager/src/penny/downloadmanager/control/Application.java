@@ -5,17 +5,15 @@
 package penny.downloadmanager.control;
 
 import java.awt.Toolkit;
-import penny.downloadmanager.model.Model;
-import penny.downloadmanager.model.db.JavaDBDataSource;
-import penny.downloadmanager.util.SwingExceptionHandler;
-import penny.downloadmanager.view.View;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
+import penny.downloadmanager.model.Model;
+import penny.downloadmanager.model.db.JavaDBDataSource;
 import penny.downloadmanager.util.EventRateCounter;
+import penny.downloadmanager.util.SwingExceptionHandler;
+import penny.downloadmanager.view.View;
 
 /**
  *
