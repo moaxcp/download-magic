@@ -31,6 +31,7 @@ public class View {
     private static MainWindow mainWindowView;
     private static EditFileFormat editFileFormat;
     private static StartupSettings startupSettings;
+    private static SplashScreen splashScreen;
 
     /**
      * @return the addDialogView
@@ -66,6 +67,10 @@ public class View {
 
     public static StartupSettings getStartupSettings() {
         return startupSettings;
+    }
+    
+    public static SplashScreen getSplashScreen() {
+        return splashScreen;
     }
     
     public static void initLookAndFeel() {
@@ -105,5 +110,7 @@ public class View {
         mainWindowView = new MainWindow(Model.getMainWindowModel(), Model.getTaskManagerModel());
         addTask = new AddTask();
         startupSettings = new StartupSettings(Model.getStartupDialogModel());
+        splashScreen = new SplashScreen();
+        Model.getSplashScreenModel().addPropertyChangeListener(splashScreen);
     }
 }

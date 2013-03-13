@@ -49,7 +49,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private JMenu lookMenu;
 
     public MainWindow(MainWindowModel mainWindowModel, TaskManagerModel taskModel) {
-        this.setLocationByPlatform(true);
         this.mainWindowModel = mainWindowModel;
         this.taskModel = taskModel;
         taskModel.addPropertyChangeListener(this);
@@ -60,6 +59,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         mainWindowModel.getTasks().addListEventListener(this);
         Model.getApplicationSettings().getLookModel().addPropertyChangeListener(this);
         initComponents();
+        this.setLocationByPlatform(true);
         ProgressRenderer prog = new ProgressRenderer(0, 100);
         prog.setStringPainted(true);
         downloadTable.setDefaultRenderer(JProgressBar.class, prog);

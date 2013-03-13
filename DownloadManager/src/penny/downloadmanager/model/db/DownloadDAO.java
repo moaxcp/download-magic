@@ -19,7 +19,11 @@ public interface DownloadDAO {
 
     public List<Download> getDownloads();
     
+    public List<UUID> getIds();
+    
     public Download getDownload(UUID uuid);
+    
+    public Object getProperty(UUID uuid, String property);
     
     public void insertDownload(Download download);
 

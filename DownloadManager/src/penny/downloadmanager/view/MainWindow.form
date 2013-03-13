@@ -156,7 +156,7 @@
                   <Component id="stopButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" pref="365" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" pref="369" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -199,7 +199,7 @@
                           <Component id="queueDownloadButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane4" pref="287" max="32767" attributes="0"/>
+                      <Component id="jScrollPane4" pref="291" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -282,7 +282,7 @@
                           <Component id="removeTaskButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jScrollPane1" pref="287" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="291" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>

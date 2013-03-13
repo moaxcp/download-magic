@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -23,6 +24,7 @@ import penny.downloadmanager.model.gui.AddDialogModel;
 import penny.downloadmanager.model.gui.AddTaskModel;
 import penny.downloadmanager.model.gui.MainWindowModel;
 import penny.downloadmanager.model.gui.SettingsDialogModel;
+import penny.downloadmanager.model.gui.SplashScreenModel;
 import penny.downloadmanager.model.gui.StartupDialogModel;
 import penny.downloadmanager.model.task.DTaskData;
 import penny.downloadmanager.model.task.TaskData;
@@ -46,6 +48,7 @@ public class Model {
     private static ApplicationSettingsSaver settingsSaver;
     private static TaskSaver taskSaver;
     private static StartupDialogModel startupDialogModel;
+    private static SplashScreenModel splashScreenModel;
 
     /**
      * @return the addDialogModel
@@ -118,6 +121,10 @@ public class Model {
         return settingsSaver;
     }
 
+    public static SplashScreenModel getSplashScreenModel() {
+        return splashScreenModel;
+    }
+
     public static List<String> getDownloadProperties() {
         List<String> list = new ArrayList<String>();
         for (String s : mainWindowModel.getDownloadFormat().getColumns().keySet()) {
@@ -146,6 +153,7 @@ public class Model {
         taskSaver = new TaskSaver(tasks);
         startupDialogModel = new StartupDialogModel();
         startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
+        splashScreenModel = new SplashScreenModel();
     }
 
     public static boolean typeMatches(String contentType, List<String> types) {
@@ -222,16 +230,28 @@ public class Model {
     }
 
     public static void loadData() {
+        splashScreenModel.setVisible(true);
         try {
             try {
+                splashScreenModel.setStage("Loading settings...");
                 settingsSaver.load();
             } catch (Exception ex) {
                 Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
             }
             startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
+            splashScreenModel.setStage("Initializing DB...");
             JavaDBDataSource.getInstance().initDB();
             DownloadDAO dao = DAOFactory.getInstance().getDownloadDAO();
-            List<Download> downloads1 = dao.getDownloads();
+            splashScreenModel.setStage("Loading Downloads...");
+            List<Download> downloads1 = new ArrayList<Download>();
+            List<UUID> ids = dao.getIds();
+            splashScreenModel.setCurrent(0);
+            splashScreenModel.setSize(ids.size());
+            for(UUID id : ids) {
+                splashScreenModel.setMessage("Loading " + id);
+                downloads1.add(dao.getDownload(id));
+                splashScreenModel.setCurrent(splashScreenModel.getCurrent() + 1);
+            }
             downloads.addAll(downloads1);
             downloadSaver = new DownloadSaver(downloads);
             mainWindowModel.setDownloadSaver(downloadSaver);
@@ -243,7 +263,11 @@ public class Model {
             }
 
             if (Model.getApplicationSettings().getStartupModel().isCheckSizes()) {
+                splashScreenModel.setStage("Checking file sizes...");
+                splashScreenModel.setCurrent(0);
+                splashScreenModel.setSize(downloads1.size());
                 for (Download d : downloads1) {
+                    splashScreenModel.setMessage("Checking for " + d.getId());
                     if (save(d)) {
                         Logger.getLogger(Model.class.getName()).fine("Checking file size for " + d.getUrl());
                         File file = new File(d.getTempPath());
@@ -270,11 +294,16 @@ public class Model {
                             }
                         }
                     }
+                    splashScreenModel.setCurrent(splashScreenModel.getCurrent() + 1);
                 }
             }
 
             if (Model.getApplicationSettings().getStartupModel().isCheckMD5s()) {
+                splashScreenModel.setStage("Checking file MD5s...");
+                splashScreenModel.setCurrent(0);
+                splashScreenModel.setSize(downloads1.size());
                 for (Download d : downloads1) {
+                    splashScreenModel.setMessage("Checking for " + d.getId());
                     if (save(d)) {
                         File file = new File(d.getTempPath());
                         if (!file.exists()) {
@@ -285,9 +314,11 @@ public class Model {
                             d.getMD5().copy(Util.getMD5State(file));
                         }
                     }
+                    splashScreenModel.setCurrent(splashScreenModel.getCurrent() + 1);
                 }
             }
             try {
+                splashScreenModel.setStage("Loading tasks...");
                 taskSaver.loadList();
             } catch (IOException | ClassNotFoundException ex) {
                 Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
@@ -313,6 +344,8 @@ public class Model {
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            splashScreenModel.setVisible(false);
         }
     }
 }
