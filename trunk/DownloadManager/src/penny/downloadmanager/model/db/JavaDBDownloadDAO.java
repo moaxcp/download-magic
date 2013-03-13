@@ -55,6 +55,26 @@ public class JavaDBDownloadDAO implements DownloadDAO {
     @Override
     public List<Download> getDownloads() {
         List<Download> downloads = new ArrayList<Download>();
+        List<UUID> ids = getIds();
+        for (UUID id : ids) {
+            try {
+                Download d = getDownload(id);
+                if (d != null) {
+                    downloads.add(d);
+                } else {
+                    Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Could not create a Download with {0} but it is in the db.", id);
+                }
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "UUID from db \"{0}\" is not valid.", id);
+                throw new IllegalStateException("There was an Illegal Argument Exception", ex);
+            }
+        }
+        return downloads;
+    }
+
+    @Override
+    public List<UUID> getIds() {
+        List<UUID> ids = new ArrayList<UUID>();
         Connection connection = JavaDBDataSource.getInstance().getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -63,17 +83,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             ResultSet rs = statement.executeQuery(query);
 
             while (rs.next()) {
-                try {
-                    Download d = getDownload(UUID.fromString(rs.getString("ID")));
-                    if (d != null) {
-                        downloads.add(d);
-                    } else {
-                        Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "Could not create a Download with {0} but it is in the db.", rs.getString(Download.PROP_ID));
-                    }
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, "UUID from db \"{0}\" is not valid.", rs.getString(Download.PROP_ID));
-                    throw new IllegalStateException("There was an Illegal Argument Exception", ex);
-                }
+                ids.add(UUID.fromString(rs.getString("ID")));
             }
             statement.close();
         } catch (SQLException ex) {
@@ -82,7 +92,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
         } finally {
             JavaDBDataSource.getInstance().returnConnection(connection);
         }
-        return downloads;
+        return ids;
     }
 
     @Override
@@ -137,6 +147,28 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             JavaDBDataSource.getInstance().returnConnection(connection);
         }
         return d;
+    }
+    
+    @Override
+    public Object getProperty(UUID uuid, String property) {
+        Object o = null;
+        Connection connection = JavaDBDataSource.getInstance().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "select " + property + " from download where " + Download.PROP_ID + " = '" + uuid + "'";
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
+            ResultSet rs = statement.executeQuery(query);
+            if (rs.next()) {
+                o = rs.getObject(property);
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException("There was an SQL Exception", ex);
+        } finally {
+            JavaDBDataSource.getInstance().returnConnection(connection);
+        }
+        return o;
     }
 
     @Override
@@ -266,7 +298,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
             List<String> wordsDownload = download.getWords();
             List<String> remove = new ArrayList<>();
             List<String> add = new ArrayList<>();
-            
+
             Collections.copy(remove, hrefDB);
             remove.removeAll(hrefDownload);
             linkDao.deleteLinks(download.getId(), remove);
@@ -276,7 +308,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
             remove.clear();
             add.clear();
-            
+
             Collections.copy(remove, srcDB);
             remove.removeAll(srcDownload);
             linkDao.deleteLinks(download.getId(), remove);
@@ -286,7 +318,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
             remove.clear();
             add.clear();
-            
+
             Collections.copy(remove, locationsDB);
             remove.removeAll(locationsDownload);
             linkDao.deleteLinks(download.getId(), remove);
@@ -296,7 +328,7 @@ public class JavaDBDownloadDAO implements DownloadDAO {
 
             remove.clear();
             add.clear();
-            
+
             Collections.copy(remove, wordsDB);
             remove.removeAll(wordsDownload);
             linkDao.deleteLinks(download.getId(), remove);
