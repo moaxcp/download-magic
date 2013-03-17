@@ -29,6 +29,7 @@ import penny.downloadmanager.model.gui.StartupDialogModel;
 import penny.downloadmanager.model.task.DTaskData;
 import penny.downloadmanager.model.task.TaskData;
 import penny.downloadmanager.util.Util;
+import penny.downloadmanager.view.View;
 
 /**
  *
@@ -125,9 +126,10 @@ public class Model {
         return splashScreenModel;
     }
 
-    public static List<String> getDownloadProperties() {
+    public static List<String> getAllDownloadProperties() {
         List<String> list = new ArrayList<String>();
-        for (String s : mainWindowModel.getDownloadFormat().getColumns().keySet()) {
+        list.addAll(DAOFactory.getInstance().getPropertyDAO().getPropertyNames());
+        for (String s : Download.propertyNames) {
             list.add(s);
         }
         return list;
@@ -143,10 +145,10 @@ public class Model {
         settingsSaver = new ApplicationSettingsSaver("data/settings.dat");
         settingsSaver.setApplicationSettings(applicationSettings);
         settingsDialogModel.getAppSettingsCopy().copy(applicationSettings);
+        mainWindowModel = new MainWindowModel();
         addDialogModel = new AddDialogModel();
         addTaskModel = new AddTaskModel();
         taskManagerModel = new TaskManagerModel();
-        mainWindowModel = new MainWindowModel();
         downloads = (ObservableElementList<Download>) mainWindowModel.getDownloads();
         mainWindowModel.setTasks(taskManagerModel.getTasks());
         tasks = (ObservableElementList<TaskData>) taskManagerModel.getTasks();
@@ -235,6 +237,7 @@ public class Model {
             try {
                 splashScreenModel.setStage("Loading settings...");
                 settingsSaver.load();
+                
             } catch (Exception ex) {
                 Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -327,19 +330,19 @@ public class Model {
                 Model.getTasks().add(new DTaskData());
             }
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString(),
+            JOptionPane.showMessageDialog(View.getSplashScreen(), ex.toString(),
                     "SQLException",
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NullPointerException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString(),
+            JOptionPane.showMessageDialog(View.getSplashScreen(), ex.toString(),
                     "NullPointerException",
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(null, ex.toString(),
+            JOptionPane.showMessageDialog(View.getSplashScreen(), ex.toString(),
                     "Exception",
                     JOptionPane.ERROR_MESSAGE);
             Application.setShutdown(true);

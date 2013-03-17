@@ -18,7 +18,7 @@ import java.util.List;
 import javax.swing.event.SwingPropertyChangeSupport;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.model.DownloadSaver;
-import penny.downloadmanager.model.DownloadTableFormat;
+import penny.downloadmanager.view.DownloadTableFormat;
 import penny.downloadmanager.model.db.DAOFactory;
 import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.db.DownloadDAO;
@@ -47,7 +47,6 @@ public class MainWindowModel {
     private boolean running;
 
     private EventList<Download> downloads;
-    private DownloadTableFormat downloadFormat;
     private EventList<TaskData> tasks;
     private DownloadSaver downloadSaver;
 
@@ -74,8 +73,6 @@ public class MainWindowModel {
         running = false;
 
         propertySupport = new SwingPropertyChangeSupport(this, true);
-
-        downloadFormat = new DownloadTableFormat();
     }
 
     public void clearDownloads() {
@@ -215,20 +212,6 @@ public class MainWindowModel {
         TaskData oldValue = this.selectedTask;
         this.selectedTask = selectedTask;
         propertySupport.firePropertyChange(PROP_SELTASK, oldValue, selectedTask);
-    }
-
-    /**
-     * @return the downloadFormat
-     */
-    public DownloadTableFormat getDownloadFormat() {
-        return downloadFormat;
-    }
-
-    /**
-     * @param downloadFormat the downloadFormat to set
-     */
-    public void setDownloadFormat(DownloadTableFormat downloadFormat) {
-        this.downloadFormat = downloadFormat;
     }
 
     /**

@@ -10,12 +10,13 @@
  */
 package penny.downloadmanager.view;
 
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
+import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
+import ca.odell.glazedlists.swing.TableComparatorChooser;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
@@ -24,6 +25,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import penny.download.DownloadStatus;
 import penny.downloadmanager.control.MainWindowControl;
 import penny.downloadmanager.model.LookAndFeelModel;
@@ -33,39 +35,61 @@ import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.MainWindowModel;
 import penny.downloadmanager.model.task.Status;
 import penny.downloadmanager.model.task.TaskData;
+import penny.downloadmanager.view.renderer.ByteRateRenderer;
+import penny.downloadmanager.view.renderer.ByteRenderer;
+import penny.downloadmanager.view.renderer.ListRenderer;
 import penny.downloadmanager.view.renderer.ProgressRenderer;
 import penny.downloadmanager.view.renderer.TaskDataRenderer;
+import penny.downloadmanager.view.renderer.TimeRenderer;
 
 /**
  *
  * @author john
  */
-public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener, ListEventListener, ListSelectionListener {
+public class MainWindow extends javax.swing.JFrame implements PropertyChangeListener, ListSelectionListener {
 
     private EventTableModel<Download> downloadTableModel;
     private EventListModel<TaskData> taskListModel;
     private MainWindowModel mainWindowModel;
     private TaskManagerModel taskModel;
     private JMenu lookMenu;
+    private ColumnPopupMenu columnMenu;
+    private DownloadTableFormat downloadFormat;
+    private TableComparatorChooser tableSorter;
 
     public MainWindow(MainWindowModel mainWindowModel, TaskManagerModel taskModel) {
+        SortedList<Download> downloads = new SortedList(mainWindowModel.getDownloads());
         this.mainWindowModel = mainWindowModel;
         this.taskModel = taskModel;
         taskModel.addPropertyChangeListener(this);
         this.mainWindowModel.addPropertyChnageListener(this);
-        downloadTableModel = new EventTableModel<Download>(mainWindowModel.getDownloads(), mainWindowModel.getDownloadFormat());
-        mainWindowModel.getDownloads().addListEventListener(this);
+        
+        downloadFormat = new DownloadTableFormat(Model.getApplicationSettings().getColumns());
+        downloadTableModel = new EventTableModel<Download>(downloads, downloadFormat);
+        downloadFormat.setTableModel(downloadTableModel);
+        
         taskListModel = new EventListModel<TaskData>(mainWindowModel.getTasks());
-        mainWindowModel.getTasks().addListEventListener(this);
         Model.getApplicationSettings().getLookModel().addPropertyChangeListener(this);
+        
         initComponents();
+        
+        downloadFormat.setColumnModel(downloadTable.getColumnModel());
+        downloadTable.getTableHeader().addMouseListener(downloadFormat);
+        
         this.setLocationByPlatform(true);
-        ProgressRenderer prog = new ProgressRenderer(0, 100);
-        prog.setStringPainted(true);
-        downloadTable.setDefaultRenderer(JProgressBar.class, prog);
+        
+        downloadTable.setDefaultRenderer(JProgressBar.class, new ProgressRenderer(1000));
+        downloadTable.setDefaultRenderer(ByteRateRenderer.class, new ByteRateRenderer());
+        downloadTable.setDefaultRenderer(ByteRenderer.class, new ByteRenderer());
+        downloadTable.setDefaultRenderer(ListRenderer.class, new ListRenderer());
+        downloadTable.setDefaultRenderer(TimeRenderer.class, new TimeRenderer());
+        downloadTable.setDefaultRenderer(String.class, new DefaultTableCellRenderer());
+        
         downloadTable.getSelectionModel().addListSelectionListener(this);
         taskList.getSelectionModel().addListSelectionListener(this);
-
+        
+        tableSorter = TableComparatorChooser.install(downloadTable, downloads, TableComparatorChooser.MULTIPLE_COLUMN_MOUSE_WITH_UNDO, downloadFormat);
+        
         LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
         lookMenu = new JMenu("Look And Feel", false);
         ButtonGroup lookGroup = new ButtonGroup();
@@ -79,6 +103,20 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             button.setActionCommand(name);
         }
         viewMenu.add(lookMenu);
+        
+        columnMenu = new ColumnPopupMenu(downloadFormat);
+        MenuScroller.setScrollerFor(columnMenu);
+        downloadTable.getTableHeader().setComponentPopupMenu(columnMenu);
+    }
+    
+    public TableComparatorChooser getSorter() {
+        return tableSorter;
+    }
+    
+    public void initView() {
+        downloadFormat.initColumns();
+        columnMenu.initMenu();
+        tableSorter.fromString(Model.getApplicationSettings().getSortState());
     }
 
     /**
@@ -399,6 +437,8 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         applicationStartup.addActionListener(mainWindowControl);
         applicationStartup.setActionCommand(MainWindowControl.COM_APPLICATIONSTARTUP);
+        
+        tableSorter.addSortActionListener(mainWindowControl);
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
@@ -442,37 +482,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         }
     }
 
-    public void listChanged(ListEvent listChanges) {
-        EventList changeList = listChanges.getSourceList();
-
-        while (listChanges.next()) {
-            int sourceIndex = listChanges.getIndex();
-            int changeType = listChanges.getType();
-
-            switch (changeType) {
-                case ListEvent.DELETE:
-
-                    break;
-                case ListEvent.INSERT:
-                    changeList.getReadWriteLock().readLock().lock();
-                    Object obj = changeList.get(sourceIndex);
-                    changeList.getReadWriteLock().readLock().unlock();
-                    if (obj instanceof Download && mainWindowModel.getDownloadFormat().getColumns((Download) obj)) {
-                        downloadTableModel.setTableFormat(mainWindowModel.getDownloadFormat());
-                    }
-                    break;
-                case ListEvent.UPDATE:
-                    changeList.getReadWriteLock().readLock().lock();
-                    Object obj2 = changeList.get(sourceIndex);
-                    changeList.getReadWriteLock().readLock().unlock();
-                    if (obj2 instanceof Download && mainWindowModel.getDownloadFormat().getColumns((Download) obj2)) {
-                        downloadTableModel.setTableFormat(mainWindowModel.getDownloadFormat());
-                    }
-                    break;
-            }
-        }
-    }
-
+    @Override
     public void valueChanged(ListSelectionEvent e) {
 
         if (e.getSource().equals(downloadTable.getSelectionModel()) && !e.getValueIsAdjusting()) {

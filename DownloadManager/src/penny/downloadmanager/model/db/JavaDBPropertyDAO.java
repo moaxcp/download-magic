@@ -9,7 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +35,29 @@ public class JavaDBPropertyDAO implements PropertyDAO {
                 String name = rs.getString("name");
                 Object prop = rs.getObject("property");
                 props.put(name, prop);
+            }
+            statement.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalStateException("There was an SQL Exception", ex);
+        } finally {
+            JavaDBDataSource.getInstance().returnConnection(connection);
+        }
+        return props;
+    }
+    
+    @Override
+    public List<String> getPropertyNames() {
+        List<String> props = new ArrayList<String>();
+        Connection connection = JavaDBDataSource.getInstance().getConnection();
+        try {
+            Statement statement = connection.createStatement();
+            String query = "select distinct NAME from property";
+            Logger.getLogger(JavaDBDownloadDAO.class.getName()).fine(query);
+            ResultSet rs = statement.executeQuery(query);
+            while (rs.next()) {
+                String name = rs.getString("name");
+                props.add(name);
             }
             statement.close();
         } catch (SQLException ex) {
