@@ -30,7 +30,7 @@ public class EditFileFormat extends javax.swing.JDialog {
     public EditFileFormat(SettingsDialogModel settingsModel) {
         model = settingsModel;
         listModel = new javax.swing.AbstractListModel() {
-            List<String> strings = Model.getDownloadProperties();
+            List<String> strings = Model.getAllDownloadProperties();
             public int getSize() { return strings.size(); }
             public Object getElementAt(int i) { return strings.get(i); }
         };

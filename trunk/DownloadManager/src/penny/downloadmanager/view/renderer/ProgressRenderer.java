@@ -17,16 +17,21 @@ import javax.swing.table.*;
  * @author john.mercier
  */
 public class ProgressRenderer extends JProgressBar implements TableCellRenderer {
+    
+    private int max;
 
-    public ProgressRenderer(int min, int max) {
-        super(min, max);
+    public ProgressRenderer(int max) {
+        super(0, max);
+        this.max = max;
+        this.setStringPainted(true);
     }
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        int perc = (int) ((Float) value).floatValue();
-        if (perc >= 0) {
-            setValue((int) ((Float) value).floatValue());
-            this.setString(String.format("%1$.2f%2$c", ((Float) value).floatValue(), '%'));
+        int currentValue = (int) ((Double) value).doubleValue() * max;
+        double percent = ((Double) value).doubleValue() * 100;
+        if (currentValue >= 0) {
+            setValue(currentValue);
+            this.setString(String.format("%1$.2f%%", percent));
         } else {
             setValue(0);
             this.setString("unknown");

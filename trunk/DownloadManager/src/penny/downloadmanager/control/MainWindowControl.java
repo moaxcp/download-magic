@@ -54,6 +54,8 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
     public static final String COM_CLEARCOMPLETEDOWNLOADS = "clearCompleteDownloads";
     public static final String COM_CLEARERRORDOWNLOADS = "clearErrorDownloads";
     public static final String COM_APPLICATIONSTARTUP = "applicationStartup";
+    public static final String COM_SORT = "sort";
+    
     private MainWindowModel mainModel;
     private SettingsDialogModel settingsModel;
     private AddDialogModel addModel;
@@ -148,6 +150,9 @@ public class MainWindowControl implements ActionListener, WindowListener, MouseL
             mainModel.clearErrorDownloads();
         } else if (e.getActionCommand().equals(COM_APPLICATIONSTARTUP)) {
             Model.getStartupDialogModel().setVisible(true);
+        } else if(e.getActionCommand().equals(COM_SORT)) {
+            Model.getApplicationSettings().setSortState(View.getMainWindowView().getSorter().toString());
+            Model.getSettingsSaver().save();
         } else {
             LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
             if (lookModel.getLookAndFeels().containsKey(e.getActionCommand())) {

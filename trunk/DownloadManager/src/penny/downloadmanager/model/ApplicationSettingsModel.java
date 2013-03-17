@@ -4,13 +4,17 @@
  */
 package penny.downloadmanager.model;
 
-import penny.downloadmanager.model.gui.MD5ingModel;
+import penny.downloadmanager.view.ColumnStatus;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import penny.downloadmanager.model.db.Download;
 import penny.downloadmanager.model.gui.DownloadingModel;
+import penny.downloadmanager.model.gui.ImageModel;
+import penny.downloadmanager.model.gui.MD5ingModel;
 import penny.downloadmanager.model.gui.ParsingModel;
 import penny.downloadmanager.model.gui.SavingModel;
-import penny.downloadmanager.model.gui.ImageModel;
-import java.io.Serializable;
-import java.util.List;
+import penny.downloadmanager.view.renderer.ProgressRenderer;
 
 /**
  *
@@ -25,6 +29,8 @@ public class ApplicationSettingsModel implements Serializable {
     private ImageModel imageModel;
     private StartupModel startupModel;
     private LookAndFeelModel lookModel;
+    private List<ColumnStatus> columns;
+    private String sortState;
 
     public ApplicationSettingsModel() {
         savingModel = new SavingModel();
@@ -34,6 +40,16 @@ public class ApplicationSettingsModel implements Serializable {
         imageModel = new ImageModel();
         startupModel = new StartupModel();
         lookModel = new LookAndFeelModel();
+        columns = new ArrayList<ColumnStatus>();
+        int i = 0;
+        for (String s : Download.propertyNames) {
+            ColumnStatus c  = new ColumnStatus(s, true);
+            columns.add(c);
+            c.setViewOrder(i);
+            c.setVisible(true);
+            i++;
+        }
+        sortState = "";
     }
 
     public ApplicationSettingsModel(ApplicationSettingsModel appSettings) {
@@ -48,6 +64,17 @@ public class ApplicationSettingsModel implements Serializable {
         this.imageModel.copy(appSettings.getImageModel());
         this.startupModel.copy(appSettings.getStartupModel());
         this.lookModel.copy(appSettings.getLookModel());
+        for (ColumnStatus c : appSettings.getColumns()) {
+            for (ColumnStatus d : columns) {
+                if (d.getName().equals(c.getName())) {
+                    d.setViewOrder(c.getViewOrder());
+                    d.setVisible(c.isVisible());
+                    d.setWidth(c.getWidth());
+                    break;
+                }
+            }
+        }
+        this.sortState = appSettings.getSortState();
     }
 
     /**
@@ -91,8 +118,24 @@ public class ApplicationSettingsModel implements Serializable {
     public StartupModel getStartupModel() {
         return startupModel;
     }
-    
+
     public LookAndFeelModel getLookModel() {
         return lookModel;
+    }
+
+    public List<ColumnStatus> getColumns() {
+        return columns;
+    }
+
+    public void setColumns(List<ColumnStatus> list) {
+        columns = list;
+    }
+    
+    public String getSortState() {
+        return sortState;
+    }
+    
+    public void setSortState(String sortState) {
+        this.sortState = sortState;
     }
 }

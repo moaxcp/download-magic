@@ -73,6 +73,11 @@ public class View {
         return splashScreen;
     }
     
+    public static void initViewState() {
+        initLookAndFeel();
+        mainWindowView.initView();
+    }
+    
     public static void initLookAndFeel() {
         LookAndFeelModel lookModel = Model.getApplicationSettings().getLookModel();
         try {
