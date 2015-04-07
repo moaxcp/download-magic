@@ -1,0 +1,38 @@
+Create a recoverable MD5. This means an MD5 process that can be stopped and restarted without having to reprocess the source. The MD5State is serializable and may be saved at anytime.
+
+This md5 implementation is perfect for ranged protocols such as HTTP and FTP where a stream can be started in the middle of a file. It makes it easier to recover an already calculated md5 of a partial file and start the calculation over with a new ranged connection through HTTP or FTP. Otherwise users will have to recalculate the MD5 of the partial file and start the ranged connection.
+
+This project is a rewrite of fast-md5 without native support.
+
+Example with Hello World!:
+
+```
+public class Test {
+
+    public static void main(String... args) {
+        MessageDigest expected = null;
+        MD5MessageDigest test = null;
+        try {
+            expected = MessageDigest.getInstance("md5");
+            test = new MD5MessageDigest();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String message = "Hello world!";
+
+        expected.update(message.getBytes());
+        String s = new BigInteger(1, expected.digest()).toString(16);
+        if (s.length() == 31) {
+            s = "0" + s;
+        }
+        test.digest(message.getBytes());
+        System.out.println(s);
+        System.out.println(test.getState().toString());
+    }
+}
+```
+
+To get the MD5 State use getState() on the MD5MessageDigest object. The state can then be saved to a file or DB. The goal of this project is to allow the MD5 state to be recovered and used later. This is useful if you write a program that needs to be able to shutdown and start the MD5 process from where it left off.
+
+Please let me know if you find any problems!

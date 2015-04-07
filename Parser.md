@@ -1,0 +1,1 @@
+The Parser package is used by the DownloadManager to parse links and words from files. A link is anything that starts with href or src in a file. The parser takes these out of an html file or any file being parsed and sends them to the DownloadManager. Words are basically anything between special characters.
