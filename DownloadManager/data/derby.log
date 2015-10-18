@@ -1,0 +1,19 @@
+----------------------------------------------------------------
+Sat Oct 17 23:12:31 EDT 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.12.1.1 - (1704137): instance a816c00e-0150-78ef-29e5-000051442ceb 
+on database directory /home/john/projects/project-penny/DownloadManager/data/downloads with class loader sun.misc.Launcher$AppClassLoader@c387f44 
+Loaded from file:/home/john/.m2/repository/org/apache/derby/derby/10.12.1.1/derby-10.12.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_60-b27
+user.dir=/home/john/projects/project-penny/DownloadManager
+os.name=Linux
+os.arch=amd64
+os.version=4.0.5-gentoo
+derby.system.home=./data
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sat Oct 17 23:12:34 EDT 2015: Shutting down Derby engine
+----------------------------------------------------------------
+Sat Oct 17 23:12:34 EDT 2015:
+Shutting down instance a816c00e-0150-78ef-29e5-000051442ceb on database directory /home/john/projects/project-penny/DownloadManager/data/downloads with class loader sun.misc.Launcher$AppClassLoader@c387f44 
+----------------------------------------------------------------
