@@ -56,12 +56,12 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                         break;
                 }
             }
-            
-            if(addLinks.size() > 0) {
+
+            if (addLinks.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLinks, Download.HREF);
             }
-            
-            if(removeLinks.size() > 0) {
+
+            if (removeLinks.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks);
             }
         }
@@ -99,12 +99,12 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                         break;
                 }
             }
-            
-            if(addLinks.size() > 0) {
+
+            if (addLinks.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLinks, Download.SRC);
             }
-            
-            if(removeLinks.size() > 0) {
+
+            if (removeLinks.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLinks);
             }
         }
@@ -142,12 +142,12 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                         break;
                 }
             }
-            
-            if(addLocations.size() > 0) {
+
+            if (addLocations.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().addLinks(download.getId(), addLocations, Download.REDIRECT);
             }
-            
-            if(removeLocations.size() > 0) {
+
+            if (removeLocations.size() > 0) {
                 DAOFactory.getInstance().getLinkDAO().deleteLinks(download.getId(), removeLocations);
             }
         }
@@ -167,7 +167,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
             List<String> addWords = new ArrayList<String>();
             List<String> removeWords = new ArrayList<String>();
-            
+
             while (listChanges.next()) {
                 int sourceIndex = listChanges.getIndex();
                 int changeType = listChanges.getType();
@@ -240,11 +240,18 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
         md5ValuesMap = new HashMap<Download, MD5State>();
         linkStateValuesMap = new HashMap<Download, LinkState>();
-        
+
         wordSavers = new HashMap<Download, WordSaver>();
         hrefSavers = new HashMap<Download, HrefLinkSaver>();
         srcSavers = new HashMap<Download, SrcLinkSaver>();
         locationSavers = new HashMap<Download, LocationSaver>();
+
+        for (Download d : downloads) {
+            wordSavers.put(d, new WordSaver(d));
+            hrefSavers.put(d, new HrefLinkSaver(d));
+            srcSavers.put(d, new SrcLinkSaver(d));
+            locationSavers.put(d, new LocationSaver(d));
+        }
     }
 
     public boolean isSaveDelete() {
@@ -321,7 +328,6 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                         dao.deleteDownload(d1.getId());
                     }
 
-
                     WordSaver wordSaver = wordSavers.get(d1);
                     d1.removeWordsListener(wordSaver);
                     wordSavers.remove(d1);
@@ -370,7 +376,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
 
         if (saveProps.contains(evt.getPropertyName())) {
             dao.updateDownload(d, evt.getPropertyName());
-        } 
+        }
 //        else if (evt.getPropertyName().equals(Download.PROP_SRCLINKS)) {
 //            DAOFactory.getInstance().getLinkDAO().addLink(d.getId(), (String) evt.getNewValue(), Download.SRC);
 //        } else if (evt.getPropertyName().equals(Download.PROP_HREFLINKS)) {
