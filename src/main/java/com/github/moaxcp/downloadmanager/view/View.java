@@ -15,7 +15,6 @@ import javax.swing.UnsupportedLookAndFeelException;
 import com.github.moaxcp.downloadmanager.model.LookAndFeelModel;
 import com.github.moaxcp.downloadmanager.model.Model;
 import com.github.moaxcp.downloadmanager.view.add.AddDialog;
-import com.github.moaxcp.downloadmanager.view.add.AddTask;
 import com.github.moaxcp.downloadmanager.view.settings.DownloadSettingsDialog;
 import com.github.moaxcp.downloadmanager.view.settings.EditFileFormat;
 import com.github.moaxcp.downloadmanager.view.settings.StartupSettings;
@@ -26,7 +25,6 @@ import com.github.moaxcp.downloadmanager.view.settings.StartupSettings;
  */
 public class View {
     private static AddDialog addDialogView;
-    private static AddTask addTask;
     private static DownloadSettingsDialog settingsDialogView;
     private static MainWindow mainWindowView;
     private static EditFileFormat editFileFormat;
@@ -59,10 +57,6 @@ public class View {
      */
     public static EditFileFormat getEditFileFormat() {
         return editFileFormat;
-    }
-
-    public static AddTask getAddTask() {
-        return addTask;
     }
 
     public static StartupSettings getStartupSettings() {
@@ -113,7 +107,6 @@ public class View {
         Model.getSettingsDialogModel().addPropertyChangeListener(settingsDialogView);
         addDialogView = new AddDialog(Model.getAddDialogModel());
         mainWindowView = new MainWindow(Model.getMainWindowModel(), Model.getTaskManagerModel());
-        addTask = new AddTask();
         startupSettings = new StartupSettings(Model.getStartupDialogModel());
         splashScreen = new SplashScreen();
         Model.getSplashScreenModel().addPropertyChangeListener(splashScreen);

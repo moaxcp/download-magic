@@ -68,7 +68,6 @@ public class Control {
         View.getAddDialogView().addWindowListener(addDialogControl);
         View.getMainWindowView().registerController(mainWindowControl);
         addTaskControl = new AddTaskControl(Model.getAddTaskModel(), Model.getMainWindowModel());
-        View.getAddTask().registerController(addTaskControl);
         startupControl = new StartupSettingsControl(Model.getStartupDialogModel());
         View.getStartupSettings().registerController(startupControl);
     }
