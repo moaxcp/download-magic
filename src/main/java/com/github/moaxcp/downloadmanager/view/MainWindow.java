@@ -15,8 +15,6 @@ import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
@@ -33,13 +31,11 @@ import com.github.moaxcp.downloadmanager.model.Model;
 import com.github.moaxcp.downloadmanager.model.TaskManagerModel;
 import com.github.moaxcp.downloadmanager.model.db.Download;
 import com.github.moaxcp.downloadmanager.model.gui.MainWindowModel;
-import com.github.moaxcp.downloadmanager.model.task.Status;
 import com.github.moaxcp.downloadmanager.model.task.TaskData;
 import com.github.moaxcp.downloadmanager.view.renderer.ByteRateRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ByteRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ListRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ProgressRenderer;
-import com.github.moaxcp.downloadmanager.view.renderer.TaskDataRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.TimeRenderer;
 
 /**
