@@ -47,7 +47,6 @@ public class Model {
     private static ObservableElementList<TaskData> tasks;
     private static DownloadSaver downloadSaver;
     private static ApplicationSettingsSaver settingsSaver;
-    private static TaskSaver taskSaver;
     private static StartupDialogModel startupDialogModel;
     private static SplashScreenModel splashScreenModel;
 
@@ -135,10 +134,6 @@ public class Model {
         return list;
     }
 
-    public static TaskSaver getTaskSaver() {
-        return taskSaver;
-    }
-
     public static void build() {
         settingsDialogModel = new SettingsDialogModel();
         applicationSettings = settingsDialogModel.getAppSettings();
@@ -152,7 +147,6 @@ public class Model {
         downloads = (ObservableElementList<Download>) mainWindowModel.getDownloads();
         mainWindowModel.setTasks(taskManagerModel.getTasks());
         tasks = (ObservableElementList<TaskData>) taskManagerModel.getTasks();
-        taskSaver = new TaskSaver(tasks);
         startupDialogModel = new StartupDialogModel();
         startupDialogModel.setStartupModel(applicationSettings.getStartupModel());
         splashScreenModel = new SplashScreenModel();
@@ -319,12 +313,6 @@ public class Model {
                     }
                     splashScreenModel.setCurrent(splashScreenModel.getCurrent() + 1);
                 }
-            }
-            try {
-                splashScreenModel.setStage("Loading tasks...");
-                taskSaver.loadList();
-            } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (Model.getTasks().size() == 0) {
                 Model.getTasks().add(new DTaskData());

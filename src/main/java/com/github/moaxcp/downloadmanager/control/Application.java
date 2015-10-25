@@ -59,13 +59,6 @@ public class Application {
 
             @Override
             public void run() {
-                try {
-                    Model.getTaskSaver().saveList();
-                    System.out.println("saved tasks");
-                } catch (Exception ex) {
-                    System.out.println("could not save tasks");
-                    ex.printStackTrace();
-                }
 
                 try {
                     Model.getDownloadSaver().saveAllDownloads();

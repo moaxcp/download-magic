@@ -8,7 +8,6 @@ package com.github.moaxcp.downloadmanager.control;
 import com.github.moaxcp.downloadmanager.model.gui.AddTaskModel;
 import com.github.moaxcp.downloadmanager.model.gui.MainWindowModel;
 import com.github.moaxcp.downloadmanager.model.task.DTaskData;
-import com.github.moaxcp.downloadmanager.model.task.LinkToDownloadTaskData;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -34,8 +33,6 @@ public class AddTaskControl implements ActionListener {
         if(e.getActionCommand().equals(COM_OK)) {
             if(addTaskModel.getSelectedTask().equals(AddTaskModel.TaskList.DOWNLOAD)) {
                 mainModel.getTasks().add(new DTaskData());
-            } else if(addTaskModel.getSelectedTask().equals(AddTaskModel.TaskList.LinkToDownload)) {
-                mainModel.getTasks().add(new LinkToDownloadTaskData());
             }
             addTaskModel.setVisible(false);
         } else if(e.getActionCommand().equals(COM_CANCEL)) {

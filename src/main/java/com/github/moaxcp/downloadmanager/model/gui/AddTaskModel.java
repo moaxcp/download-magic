@@ -14,8 +14,7 @@ import javax.swing.event.SwingPropertyChangeSupport;
  */
 public class AddTaskModel {
     public static enum TaskList {
-        DOWNLOAD("Download"),
-        LinkToDownload("Link To Download");
+        DOWNLOAD("Download");
 
         private String name;
 

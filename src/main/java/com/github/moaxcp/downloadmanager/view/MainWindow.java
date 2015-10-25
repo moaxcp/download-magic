@@ -15,8 +15,6 @@ import ca.odell.glazedlists.swing.EventListModel;
 import ca.odell.glazedlists.swing.EventTableModel;
 import ca.odell.glazedlists.swing.TableComparatorChooser;
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.ButtonGroup;
@@ -33,13 +31,11 @@ import com.github.moaxcp.downloadmanager.model.Model;
 import com.github.moaxcp.downloadmanager.model.TaskManagerModel;
 import com.github.moaxcp.downloadmanager.model.db.Download;
 import com.github.moaxcp.downloadmanager.model.gui.MainWindowModel;
-import com.github.moaxcp.downloadmanager.model.task.Status;
 import com.github.moaxcp.downloadmanager.model.task.TaskData;
 import com.github.moaxcp.downloadmanager.view.renderer.ByteRateRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ByteRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ListRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.ProgressRenderer;
-import com.github.moaxcp.downloadmanager.view.renderer.TaskDataRenderer;
 import com.github.moaxcp.downloadmanager.view.renderer.TimeRenderer;
 
 /**
@@ -86,7 +82,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         downloadTable.setDefaultRenderer(String.class, new DefaultTableCellRenderer());
         
         downloadTable.getSelectionModel().addListSelectionListener(this);
-        taskList.getSelectionModel().addListSelectionListener(this);
         
         tableSorter = TableComparatorChooser.install(downloadTable, downloads, TableComparatorChooser.MULTIPLE_COLUMN_MOUSE_WITH_UNDO, downloadFormat);
         
@@ -136,11 +131,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
         addDownloadButton = new javax.swing.JButton();
         removeDownloadButton = new javax.swing.JButton();
         queueDownloadButton = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        addTaskButton = new javax.swing.JButton();
-        removeTaskButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        taskList = new javax.swing.JList();
         stopButton = new javax.swing.JButton();
         startButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -203,44 +193,10 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(removeDownloadButton)
                     .addComponent(queueDownloadButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Downloads", jPanel2);
-
-        addTaskButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/moaxcp/downloadmanager/resources/16x16/actions/list-add.png"))); // NOI18N
-        addTaskButton.setText("Add");
-
-        removeTaskButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/moaxcp/downloadmanager/resources/16x16/actions/list-remove.png"))); // NOI18N
-        removeTaskButton.setText("Remove");
-        removeTaskButton.setEnabled(false);
-
-        taskList.setModel(taskListModel);
-        taskList.setCellRenderer(new TaskDataRenderer(taskList));
-        jScrollPane1.setViewportView(taskList);
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(addTaskButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(removeTaskButton)
-                .addGap(372, 372, 372))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(addTaskButton)
-                    .addComponent(removeTaskButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 283, Short.MAX_VALUE))
-        );
-
-        jTabbedPane1.addTab("Task Manager", jPanel3);
 
         stopButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/github/moaxcp/downloadmanager/resources/16x16/actions/media-playback-stop.png"))); // NOI18N
         stopButton.setText("Stop");
@@ -330,7 +286,7 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                     .addComponent(startButton)
                     .addComponent(stopButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -340,7 +296,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JMenuItem aboutMenu;
     private javax.swing.JButton addDownloadButton;
     private javax.swing.JMenuItem addDownloadMenu;
-    private javax.swing.JButton addTaskButton;
     private javax.swing.JMenuItem applicationStartup;
     private javax.swing.JMenuItem clearCompleteDownloadsMenu;
     private javax.swing.JMenuItem clearDownloadsMenu;
@@ -356,19 +311,15 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPopupMenu jPopupMenu1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton queueDownloadButton;
     private javax.swing.JCheckBoxMenuItem randomChangesMenu;
     private javax.swing.JButton removeDownloadButton;
-    private javax.swing.JButton removeTaskButton;
     private javax.swing.JMenuItem settingsMenu;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
-    private javax.swing.JList taskList;
     private javax.swing.JMenuItem testConnectionMenu;
     private javax.swing.JMenu viewMenu;
     // End of variables declaration//GEN-END:variables
@@ -393,12 +344,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         queueDownloadButton.addActionListener(mainWindowControl);
         queueDownloadButton.setActionCommand(MainWindowControl.COM_QUEUEDOWNLOAD);
-
-        addTaskButton.addActionListener(mainWindowControl);
-        addTaskButton.setActionCommand(MainWindowControl.COM_ADDTASK);
-
-        removeTaskButton.addActionListener(mainWindowControl);
-        removeTaskButton.setActionCommand(MainWindowControl.COM_REMOVETASK);
 
         randomChangesMenu.addActionListener(mainWindowControl);
         randomChangesMenu.setActionCommand(MainWindowControl.COM_RANDOM);
@@ -460,8 +405,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
             }
         } else if (evt.getPropertyName().equals(Download.PROP_STATUS)) {
             downloadStatus(((Download) evt.getSource()).getStatus());
-        } else if (evt.getPropertyName().equals(TaskData.PROP_STATUS)) {
-            taskStatus(((TaskData) evt.getSource()).getStatus());
         } else if (evt.getPropertyName().equals(TaskManagerModel.PROP_RUNNING)) {
             if (evt.getNewValue().equals(Boolean.TRUE)) {
                 startButton.setEnabled(false);
@@ -494,14 +437,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
                 removeDownloadButton.setEnabled(false);
                 queueDownloadButton.setEnabled(false);
             }
-        } else if (e.getSource().equals(taskList.getSelectionModel()) && !e.getValueIsAdjusting()) {
-            int i = taskList.getSelectedIndex();
-            if (i >= 0) {
-                mainWindowModel.setSelectedTask(mainWindowModel.getTasks().get(i));
-                taskStatus(mainWindowModel.getSelectedTask().getStatus());
-            } else {
-                removeTaskButton.setEnabled(false);
-            }
         }
     }
 
@@ -516,14 +451,6 @@ public class MainWindow extends javax.swing.JFrame implements PropertyChangeList
 
         if (ds == DownloadStatus.QUEUED) {
             queueDownloadButton.setEnabled(false);
-        }
-    }
-
-    public void taskStatus(Status ts) {
-        if (ts == Status.RUNNING) {
-            removeTaskButton.setEnabled(false);
-        } else {
-            removeTaskButton.setEnabled(true);
         }
     }
 }
