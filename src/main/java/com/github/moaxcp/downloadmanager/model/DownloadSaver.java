@@ -135,7 +135,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                         removeLocations.add(listChanges.getOldValue());
                         break;
                     case ListEvent.INSERT:
-                        addLocations.add(download.getSrcLinks().get(sourceIndex));
+                        addLocations.add(download.getLocations().get(sourceIndex));
                         break;
                     case ListEvent.UPDATE:
 
@@ -335,7 +335,7 @@ public class DownloadSaver implements ListEventListener<Download>, PropertyChang
                     srcSavers.remove(d1);
 
                     LocationSaver locationSaver = locationSavers.get(d1);
-                    d1.removeSrcLinksListener(locationSaver);
+                    d1.removeLocationsListener(locationSaver);
                     locationSavers.remove(d1);
                     break;
                 case ListEvent.INSERT:
